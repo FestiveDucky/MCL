@@ -3,17 +3,17 @@
 
 
 // ---------- Field bounds (inches) ----------
-constexpr float X_MIN = -70.25f;
-constexpr float X_MAX = 70.25f;  // set to your coordinate system
-constexpr float Y_MIN = -70.25f;
-constexpr float Y_MAX = 70.25f;
+constexpr float X_MIN = -70.75f;
+constexpr float X_MAX = 70.75f;  // set to your coordinate system
+constexpr float Y_MIN = -70.75f;
+constexpr float Y_MAX = 70.75f;
 
 // ---------- Distance sensor validity ----------
-constexpr float Z_MIN = 2.0f;     // min reliable range (in)
+constexpr float Z_MIN = 1.0f;     // min reliable range (in)
 constexpr float Z_MAX = 70.0f;    // max reliable range (in)
 
 // ---------- Likelihood model tuning ----------
-constexpr float SIGMA_D = 5.0f;   // distance measurement std dev (in)
+constexpr float SIGMA_D = 4.0f;   // distance measurement std dev (in)
 constexpr float P_FLOOR = 1e-2f;
 
 constexpr float W_HIT   = 0.90f; // Only for Gaussian
@@ -73,9 +73,10 @@ void Particle::adjustPose(float x, float y, float sigmaXY) {
     
     addError(sigmaXY);
     
-    if (pose_.x > 70.25 || pose_.x < -70.25 || pose_.y > 70.25 || pose_.y < -70.25) {
-        pose_.x = sampleUniformSymmetric(-70.25, 70.25);
-        pose_.y = sampleUniformSymmetric(-70.25, 70.25);
+    float wallDist = 70.75;
+    if (pose_.x > wallDist || pose_.x < -wallDist || pose_.y > wallDist || pose_.y < -wallDist) {
+        pose_.x = sampleUniformSymmetric(-wallDist, wallDist);
+        pose_.y = sampleUniformSymmetric(-wallDist, wallDist);
     }
 }
 

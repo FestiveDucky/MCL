@@ -1,7 +1,7 @@
 #include "main.h"
 #include "lemlib/chassis/chassis.hpp"
 
-lemlib::MCLSettings settings(100);
+lemlib::MCLSettings settings(500);
 
 pros::MotorGroup left_motor_group({-11, 12, -13}, pros::MotorGears::blue);
 pros::MotorGroup right_motor_group({18, -19, 20}, pros::MotorGears::blue);

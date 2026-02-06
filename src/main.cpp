@@ -33,9 +33,11 @@ void initialize() {
         while (true) {
 			lemlib::Pose poseMCL = chassis.getPose();
 			lemlib::Pose poseOLD = lemlib::getOldPose();
+			std::uint32_t calculationTime = lemlib::getCalculationTime();
 			pros::lcd::print(0, "MCL X: %f Y: %f", poseMCL.x, poseMCL.y);
 			pros::lcd::print(1, "Theta: %f", poseMCL.theta);
 			pros::lcd::print(2, "OLD X: %f Y: %f", poseOLD.x, poseOLD.y);
+			pros::lcd::print(3, "Calculation Time: %d", calculationTime);
             // sc.showInfoLabel(position.c_str());
             pros::delay(100); 
         }
@@ -108,18 +110,19 @@ void autonomous() {
  */
 void opcontrol() {
 	// sc.state = RobotState::DRIVER;
+	// chassis.setPose(-13, -47, -90);
 	//sc.hideSelector();
 
 	// right9ball();	
 	// test();
 	skills();
+	
 
 	//right();
 	descore.set_value(true);
 	
 	
 	while (true) {
-
 		// Potentiometer test 
 		// int at = potentiometer.get_value();
 		// pros::lcd::print(3, "Potentiometer Value: %d", at);

@@ -66,6 +66,8 @@ void init();
 
 void initParticles();
 
+std::uint32_t getCalculationTime();
+
 static double effectiveSampleSize(const std::vector<Particle>& particles);
 static std::vector<Particle> systematicResample(const std::vector<Particle>& particles);
 static std::pair<float, float> weightedMeanXY(const std::vector<Particle>& particles);

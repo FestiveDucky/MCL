@@ -26,6 +26,8 @@ lemlib::Pose odomSpeed(0, 0, 0); // the speed of the robot
 lemlib::Pose odomLocalSpeed(0, 0, 0); // the local speed of the robot
 lemlib::MCLSettings mclSettings(0); 
 lemlib::Pose oldOdomPoseCalculation(-48, -48, 0);
+std::uint32_t updateStartTime = 0;
+std::uint32_t updateTime = 0;
 std::uint32_t prev_time = 0;
 // pros::Mutex mclPoseMtx;
 // pros::Mutex oldPoseMtx;
@@ -49,6 +51,10 @@ float prevHorizontal = 0;
 float prevHorizontal1 = 0;
 float prevHorizontal2 = 0;
 float prevImu = 0;
+
+std::uint32_t lemlib::getCalculationTime() {
+    return updateTime;
+}
 
 void lemlib::setMCLSettings(lemlib::MCLSettings settings) {
     mclSettings = settings;
@@ -105,6 +111,8 @@ lemlib::Pose lemlib::estimatePose(float time, bool radians) {
 }
 
 void lemlib::update() {
+    updateStartTime = pros::micros();
+
     // get the current sensor values
     float vertical1Raw = 0;
     float vertical2Raw = 0;
@@ -220,12 +228,11 @@ void lemlib::update() {
     if (shouldDoSensor) {
         prev_time = pros::millis();
         // 2) Sensor update: update particle weights
-         float zF = front_distance.get() / 25.4;
-         float zL = left_distance.get() / 25.4;
-         float zR = right_distance.get() / 25.4;
+        float zF = front_distance.get() / 25.4;
+        float zL = left_distance.get() / 25.4;
+        float zR = right_distance.get() / 25.4;
     
         for (auto& p : particles) {
-            
             p.sensorUpdate(zF, zL, zR, heading);
         }
         
@@ -277,6 +284,8 @@ void lemlib::update() {
     odomLocalSpeed.x = ema(localX / 0.01, odomLocalSpeed.x, 0.95);
     odomLocalSpeed.y = ema(localY / 0.01, odomLocalSpeed.y, 0.95);
     odomLocalSpeed.theta = ema(deltaHeading / 0.01, odomLocalSpeed.theta, 0.95);
+
+    updateTime = pros::micros() - updateStartTime;
 }
 
 static std::pair<float, float> lemlib::weightedMeanXY(const std::vector<Particle>& particles) {

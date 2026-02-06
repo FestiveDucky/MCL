@@ -329,6 +329,7 @@ struct MoveToPointParams {
         /** distance between the robot and target point where the movement will exit. Only has an effect if minSpeed is
          * non-zero.*/
         float earlyExitRange = 0;
+        bool headingCorrection = true;
 };
 
 // default drive curve

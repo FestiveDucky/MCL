@@ -23,17 +23,24 @@
 
 void skills() {
     chassis.setPose(-13, -47, -90);
-
-    int scraperDist = 70;
-
     descore.set_value(true);
+
+    int scraperDist = 66;
+    int scraperTimeout = 3000;
+    float matchLoaderSpeed = 50;
+    int scraperDelay = 1500;
+    int scoreDelay = 2000;
+
+    // First match loader
     chassis.moveToPoint(-46.5, -48, 2000, {}, false);
     chassis.turnToPoint(-46.5, -scraperDist, 800, {}, false);
     scraper_piston.toggle();
     pros::delay(300);
     bottom_intake.move(127);
-    chassis.moveToPoint(-46.5, -scraperDist, 1800, {.maxSpeed=45},false);
-    pros::delay(1800);
+    chassis.moveToPoint(-46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
+    pros::delay(scraperDelay);
+
+    // Move through tunnel
     chassis.moveToPoint(-46.5, -47, 800, {.forwards = false, .maxSpeed=50},false);
     chassis.turnToPoint(-61.5, -36, 600,{.forwards = false},false);
     chassis.moveToPoint(-61.5, -36, 800,{.forwards = false, .maxSpeed = 50},false);
@@ -41,59 +48,115 @@ void skills() {
     chassis.moveToPoint(-61.5, 36, 2000,{.forwards = false, .maxSpeed = 70},false);
     chassis.turnToPoint(-48, 36,800, {},false);
     chassis.moveToPoint(-48, 36, 800, {.maxSpeed = 70}, false);
+
+    // Score first 6 balls
     chassis.turnToPoint(-48, 24, 800, {.forwards = false}, false);
     chassis.moveToPoint(-48, 24, 800, {.forwards = false}, false);
 	top_score.set_value(false);
     top_intake.move(127);
     bottom_intake.move(127);
-    pros::delay(1800);
+    pros::delay(scoreDelay);
     top_intake.move(0);
     bottom_intake.move(0);
     top_score.set_value(true);
-    chassis.moveToPoint(-46.5, scraperDist, 1800, {.maxSpeed=45}, false);
+
+    // Second match loader
     bottom_intake.move(127);
-    pros::delay(1600);
+    chassis.moveToPoint(-46.5, scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed}, false);
+    pros::delay(scraperDelay);
+    
+    // Score second set of 6 balls
     chassis.moveToPoint(-48, 24, 1500, {.forwards = false,.maxSpeed = 40}, false);
     top_score.set_value(false);
     top_intake.move(127);
-    pros::delay(1800);
+    pros::delay(scoreDelay);
     top_intake.move(0);
     bottom_intake.move(0);
     top_score.set_value(true);
+    
+    // Move across field 
     chassis.moveToPoint(-48, 36, 900, {}, false);
     chassis.turnToPoint(46.5, 36, 800,{},false);
     chassis.moveToPoint(46.5, 36, 2500,{},false);
+
+    // Third match loader
     chassis.turnToPoint(46.5, scraperDist, 800, {}, false);
-    chassis.moveToPoint(46.5, scraperDist, 1800,{},false);
     bottom_intake.move(127);
-    pros::delay(1600);
-    chassis.moveToPoint(46.5, 47, 1000,{.forwards=false, .maxSpeed=50}, false);
+    chassis.moveToPoint(46.5, scraperDist, scraperTimeout,{.maxSpeed=matchLoaderSpeed},false);
+    pros::delay(scraperDelay);
+
+    // Move through tunnel
+    chassis.moveToPoint(46.5, 47, 800,{.forwards=false, .maxSpeed=50}, false);
     chassis.turnToPoint(61.5, 36, 600,{.forwards = false},false);
     chassis.moveToPoint(61.5, 36, 800,{.forwards = false, .maxSpeed = 50},false);
     chassis.turnToPoint(61.5, -36, 800,{.forwards = false},false);
     chassis.moveToPoint(61.5, -36, 2000,{.forwards = false, .maxSpeed = 70},false);
-    chassis.turnToPoint(48, -36,800, {},false);
+    chassis.turnToPoint(48, -36, 800, {},false);
     chassis.moveToPoint(48, -36, 800, {.maxSpeed = 70}, false);
+
+    // Score third set of 6 balls
     chassis.turnToPoint(48, -24, 800, {.forwards = false}, false);
     chassis.moveToPoint(48, -24, 800, {.forwards = false}, false);
 	top_score.set_value(false);
     top_intake.move(127);
     bottom_intake.move(127);
-    pros::delay(1800);
+    pros::delay(scoreDelay);
     top_intake.move(0);
     bottom_intake.move(0);
     top_score.set_value(true);
+
+    // Fourth match loader
+    bottom_intake.move(127);
+    chassis.moveToPoint(46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed}, false);
+
+    pros::delay(scraperDelay);
     
+    // Score fourth set of 6 balls
+    chassis.moveToPoint(48, -24, 1500, {.forwards = false,.maxSpeed = 40}, false);
+    top_score.set_value(false);
+    top_intake.move(127);
+    pros::delay(scoreDelay);
+    top_intake.move(0);
+    bottom_intake.move(0);
+    top_score.set_value(true);
 
+    // Get first set of 4 center balls
+    chassis.moveToPoint(48, -48, 1000, {}, false);
+    chassis.turnToPoint(18, -18, 800, {}, false);
+    scraper_piston.toggle();
+    bottom_intake.move(127);
+    chassis.moveToPoint(18, -18, 1500, {.maxSpeed=40}, false);
 
+    // Get Second set of 4 center balls
+    chassis.turnToPoint(-30, -24, 800, {}, false);
+    chassis.moveToPoint(-30, -24, 3000, {.maxSpeed=40}, false);
+    pros::delay(700);
+    bottom_intake.move(0);
 
+    // Turn to middle and score
+    chassis.moveToPoint(-24, -24, 1000, {.forwards = false}, false);
+    chassis.turnToPoint(-8, -8, 800, {.forwards = false}, false);
+    chassis.moveToPoint(-8, -8, 1000, {.forwards = false, .maxSpeed=60, .headingCorrection=false}, false);
+    // chassis.turnToPoint(0, 0, 800, {.forwards = false}, false);
 
+    scraper_piston.toggle();
+    bottom_intake.move(-50);
+    top_intake.move(-50);
+    pros::delay(1000);
+    middlescore_piston.set_value(true);
+	bottom_intake.move(127);
+	top_intake.move(127);
+    pros::delay(scoreDelay + 10000);
+    top_intake.move(0);
+    bottom_intake.move(0);
+    middlescore_piston.set_value(false);
+    scraper_piston.toggle();
 
-    
+    // Move to park zone and Park
+    chassis.moveToPoint(-48, -48, 1200, {}, false);
+    chassis.turnToPoint(-17, -60, 800, {}, false);
+    chassis.moveToPose(-17, -60, 90, 2000, {}, false);
 
-    
-
-    
 
 
 }
