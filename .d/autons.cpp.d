@@ -677,7 +677,7 @@ bin/autons.cpp.o: src/autons.cpp include/main.h include/api.h \
  include/lemlib/logger/telemetrySink.hpp include/pros/apix.h \
  include/api.h include/pros/device.h include/pros/serial.h \
  include/pros/serial.hpp include/devices.h include/main.h \
- include/intake.h
+ include/lemlib/chassis/odom.hpp include/particle.h include/intake.h
 include/main.h:
 include/api.h:
 include/pros/adi.h:
@@ -1445,4 +1445,6 @@ include/pros/serial.h:
 include/pros/serial.hpp:
 include/devices.h:
 include/main.h:
+include/lemlib/chassis/odom.hpp:
+include/particle.h:
 include/intake.h:

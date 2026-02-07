@@ -67,6 +67,8 @@ void init();
 void initParticles();
 
 std::uint32_t getCalculationTime();
+std::uint32_t getConfidence();
+void toggleMCL();
 
 static double effectiveSampleSize(const std::vector<Particle>& particles);
 static std::vector<Particle> systematicResample(const std::vector<Particle>& particles);

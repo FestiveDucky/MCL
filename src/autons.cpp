@@ -1,5 +1,6 @@
 #include "main.h"
 #include "devices.h"
+#include "lemlib/chassis/odom.hpp"
 #include "intake.h"
 
 // void distanceResetLeft() {
@@ -135,6 +136,10 @@ void skills() {
 
     // Turn to middle and score
     chassis.moveToPoint(-24, -24, 1000, {.forwards = false}, false);
+    
+    pros::delay(1000);
+    lemlib::toggleMCL();
+
     chassis.turnToPoint(-8, -8, 800, {.forwards = false}, false);
     chassis.moveToPoint(-8, -8, 1000, {.forwards = false, .maxSpeed=60, .headingCorrection=false}, false);
     // chassis.turnToPoint(0, 0, 800, {.forwards = false}, false);
@@ -146,12 +151,13 @@ void skills() {
     middlescore_piston.set_value(true);
 	bottom_intake.move(127);
 	top_intake.move(127);
-    pros::delay(scoreDelay + 10000);
+    pros::delay(scoreDelay + 1000);
     top_intake.move(0);
     bottom_intake.move(0);
     middlescore_piston.set_value(false);
     scraper_piston.toggle();
 
+    lemlib::toggleMCL();
     // Move to park zone and Park
     chassis.moveToPoint(-48, -48, 1200, {}, false);
     chassis.turnToPoint(-17, -60, 800, {}, false);

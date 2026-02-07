@@ -29,6 +29,8 @@ lemlib::Pose oldOdomPoseCalculation(-48, -48, 0);
 std::uint32_t updateStartTime = 0;
 std::uint32_t updateTime = 0;
 std::uint32_t prev_time = 0;
+std::uint32_t frontConf = 0;
+bool paused = false;
 // pros::Mutex mclPoseMtx;
 // pros::Mutex oldPoseMtx;
 
@@ -51,6 +53,14 @@ float prevHorizontal = 0;
 float prevHorizontal1 = 0;
 float prevHorizontal2 = 0;
 float prevImu = 0;
+
+void lemlib::toggleMCL() {
+    paused = !paused;
+}
+
+std::uint32_t lemlib::getConfidence() {
+    return frontConf;
+}
 
 std::uint32_t lemlib::getCalculationTime() {
     return updateTime;
@@ -213,7 +223,13 @@ void lemlib::update() {
     
     const float deltaS = std::hypot(dxField, dyField);
     const float deltaT = std::fabs(deltaHeading);
-    const float sigmaXY = SIGMA0_XY + K_DIST_XY * deltaS + K_TURN_XY * deltaT;
+    float sigmaXY;
+    if (paused) {
+        // Only add minor amounts of error to positions if we are paused
+        sigmaXY = SIGMA0_XY;
+    } else {
+        sigmaXY = SIGMA0_XY + K_DIST_XY * deltaS + K_TURN_XY * deltaT;
+    }
     
     // 1) Motion update: move every particle
     for (auto& p : particles) {
@@ -224,13 +240,19 @@ void lemlib::update() {
     // TODO -> if robot rotates in place this never executes add a delta heading value
     // Possibly sensor update once every 0.5s even if we standing still to prevent particles from spreading out too much
     // const bool shouldDoSensor = (deltaS > 0.01f) || (pros::millis() - prev_time > 200);
-    const bool shouldDoSensor = 1;
+    const bool shouldDoSensor = !paused;
     if (shouldDoSensor) {
         prev_time = pros::millis();
         // 2) Sensor update: update particle weights
         float zF = front_distance.get() / 25.4;
         float zL = left_distance.get() / 25.4;
         float zR = right_distance.get() / 25.4;
+
+        int cF = front_distance.get_confidence();
+        // int cL = left_distance.get_confidence();
+        // int cR = right_distance.get_confidence();
+
+        frontConf = cF;
     
         for (auto& p : particles) {
             p.sensorUpdate(zF, zL, zR, heading);

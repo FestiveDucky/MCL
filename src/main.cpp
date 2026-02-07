@@ -34,10 +34,12 @@ void initialize() {
 			lemlib::Pose poseMCL = chassis.getPose();
 			lemlib::Pose poseOLD = lemlib::getOldPose();
 			std::uint32_t calculationTime = lemlib::getCalculationTime();
+			std::int32_t confidenceFront = lemlib::getConfidence();
 			pros::lcd::print(0, "MCL X: %f Y: %f", poseMCL.x, poseMCL.y);
 			pros::lcd::print(1, "Theta: %f", poseMCL.theta);
 			pros::lcd::print(2, "OLD X: %f Y: %f", poseOLD.x, poseOLD.y);
 			pros::lcd::print(3, "Calculation Time: %d", calculationTime);
+			pros::lcd::print(4, "Front Sensor Confidence: %d", confidenceFront);
             // sc.showInfoLabel(position.c_str());
             pros::delay(100); 
         }
@@ -110,12 +112,12 @@ void autonomous() {
  */
 void opcontrol() {
 	// sc.state = RobotState::DRIVER;
-	// chassis.setPose(-13, -47, -90);
 	//sc.hideSelector();
 
 	// right9ball();	
 	// test();
 	skills();
+	// chassis.setPose(-48, -48, 0);
 	
 
 	//right();
