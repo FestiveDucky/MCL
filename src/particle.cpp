@@ -6,9 +6,9 @@
 // ---------- Feature toggles ----------
 constexpr bool MCL_CLAMP_OOB_PARTICLES = true;     // #1
 constexpr bool MCL_PENALIZE_OOB_PARTICLES = true;  // #1
-constexpr float OOB_WEIGHT_MULT = 1e-3f;
+constexpr double OOB_WEIGHT_MULT = 1e-3;
 
-constexpr bool MCL_USE_FIELD_MARGIN = false;       // #3
+constexpr bool MCL_USE_FIELD_MARGIN = true;       // #3
 constexpr float FIELD_MARGIN_IN = 5.5f;            // Half of track width
 
 constexpr bool MCL_USE_SENSOR_CONFIDENCE = true;   // #4
@@ -19,6 +19,10 @@ constexpr float NO_HIT_PENALTY = 0.05f;
 
 // ---------- Field bounds (inches) ----------
 constexpr float FIELD_HALF = 70.75f;
+constexpr float WALL_X_MIN = -FIELD_HALF;
+constexpr float WALL_X_MAX = FIELD_HALF;
+constexpr float WALL_Y_MIN = -FIELD_HALF;
+constexpr float WALL_Y_MAX = FIELD_HALF;
 constexpr float ACTIVE_FIELD_MARGIN = MCL_USE_FIELD_MARGIN ? FIELD_MARGIN_IN : 0.0f;
 constexpr float X_MIN = -FIELD_HALF + ACTIVE_FIELD_MARGIN;
 constexpr float X_MAX = FIELD_HALF - ACTIVE_FIELD_MARGIN;
@@ -30,8 +34,8 @@ constexpr float Z_MIN = 0.1f;     // min reliable range (in)
 constexpr float Z_MAX = 85.0f;    // max reliable range (in)
 
 // ---------- Likelihood model tuning ----------
-constexpr float SIGMA_D = 4.0f;   // distance measurement std dev (in)
-constexpr float P_FLOOR = 1e-2f;
+constexpr float SIGMA_D = 10.0f;   // distance measurement std dev (in)
+constexpr double P_FLOOR = 1e-4;
 
 constexpr float W_HIT = 0.90f; // Only for Gaussian
 constexpr float W_RAND = 1 - W_HIT; // Only for Gaussian
@@ -76,8 +80,8 @@ static inline float confidenceToUnit(int conf) {
     return clampf(static_cast<float>(conf) / SENSOR_CONF_MAX, 0.0f, 1.0f);
 }
 
-Particle::Particle(lemlib::Pose p, float w) : pose_(p.x, p.y, p.theta), weight_(w) {}
-Particle::Particle() : pose_(0.0, 0.0, 0.0), weight_(1) {}
+Particle::Particle(lemlib::Pose p, double w) : pose_(p.x, p.y, p.theta), weight_(w) {}
+Particle::Particle() : pose_(0.0, 0.0, 0.0), weight_(1.0) {}
 
 void Particle::addError(float sigma) {
     // Normal Dist
@@ -100,9 +104,10 @@ void Particle::adjustPose(float x, float y, float sigmaXY) {
             pose_.x = clampf(pose_.x, X_MIN, X_MAX);
             pose_.y = clampf(pose_.y, Y_MIN, Y_MAX);
             if (MCL_PENALIZE_OOB_PARTICLES) {
-                weight_ = std::max(weight_ * OOB_WEIGHT_MULT, 1e-10f);
+                weight_ = std::max(weight_ * OOB_WEIGHT_MULT, 1e-12);
             }
         } else {
+            // My old code
             pose_.x = sampleUniformSymmetric(X_MIN, X_MAX);
             pose_.y = sampleUniformSymmetric(Y_MIN, Y_MAX);
         }
@@ -130,42 +135,44 @@ static inline void sensorOriginField(float xr, float yr,
 static float raycastToFieldWalls(float x0, float y0, float dx, float dy) {
     float bestT = INFINITY;
 
-    // ---- Vertical walls x = X_MIN and x = X_MAX ----
+    // Raycast uses true wall coordinates (not margin-shrunk particle bounds).
+    // Predicted sensor distances should correspond to physical field walls.
+    // ---- Vertical walls x = WALL_X_MIN and x = WALL_X_MAX ----
     if (std::fabs(dx) > 1e-6f) {
-        // x = X_MIN
+        // x = WALL_X_MIN
         {
-            float t = (X_MIN - x0) / dx;
+            float t = (WALL_X_MIN - x0) / dx;
             if (t >= 0.0f) {
                 float y = y0 + t * dy;
-                if (inRange(y, Y_MIN, Y_MAX)) bestT = std::min(bestT, t);
+                if (inRange(y, WALL_Y_MIN, WALL_Y_MAX)) bestT = std::min(bestT, t);
             }
         }
-        // x = X_MAX
+        // x = WALL_X_MAX
         {
-            float t = (X_MAX - x0) / dx;
+            float t = (WALL_X_MAX - x0) / dx;
             if (t >= 0.0f) {
                 float y = y0 + t * dy;
-                if (inRange(y, Y_MIN, Y_MAX)) bestT = std::min(bestT, t);
+                if (inRange(y, WALL_Y_MIN, WALL_Y_MAX)) bestT = std::min(bestT, t);
             }
         }
     }
 
-    // ---- Horizontal walls y = Y_MIN and y = Y_MAX ----
+    // ---- Horizontal walls y = WALL_Y_MIN and y = WALL_Y_MAX ----
     if (std::fabs(dy) > 1e-6f) {
-        // y = Y_MIN
+        // y = WALL_Y_MIN
         {
-            float t = (Y_MIN - y0) / dy;
+            float t = (WALL_Y_MIN - y0) / dy;
             if (t >= 0.0f) {
                 float x = x0 + t * dx;
-                if (inRange(x, X_MIN, X_MAX)) bestT = std::min(bestT, t);
+                if (inRange(x, WALL_X_MIN, WALL_X_MAX)) bestT = std::min(bestT, t);
             }
         }
-        // y = Y_MAX
+        // y = WALL_Y_MAX
         {
-            float t = (Y_MAX - y0) / dy;
+            float t = (WALL_Y_MAX - y0) / dy;
             if (t >= 0.0f) {
                 float x = x0 + t * dx;
-                if (inRange(x, X_MIN, X_MAX)) bestT = std::min(bestT, t);
+                if (inRange(x, WALL_X_MIN, WALL_X_MAX)) bestT = std::min(bestT, t);
             }
         }
     }
@@ -173,26 +180,26 @@ static float raycastToFieldWalls(float x0, float y0, float dx, float dy) {
     return bestT;
 }
 
-static inline float distanceLikelihood(float e) {
+static inline double distanceLikelihood(float e) {
     const float inv2sig2 = 1.0f / (2.0f * SIGMA_D * SIGMA_D);
     const float pHit = std::exp(-(e * e) * inv2sig2);
     const float pRand = 1.0f / Z_MAX;
 
-    float p = W_HIT * pHit + W_RAND * pRand;
+    const double p = static_cast<double>(W_HIT * pHit + W_RAND * pRand);
     return std::max(p, P_FLOOR);
 }
 
-static inline float likelihoodTriangle(float e) {
+static inline double likelihoodTriangle(float e) {
     const float b = 1.73205080757f * SIGMA_D;
 
     // Avoid divide by zero if sigma_d is accidentally 0
     if (b <= 1e-6f) return 1.0f;
 
-    const float t = 1.0f - (std::fabs(e) / b);
-    return std::max(P_FLOOR, std::max(0.0f, t));
+    const double t = 1.0 - (std::fabs(e) / b);
+    return std::max(P_FLOOR, std::max(0.0, t));
 }
 
-static inline float likelihoodUniformWindow(float e) {
+static inline double likelihoodUniformWindow(float e) {
     const float b = 1.73205080757f * SIGMA_D;
 
     // Inside window -> strong match
@@ -217,7 +224,7 @@ void Particle::sensorUpdate(float zF, float zL, float zR, float headingRad, int 
     const float x = pose_.x;
     const float y = pose_.y;
 
-    float wMult = 1.0f;
+    double wMult = 1.0;
 
     auto updateOne = [&](bool valid, bool noHit, float z, float xOff, float yOff, float phi, int conf) {
         if (!valid && !noHit) return;
@@ -235,13 +242,13 @@ void Particle::sensorUpdate(float zF, float zL, float zR, float headingRad, int 
         const float zHat = raycastToFieldWalls(sx, sy, dx, dy);
         if (!std::isfinite(zHat)) return;
 
-        float prob = 1.0f;
+        double prob = 1.0;
         if (valid) {
             const float e = z - zHat;
             prob = likelihoodTriangle(e);
         } else {
             // "No hit": penalize particles that expected a wall in range.
-            prob = (zHat <= Z_MAX) ? NO_HIT_PENALTY : 1.0f;
+            prob = (zHat <= Z_MAX) ? NO_HIT_PENALTY : 1.0;
         }
 
         if (MCL_USE_SENSOR_CONFIDENCE) {
@@ -258,5 +265,5 @@ void Particle::sensorUpdate(float zF, float zL, float zR, float headingRad, int 
     updateOne(vR, nR, zR, RIGHT_X_OFF, RIGHT_Y_OFF, PHI_RIGHT, cR);
 
     weight_ *= wMult;
-    weight_ = std::max(weight_, 1e-10f);
+    weight_ = std::max(weight_, 1e-12f);
 }

@@ -51,13 +51,20 @@ constexpr float MAX_DELTA_S_FOR_NOISE = 3.0f;
 constexpr bool MCL_CLAMP_SIGMA_XY = true;          // #7
 constexpr float MAX_SIGMA_XY = 1.50f;
 
-enum class MclPoseEstimateMode {
-    WeightedMean,
-    Map,
-    TrimmedMean
-};
-constexpr MclPoseEstimateMode MCL_POSE_MODE = MclPoseEstimateMode::TrimmedMean; // #6
-constexpr float MCL_TRIMMED_KEEP_FRACTION = 0.20f; // #6
+// Pose estimator: mean-shift -> optional Huber refinement -> adaptive EMA.
+constexpr float EST_MS_BANDWIDTH = 4.0f;
+constexpr int EST_MS_ITERS = 6;
+constexpr float EST_MS_EPS_STOP = 0.1f;
+constexpr bool EST_USE_HUBER_REFINEMENT = true;
+constexpr int EST_HUBER_ITERS = 3;
+constexpr float EST_HUBER_GATE_MULT = 2.0f;
+constexpr float EST_HUBER_DELTA_MULT = 0.5f;
+constexpr float EST_ALPHA_MIN = 0.25f;
+constexpr float EST_ALPHA_MAX = 0.93f;
+constexpr float EST_SIGMA_LO = 1.5f;
+constexpr float EST_SIGMA_HI = 7.0f;
+constexpr float EST_JUMP_THRESH = 10.0f;
+constexpr float EST_ALPHA_JUMP = 0.92f;
 
 std::vector<Particle> particles; // The possible robot poses
 
@@ -258,6 +265,8 @@ void lemlib::update() {
     // Possibly sensor update once every 0.5s even if we standing still to prevent particles from spreading out too much
     // const bool shouldDoSensor = (deltaS > 0.01f) || (pros::millis() - prev_time > 200);
     const bool shouldDoSensor = !paused;
+    float estX = odomPose.x;
+    float estY = odomPose.y;
     if (shouldDoSensor) {
         prev_time = pros::millis();
         // 2) Sensor update: update particle weights
@@ -277,6 +286,11 @@ void lemlib::update() {
         
         // 3) Normalize weights
         normalizeWeights(particles);
+
+        // Estimate pose from the posterior BEFORE resampling resets weights.
+        auto [preResampleX, preResampleY] = weightedMeanXY(particles);
+        estX = preResampleX;
+        estY = preResampleY;
         
         // 4) Neff check -> resample if needed
         const double Neff = effectiveSampleSize(particles);
@@ -294,12 +308,14 @@ void lemlib::update() {
     } else {
         // If you did not do sensor update, keep weights as-is (often uniform).
         // You could optionally skip resampling entirely here (recommended).
+        auto [noSensorX, noSensorY] = weightedMeanXY(particles);
+        estX = noSensorX;
+        estY = noSensorY;
     }
     
-    // 5) Get weighted mean of particle positions
-    auto [meanX, meanY] = weightedMeanXY(particles);
-    odomPose.x = meanX;
-    odomPose.y = meanY;
+    // 5) Apply filtered estimate
+    odomPose.x = estX;
+    odomPose.y = estY;
     odomPose.theta = heading;
     
     // OLD calculate global x and y
@@ -328,78 +344,121 @@ void lemlib::update() {
 }
 
 static std::pair<float, float> lemlib::weightedMeanXY(const std::vector<Particle>& particles) {
-    if (particles.empty()) return {0.0f, 0.0f};
+    if (particles.empty()) return {odomPose.x, odomPose.y};
 
-    if (MCL_POSE_MODE == MclPoseEstimateMode::Map) {
-        const auto bestIt = std::max_element(
-            particles.begin(), particles.end(),
-            [](const Particle& a, const Particle& b) { return a.weight_ < b.weight_; });
-        return {bestIt->pose_.x, bestIt->pose_.y};
-    }
+    // Seed from the previous filtered estimate to stay on the same mode.
+    const double seedX = odomPose.x;
+    const double seedY = odomPose.y;
+    double muX = seedX;
+    double muY = seedY;
 
-    if (MCL_POSE_MODE == MclPoseEstimateMode::TrimmedMean) {
-        const size_t N = particles.size();
-        const size_t keepCount = std::max<size_t>(1, static_cast<size_t>(N * MCL_TRIMMED_KEEP_FRACTION));
-
-        std::vector<size_t> idx(N);
-        for (size_t i = 0; i < N; i++) idx[i] = i;
-
-        if (keepCount < N) {
-            std::nth_element(
-                idx.begin(), idx.begin() + keepCount, idx.end(),
-                [&](size_t a, size_t b) { return particles[a].weight_ > particles[b].weight_; });
-        }
-
+    // 1) Mean-shift with Epanechnikov kernel (no sqrt in inner loop).
+    const double h = EST_MS_BANDWIDTH;
+    const double h2 = h * h;
+    const double epsStop2 = EST_MS_EPS_STOP * EST_MS_EPS_STOP;
+    for (int k = 0; k < EST_MS_ITERS; k++) {
         double sumW = 0.0;
         double sumX = 0.0;
         double sumY = 0.0;
-        for (size_t i = 0; i < keepCount; i++) {
-            const Particle& p = particles[idx[i]];
-            const double w = p.weight_;
-            sumW += w;
-            sumX += w * p.pose_.x;
-            sumY += w * p.pose_.y;
-        }
 
-        if (sumW <= 1e-12) {
-            sumX = 0.0;
-            sumY = 0.0;
-            for (size_t i = 0; i < keepCount; i++) {
-                const Particle& p = particles[idx[i]];
-                sumX += p.pose_.x;
-                sumY += p.pose_.y;
-            }
-            const double invK = 1.0 / static_cast<double>(keepCount);
-            return {static_cast<float>(sumX * invK), static_cast<float>(sumY * invK)};
-        }
-
-        return {static_cast<float>(sumX / sumW), static_cast<float>(sumY / sumW)};
-    }
-
-    double sumW = 0.0;
-    double sumX = 0.0;
-    double sumY = 0.0;
-
-    for (const auto& p : particles) {
-        const double w = p.weight_;
-        sumW += w;
-        sumX += w * p.pose_.x;
-        sumY += w * p.pose_.y;
-    }
-
-    if (sumW <= 1e-12) {
-        // Degenerate fallback: unweighted mean
-        sumX = 0.0;
-        sumY = 0.0;
         for (const auto& p : particles) {
-            sumX += p.pose_.x;
-            sumY += p.pose_.y;
+            const double dx = p.pose_.x - muX;
+            const double dy = p.pose_.y - muY;
+            const double r2 = dx * dx + dy * dy;
+
+            const double t = 1.0 - (r2 / h2);
+            if (t <= 0.0) continue;
+
+            const double wk = p.weight_ * t;
+            sumW += wk;
+            sumX += wk * p.pose_.x;
+            sumY += wk * p.pose_.y;
         }
-        const double invN = 1.0 / std::max<size_t>(1, particles.size());
-        return {static_cast<float>(sumX * invN), static_cast<float>(sumY * invN)};
+
+        // Empty neighborhood: do not jump.
+        if (sumW <= 1e-12) return {static_cast<float>(seedX), static_cast<float>(seedY)};
+
+        const double nextX = sumX / sumW;
+        const double nextY = sumY / sumW;
+        const double ddx = nextX - muX;
+        const double ddy = nextY - muY;
+        muX = nextX;
+        muY = nextY;
+        if ((ddx * ddx + ddy * ddy) <= epsStop2) break;
     }
 
-    return {static_cast<float>(sumX / sumW), static_cast<float>(sumY / sumW)};
+    // 2) Optional Huber local refinement to reduce tail/outlier pull.
+    double robustX = muX;
+    double robustY = muY;
+    if (EST_USE_HUBER_REFINEMENT) {
+        const double rGate = EST_HUBER_GATE_MULT * h;
+        const double rGate2 = rGate * rGate;
+        const double delta = EST_HUBER_DELTA_MULT * h;
+        const double delta2 = delta * delta;
+
+        for (int k = 0; k < EST_HUBER_ITERS; k++) {
+            double sumW = 0.0;
+            double sumX = 0.0;
+            double sumY = 0.0;
+
+            for (const auto& p : particles) {
+                const double dx = p.pose_.x - robustX;
+                const double dy = p.pose_.y - robustY;
+                const double r2 = dx * dx + dy * dy;
+                if (r2 > rGate2) continue;
+                if (p.weight_ <= 0.0) continue;
+
+                // Huber influence: mean-like near center, downweights large residuals.
+                double hub = 1.0;
+                if (r2 > delta2) {
+                    const double r = std::sqrt(r2);
+                    hub = (r > 1e-12) ? (delta / r) : 1.0;
+                }
+
+                const double ww = p.weight_ * hub;
+                sumW += ww;
+                sumX += ww * p.pose_.x;
+                sumY += ww * p.pose_.y;
+            }
+
+            if (sumW <= 1e-12) break;
+
+            const double nextX = sumX / sumW;
+            const double nextY = sumY / sumW;
+            const double ddx = nextX - robustX;
+            const double ddy = nextY - robustY;
+            robustX = nextX;
+            robustY = nextY;
+            if ((ddx * ddx + ddy * ddy) <= 1e-4) break;
+        }
+    }
+
+    // 3) Adaptive EMA smoothing based on local spread around robust estimate.
+    const double varGate = 2.0 * h;
+    const double varGate2 = varGate * varGate;
+    double sumWVar = 0.0;
+    double sumR2 = 0.0;
+    for (const auto& p : particles) {
+        const double dx = p.pose_.x - robustX;
+        const double dy = p.pose_.y - robustY;
+        const double r2 = dx * dx + dy * dy;
+        if (r2 > varGate2) continue;
+        sumWVar += p.weight_;
+        sumR2 += p.weight_ * r2;
+    }
+
+    // sigma is RMS local spread (inches); larger sigma => more smoothing.
+    const double sigma = (sumWVar > 1e-12) ? std::sqrt(sumR2 / sumWVar) : EST_SIGMA_HI;
+    const double t = std::max(0.0, std::min(1.0, (sigma - EST_SIGMA_LO) / (EST_SIGMA_HI - EST_SIGMA_LO)));
+    double alpha = EST_ALPHA_MIN + t * (EST_ALPHA_MAX - EST_ALPHA_MIN);
+
+    // Innovation gate: suppress one-frame jumps.
+    const double innovation = std::hypot(robustX - seedX, robustY - seedY);
+    if (innovation > EST_JUMP_THRESH) alpha = std::max(alpha, static_cast<double>(EST_ALPHA_JUMP));
+
+    const double estX = alpha * seedX + (1.0 - alpha) * robustX;
+    const double estY = alpha * seedY + (1.0 - alpha) * robustY;
+    return {static_cast<float>(estX), static_cast<float>(estY)};
 }
 
 
@@ -409,29 +468,29 @@ static std::vector<Particle> lemlib::systematicResample(const std::vector<Partic
     out.reserve(N);
 
     // Build CDF
-    std::vector<float> cdf(N);
-    float cum = 0.0f;
+    std::vector<double> cdf(N);
+    double cum = 0.0;
     for (int i = 0; i < N; i++) {
         cum += particles[i].weight_;
         cdf[i] = cum;
     }
     // Ensure last is exactly 1 (helps with floating point edge cases)
-    cdf[N - 1] = 1.0f;
+    cdf[N - 1] = 1.0;
 
     // One random offset r in [0, 1/N)
     // TODO check if we can reuse the particle random device
     static thread_local std::mt19937 rng{std::random_device{}()};
-    std::uniform_real_distribution<float> unif(0.0f, 1.0f / N);
-    const float r = unif(rng);
+    std::uniform_real_distribution<double> unif(0.0, 1.0 / N);
+    const double r = unif(rng);
 
     int i = 0;
     for (int k = 0; k < N; k++) {
-        const float u = r + (static_cast<float>(k) / N);
+        const double u = r + (static_cast<double>(k) / N);
 
         while (i < N - 1 && u > cdf[i]) i++;
 
         out.push_back(particles[i]);     // copy particle i
-        out.back().weight_ = 1.0f / N;   // reset weight after resampling
+        out.back().weight_ = 1.0 / N;   // reset weight after resampling
     }
 
     return out;
@@ -453,13 +512,13 @@ static void lemlib::normalizeWeights(std::vector<Particle>& particles) {
 
     if (sumW <= 1e-12) {
         // Degenerate case: reset to uniform
-        const float w = 1.0f / static_cast<float>(particles.size());
+        const double w = 1.0 / static_cast<double>(particles.size());
         for (auto& p : particles) p.weight_ = w;
         return;
     }
 
     const double invSum = 1.0 / sumW;
-    for (auto& p : particles) p.weight_ = static_cast<float>(p.weight_ * invSum);
+    for (auto& p : particles) p.weight_ = p.weight_ * invSum;
 }
 
 void lemlib::init() {
@@ -479,7 +538,7 @@ void lemlib::initParticles() {
     particles.reserve(mclSettings.particleCount);
     
     for (int i = 0; i < mclSettings.particleCount; ++i) {
-        particles.emplace_back(odomPose, 1.0f / mclSettings.particleCount);
+        particles.emplace_back(odomPose, 1.0 / static_cast<double>(mclSettings.particleCount));
         particles[i].addError(MAX_START_POS_ERROR_IN / 3.0f);
     }
 }
