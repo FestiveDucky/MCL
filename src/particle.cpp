@@ -1,23 +1,40 @@
 #include "particle.h"
+#include <algorithm>
+#include <cmath>
 #include <random>
 
+// ---------- Feature toggles ----------
+constexpr bool MCL_CLAMP_OOB_PARTICLES = true;     // #1
+constexpr bool MCL_PENALIZE_OOB_PARTICLES = true;  // #1
+constexpr float OOB_WEIGHT_MULT = 1e-3f;
+
+constexpr bool MCL_USE_FIELD_MARGIN = false;       // #3
+constexpr float FIELD_MARGIN_IN = 5.5f;            // Half of track width
+
+constexpr bool MCL_USE_SENSOR_CONFIDENCE = true;   // #4
+constexpr float SENSOR_CONF_MAX = 63.0f;
+
+constexpr bool MCL_USE_NO_HIT_MODEL = true;        // #5
+constexpr float NO_HIT_PENALTY = 0.05f;
 
 // ---------- Field bounds (inches) ----------
-constexpr float X_MIN = -70.75f;
-constexpr float X_MAX = 70.75f;  // set to your coordinate system
-constexpr float Y_MIN = -70.75f;
-constexpr float Y_MAX = 70.75f;
+constexpr float FIELD_HALF = 70.75f;
+constexpr float ACTIVE_FIELD_MARGIN = MCL_USE_FIELD_MARGIN ? FIELD_MARGIN_IN : 0.0f;
+constexpr float X_MIN = -FIELD_HALF + ACTIVE_FIELD_MARGIN;
+constexpr float X_MAX = FIELD_HALF - ACTIVE_FIELD_MARGIN;
+constexpr float Y_MIN = -FIELD_HALF + ACTIVE_FIELD_MARGIN;
+constexpr float Y_MAX = FIELD_HALF - ACTIVE_FIELD_MARGIN;
 
 // ---------- Distance sensor validity ----------
-constexpr float Z_MIN = 1.0f;     // min reliable range (in)
-constexpr float Z_MAX = 70.0f;    // max reliable range (in)
+constexpr float Z_MIN = 0.1f;     // min reliable range (in)
+constexpr float Z_MAX = 85.0f;    // max reliable range (in)
 
 // ---------- Likelihood model tuning ----------
 constexpr float SIGMA_D = 4.0f;   // distance measurement std dev (in)
 constexpr float P_FLOOR = 1e-2f;
 
-constexpr float W_HIT   = 0.90f; // Only for Gaussian
-constexpr float W_RAND  = 1-W_HIT; // Only for Gaussian
+constexpr float W_HIT = 0.90f; // Only for Gaussian
+constexpr float W_RAND = 1 - W_HIT; // Only for Gaussian
 
 // ---------- Sensor mounting: robot frame offsets (inches) ----------
 // Convention: robot frame x = right, y = forward.
@@ -25,21 +42,18 @@ constexpr float W_RAND  = 1-W_HIT; // Only for Gaussian
 constexpr float FRONT_X_OFF = -4.75f;
 constexpr float FRONT_Y_OFF = 7.0f;
 
-constexpr float LEFT_X_OFF  = -4.75f;
-constexpr float LEFT_Y_OFF  = 1.3f;
+constexpr float LEFT_X_OFF = -4.75f;
+constexpr float LEFT_Y_OFF = 1.3f;
 
 constexpr float RIGHT_X_OFF = 5.0f;
 constexpr float RIGHT_Y_OFF = 2.75f;
 
 // Sensor directions relative to robot forward
 constexpr float PHI_FRONT = 0.0f;
-constexpr float PHI_LEFT  = -static_cast<float>(M_PI) / 2.0f;
+constexpr float PHI_LEFT = -static_cast<float>(M_PI) / 2.0f;
 constexpr float PHI_RIGHT = static_cast<float>(M_PI) / 2.0f;
 
-
-static thread_local std::mt19937 rng{
-    static_cast<uint32_t>(std::random_device{}())
-};
+static thread_local std::mt19937 rng{static_cast<uint32_t>(std::random_device{}())};
 
 static inline float sampleGaussian(float sigma) {
     static thread_local std::normal_distribution<float> dist;
@@ -53,16 +67,24 @@ static inline float sampleUniformSymmetric(float a, float b) {
     return dist(rng);
 }
 
-Particle::Particle(lemlib::Pose p, float w): pose_(p.x, p.y, p.theta), weight_(w) {};
-Particle::Particle(): pose_(0.0, 0.0, 0.0), weight_(1) {};
+static inline float clampf(float v, float lo, float hi) {
+    return std::max(lo, std::min(v, hi));
+}
 
+static inline float confidenceToUnit(int conf) {
+    if (!MCL_USE_SENSOR_CONFIDENCE) return 1.0f;
+    return clampf(static_cast<float>(conf) / SENSOR_CONF_MAX, 0.0f, 1.0f);
+}
+
+Particle::Particle(lemlib::Pose p, float w) : pose_(p.x, p.y, p.theta), weight_(w) {}
+Particle::Particle() : pose_(0.0, 0.0, 0.0), weight_(1) {}
 
 void Particle::addError(float sigma) {
     // Normal Dist
     // pose_.x += sampleGaussian(sigma);
     // pose_.y += sampleGaussian(sigma);
-    
-    const float r = 1.73205080757 * sigma;
+
+    const float r = 1.73205080757f * sigma;
     pose_.x += sampleUniformSymmetric(-r, r);
     pose_.y += sampleUniformSymmetric(-r, r);
 }
@@ -70,20 +92,26 @@ void Particle::addError(float sigma) {
 void Particle::adjustPose(float x, float y, float sigmaXY) {
     pose_.x += x;
     pose_.y += y;
-    
+
     addError(sigmaXY);
-    
-    float wallDist = 70.75;
-    if (pose_.x > wallDist || pose_.x < -wallDist || pose_.y > wallDist || pose_.y < -wallDist) {
-        pose_.x = sampleUniformSymmetric(-wallDist, wallDist);
-        pose_.y = sampleUniformSymmetric(-wallDist, wallDist);
+
+    if (pose_.x > X_MAX || pose_.x < X_MIN || pose_.y > Y_MAX || pose_.y < Y_MIN) {
+        if (MCL_CLAMP_OOB_PARTICLES) {
+            pose_.x = clampf(pose_.x, X_MIN, X_MAX);
+            pose_.y = clampf(pose_.y, Y_MIN, Y_MAX);
+            if (MCL_PENALIZE_OOB_PARTICLES) {
+                weight_ = std::max(weight_ * OOB_WEIGHT_MULT, 1e-10f);
+            }
+        } else {
+            pose_.x = sampleUniformSymmetric(X_MIN, X_MAX);
+            pose_.y = sampleUniformSymmetric(Y_MIN, Y_MAX);
+        }
     }
 }
 
 static inline bool inRange(float v, float lo, float hi) {
     return (v >= lo && v <= hi);
 }
-
 
 static inline void sensorOriginField(float xr, float yr,
                                      float x, float y, float headingRad,
@@ -97,16 +125,11 @@ static inline void sensorOriginField(float xr, float yr,
     sy = y - sh * xr + ch * yr;
 }
 
-
 // Raycast from (x0,y0) in direction (dx,dy) to rectangle boundary.
 // Returns smallest valid t >= 0 (distance).
 static float raycastToFieldWalls(float x0, float y0, float dx, float dy) {
     float bestT = INFINITY;
 
-    //Theta = 0, Sensor Angle: -1.570796, X: 46.601833, Y: -61.172958, Reading: 9.015748, Prediction: 9.095260, Prob: 0.990819
-    // dx = cos(-pi/2) = 0, dy = sin(-pi/2) = -1
-    // dx should be -1
-    
     // ---- Vertical walls x = X_MIN and x = X_MAX ----
     if (std::fabs(dx) > 1e-6f) {
         // x = X_MIN
@@ -160,17 +183,17 @@ static inline float distanceLikelihood(float e) {
 }
 
 static inline float likelihoodTriangle(float e) {
-    const float b = 1.73205080757 * SIGMA_D;
+    const float b = 1.73205080757f * SIGMA_D;
 
     // Avoid divide by zero if sigma_d is accidentally 0
     if (b <= 1e-6f) return 1.0f;
 
-    const float t = 1.0f - (std::fabs(e) / b);   // 82% of values fall within [0, b] with sqrt(3) * b being the maximum value
+    const float t = 1.0f - (std::fabs(e) / b);
     return std::max(P_FLOOR, std::max(0.0f, t));
 }
 
 static inline float likelihoodUniformWindow(float e) {
-    const float b = 1.73205080757 * SIGMA_D; // window half-width
+    const float b = 1.73205080757f * SIGMA_D;
 
     // Inside window -> strong match
     if (std::fabs(e) <= b) return 1.0f;
@@ -179,56 +202,61 @@ static inline float likelihoodUniformWindow(float e) {
     return P_FLOOR;
 }
 
+void Particle::sensorUpdate(float zF, float zL, float zR, float headingRad, int cF, int cL, int cR) {
+    const bool vF = inRange(zF, Z_MIN, Z_MAX);
+    const bool vL = inRange(zL, Z_MIN, Z_MAX);
+    const bool vR = inRange(zR, Z_MIN, Z_MAX);
 
-void Particle::sensorUpdate(float zF, float zL, float zR, float headingRad) {
-    bool vF = inRange(zF, Z_MIN, Z_MAX);
-    bool vL = inRange(zL, Z_MIN, Z_MAX);
-    bool vR = inRange(zR, Z_MIN, Z_MAX);
-    
-    // If no valid sensors, we learn nothing → do nothing
-    if (!vF && !vL && !vR) return;
-    
-    // 2) Pull particle position (x_i, y_i)
+    const bool nF = MCL_USE_NO_HIT_MODEL && std::isfinite(zF) && (zF > Z_MAX);
+    const bool nL = MCL_USE_NO_HIT_MODEL && std::isfinite(zL) && (zL > Z_MAX);
+    const bool nR = MCL_USE_NO_HIT_MODEL && std::isfinite(zR) && (zR > Z_MAX);
+
+    // If no usable sensors, we learn nothing.
+    if (!vF && !vL && !vR && !nF && !nL && !nR) return;
+
     const float x = pose_.x;
     const float y = pose_.y;
-    
-    // 3) Multiply likelihood contributions from each valid sensor
+
     float wMult = 1.0f;
-    
-    auto updateOne = [&](bool valid, float z, float xOff, float yOff, float phi) {
-        if (!valid) return;
-    
-        // 3a) Compute the sensor origin in field coordinates
+
+    auto updateOne = [&](bool valid, bool noHit, float z, float xOff, float yOff, float phi, int conf) {
+        if (!valid && !noHit) return;
+
+        // Sensor origin in field coordinates.
         float sx, sy;
         sensorOriginField(xOff, yOff, x, y, headingRad, sx, sy);
-    
-        // 3b) Compute the ray direction in field coordinates
+
+        // Sensor ray direction in field coordinates.
         const float a = headingRad + phi;
         const float dx = std::sin(a);
         const float dy = std::cos(a);
-    
-        // 3c) Predict measurement = distance to nearest wall along that ray
-        const float zHat = raycastToFieldWalls(sx, sy, dx, dy);
-    
-        // If particle is outside the field or ray fails, ignore this sensor for this particle
-        if (!std::isfinite(zHat)) return;
-    
-        // 3d) Convert measurement error to likelihood
-        const float e = z - zHat;
-        const float prob = likelihoodTriangle(e);
-        // printf("Angle: %f, Sensor Angle: %f, X: %f, Y: %f, Reading: %f, Prediction: %f, Prob: %f\n", headingRad, phi, sx, sy, z, zHat, prob);
-        wMult *=  prob; // NOTE: Can be replaced with the other likelihoods.
 
+        // Predicted distance to nearest wall.
+        const float zHat = raycastToFieldWalls(sx, sy, dx, dy);
+        if (!std::isfinite(zHat)) return;
+
+        float prob = 1.0f;
+        if (valid) {
+            const float e = z - zHat;
+            prob = likelihoodTriangle(e);
+        } else {
+            // "No hit": penalize particles that expected a wall in range.
+            prob = (zHat <= Z_MAX) ? NO_HIT_PENALTY : 1.0f;
+        }
+
+        if (MCL_USE_SENSOR_CONFIDENCE) {
+            // Blend toward neutral likelihood when confidence is low.
+            const float conf01 = confidenceToUnit(conf);
+            prob = conf01 * prob + (1.0f - conf01);
+        }
+
+        wMult *= std::max(prob, P_FLOOR);
     };
-    
-    // Apply each sensor
-    updateOne(vF, zF, FRONT_X_OFF, FRONT_Y_OFF, PHI_FRONT);
-    updateOne(vL, zL, LEFT_X_OFF,  LEFT_Y_OFF,  PHI_LEFT);
-    updateOne(vR, zR, RIGHT_X_OFF, RIGHT_Y_OFF, PHI_RIGHT);
-    
-    // 4) Apply multiplier to the particle's weight
+
+    updateOne(vF, nF, zF, FRONT_X_OFF, FRONT_Y_OFF, PHI_FRONT, cF);
+    updateOne(vL, nL, zL, LEFT_X_OFF, LEFT_Y_OFF, PHI_LEFT, cL);
+    updateOne(vR, nR, zR, RIGHT_X_OFF, RIGHT_Y_OFF, PHI_RIGHT, cR);
+
     weight_ *= wMult;
-    
-    // Keep weights in a sane numeric range
     weight_ = std::max(weight_, 1e-10f);
 }

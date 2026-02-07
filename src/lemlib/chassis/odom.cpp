@@ -6,6 +6,7 @@
 #include <math.h>
 #include <random>
 #include <cmath>
+#include <algorithm>
 #include "pros/rtos.hpp"
 #include "lemlib/util.hpp"
 #include "lemlib/chassis/odom.hpp"
@@ -43,6 +44,20 @@ constexpr float SIGMA0_XY = 0.05f; // base noise (in)
 constexpr float K_DIST_XY = 0.50f; // in of std dev per in traveled
 constexpr float K_TURN_XY = 0.20f; // in of std dev per rad turned
 constexpr float MAX_START_POS_ERROR_IN = 2.0f; // Within this error 99.7% of the time (For the normal dist setting), o.w. just within +-this range for uniform
+
+// ---------- Feature toggles ----------
+constexpr bool MCL_CLAMP_DELTA_S_FOR_NOISE = true; // #7
+constexpr float MAX_DELTA_S_FOR_NOISE = 3.0f;
+constexpr bool MCL_CLAMP_SIGMA_XY = true;          // #7
+constexpr float MAX_SIGMA_XY = 1.50f;
+
+enum class MclPoseEstimateMode {
+    WeightedMean,
+    Map,
+    TrimmedMean
+};
+constexpr MclPoseEstimateMode MCL_POSE_MODE = MclPoseEstimateMode::TrimmedMean; // #6
+constexpr float MCL_TRIMMED_KEEP_FRACTION = 0.20f; // #6
 
 std::vector<Particle> particles; // The possible robot poses
 
@@ -223,12 +238,14 @@ void lemlib::update() {
     
     const float deltaS = std::hypot(dxField, dyField);
     const float deltaT = std::fabs(deltaHeading);
+    const float deltaSForNoise = MCL_CLAMP_DELTA_S_FOR_NOISE ? std::min(deltaS, MAX_DELTA_S_FOR_NOISE) : deltaS;
     float sigmaXY;
     if (paused) {
         // Only add minor amounts of error to positions if we are paused
         sigmaXY = SIGMA0_XY;
     } else {
-        sigmaXY = SIGMA0_XY + K_DIST_XY * deltaS + K_TURN_XY * deltaT;
+        sigmaXY = SIGMA0_XY + K_DIST_XY * deltaSForNoise + K_TURN_XY * deltaT;
+        if (MCL_CLAMP_SIGMA_XY) sigmaXY = std::min(sigmaXY, MAX_SIGMA_XY);
     }
     
     // 1) Motion update: move every particle
@@ -249,13 +266,13 @@ void lemlib::update() {
         float zR = right_distance.get() / 25.4;
 
         int cF = front_distance.get_confidence();
-        // int cL = left_distance.get_confidence();
-        // int cR = right_distance.get_confidence();
+        int cL = left_distance.get_confidence();
+        int cR = right_distance.get_confidence();
 
         frontConf = cF;
     
         for (auto& p : particles) {
-            p.sensorUpdate(zF, zL, zR, heading);
+            p.sensorUpdate(zF, zL, zR, heading, cF, cL, cR);
         }
         
         // 3) Normalize weights
@@ -311,6 +328,54 @@ void lemlib::update() {
 }
 
 static std::pair<float, float> lemlib::weightedMeanXY(const std::vector<Particle>& particles) {
+    if (particles.empty()) return {0.0f, 0.0f};
+
+    if (MCL_POSE_MODE == MclPoseEstimateMode::Map) {
+        const auto bestIt = std::max_element(
+            particles.begin(), particles.end(),
+            [](const Particle& a, const Particle& b) { return a.weight_ < b.weight_; });
+        return {bestIt->pose_.x, bestIt->pose_.y};
+    }
+
+    if (MCL_POSE_MODE == MclPoseEstimateMode::TrimmedMean) {
+        const size_t N = particles.size();
+        const size_t keepCount = std::max<size_t>(1, static_cast<size_t>(N * MCL_TRIMMED_KEEP_FRACTION));
+
+        std::vector<size_t> idx(N);
+        for (size_t i = 0; i < N; i++) idx[i] = i;
+
+        if (keepCount < N) {
+            std::nth_element(
+                idx.begin(), idx.begin() + keepCount, idx.end(),
+                [&](size_t a, size_t b) { return particles[a].weight_ > particles[b].weight_; });
+        }
+
+        double sumW = 0.0;
+        double sumX = 0.0;
+        double sumY = 0.0;
+        for (size_t i = 0; i < keepCount; i++) {
+            const Particle& p = particles[idx[i]];
+            const double w = p.weight_;
+            sumW += w;
+            sumX += w * p.pose_.x;
+            sumY += w * p.pose_.y;
+        }
+
+        if (sumW <= 1e-12) {
+            sumX = 0.0;
+            sumY = 0.0;
+            for (size_t i = 0; i < keepCount; i++) {
+                const Particle& p = particles[idx[i]];
+                sumX += p.pose_.x;
+                sumY += p.pose_.y;
+            }
+            const double invK = 1.0 / static_cast<double>(keepCount);
+            return {static_cast<float>(sumX * invK), static_cast<float>(sumY * invK)};
+        }
+
+        return {static_cast<float>(sumX / sumW), static_cast<float>(sumY / sumW)};
+    }
+
     double sumW = 0.0;
     double sumX = 0.0;
     double sumY = 0.0;
