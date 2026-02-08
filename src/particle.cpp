@@ -265,5 +265,5 @@ void Particle::sensorUpdate(float zF, float zL, float zR, float headingRad, int 
     updateOne(vR, nR, zR, RIGHT_X_OFF, RIGHT_Y_OFF, PHI_RIGHT, cR);
 
     weight_ *= wMult;
-    weight_ = std::max(weight_, 1e-12f);
+    weight_ = std::max(weight_, 1e-12);
 }

@@ -109,7 +109,7 @@ void lemlib::Chassis::moveToPoint(float x, float y, int timeout, MoveToPointPara
         // if (lateralError < 10) {
         //     angularOut = 0;
         // }
-        if (!params.headingCorrection) {
+        if (!params.headingCorrection && lateralError < 5) {
             angularOut = 0;
         }
 

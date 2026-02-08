@@ -59,11 +59,11 @@ constexpr bool EST_USE_HUBER_REFINEMENT = true;
 constexpr int EST_HUBER_ITERS = 3;
 constexpr float EST_HUBER_GATE_MULT = 2.0f;
 constexpr float EST_HUBER_DELTA_MULT = 0.5f;
-constexpr float EST_ALPHA_MIN = 0.25f;
-constexpr float EST_ALPHA_MAX = 0.93f;
+constexpr float EST_ALPHA_MIN = 0.15f;
+constexpr float EST_ALPHA_MAX = 0.88f;
 constexpr float EST_SIGMA_LO = 1.5f;
-constexpr float EST_SIGMA_HI = 7.0f;
-constexpr float EST_JUMP_THRESH = 10.0f;
+constexpr float EST_SIGMA_HI = 9.0f;
+constexpr float EST_JUMP_THRESH = 15.0f;
 constexpr float EST_ALPHA_JUMP = 0.92f;
 
 std::vector<Particle> particles; // The possible robot poses
@@ -376,6 +376,7 @@ static std::pair<float, float> lemlib::weightedMeanXY(const std::vector<Particle
         }
 
         // Empty neighborhood: do not jump.
+        // printf("Sum of Weights: %f\n", sumW);
         if (sumW <= 1e-12) return {static_cast<float>(seedX), static_cast<float>(seedY)};
 
         const double nextX = sumX / sumW;
@@ -455,6 +456,8 @@ static std::pair<float, float> lemlib::weightedMeanXY(const std::vector<Particle
     // Innovation gate: suppress one-frame jumps.
     const double innovation = std::hypot(robustX - seedX, robustY - seedY);
     if (innovation > EST_JUMP_THRESH) alpha = std::max(alpha, static_cast<double>(EST_ALPHA_JUMP));
+
+    // printf("Innovation: %f, sigma: %f, alpha: %f\n", innovation, sigma, alpha);
 
     const double estX = alpha * seedX + (1.0 - alpha) * robustX;
     const double estY = alpha * seedY + (1.0 - alpha) * robustY;
