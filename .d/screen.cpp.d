@@ -1,56 +1,56 @@
-bin/screen.cpp.o: src/screen.cpp include/liblvgl/font/lv_font.h \
- include/liblvgl/font/../lv_conf_internal.h \
- include/liblvgl/font/../lv_conf_kconfig.h \
- include/liblvgl/font/../lv_conf.h \
- include/liblvgl/font/../misc/lv_types.h \
- include/liblvgl/font/../misc/../lv_conf_internal.h \
- include/liblvgl/font/lv_symbol_def.h \
- include/liblvgl/font/../draw/lv_draw_buf.h \
- include/liblvgl/font/../draw/../misc/lv_types.h \
- include/liblvgl/font/../draw/../misc/lv_area.h \
- include/liblvgl/font/../draw/../misc/../lv_conf_internal.h \
- include/liblvgl/font/../draw/../misc/lv_types.h \
- include/liblvgl/font/../draw/../misc/lv_math.h \
- include/liblvgl/font/../draw/../misc/lv_color.h \
- include/liblvgl/font/../draw/../misc/lv_assert.h \
- include/liblvgl/font/../draw/../misc/lv_log.h \
- include/liblvgl/font/../draw/../misc/../stdlib/lv_mem.h \
- include/liblvgl/font/../draw/../misc/../stdlib/../lv_conf_internal.h \
- include/liblvgl/font/../draw/../misc/../stdlib/lv_string.h \
- include/liblvgl/font/../draw/../misc/../stdlib/../misc/lv_types.h \
- include/liblvgl/font/../draw/../misc/lv_palette.h \
- include/liblvgl/font/../draw/../misc/lv_color.h \
- include/liblvgl/font/../draw/../misc/lv_color_op.h \
- include/liblvgl/font/../draw/../stdlib/lv_string.h \
- include/liblvgl/font/../draw/lv_image_dsc.h \
- include/liblvgl/font/../draw/../lv_conf_internal.h \
- include/liblvgl/font/../misc/lv_area.h \
- include/liblvgl/font/../misc/cache/lv_cache.h \
- include/liblvgl/font/../misc/cache/lv_cache_entry.h \
- include/liblvgl/font/../misc/cache/../../osal/lv_os.h \
- include/liblvgl/font/../misc/cache/../../osal/../lv_conf_internal.h \
- include/liblvgl/font/../misc/cache/../../osal/../misc/lv_types.h \
- include/liblvgl/font/../misc/cache/../../osal/lv_os_none.h \
- include/liblvgl/font/../misc/cache/../lv_types.h \
- include/liblvgl/font/../misc/cache/lv_cache_private.h \
- include/liblvgl/font/../misc/cache/lv_cache_lru_rb.h \
- include/liblvgl/font/../misc/cache/lv_image_cache.h \
- include/liblvgl/font/../misc/cache/../../lv_conf_internal.h \
- include/liblvgl/font/../misc/cache/lv_image_header_cache.h \
- include/main.h include/api.h include/pros/adi.h include/pros/ai_vision.h \
- include/pros/colors.h include/pros/device.h include/pros/distance.h \
- include/pros/error.h include/pros/ext_adi.h include/pros/adi.h \
- include/pros/adi.h include/pros/gps.h include/pros/imu.h \
- include/pros/link.h include/pros/llemu.h include/liblvgl/llemu.h \
- include/liblvgl/lvgl.h include/liblvgl/lv_version.h \
- include/liblvgl/lvgl_private.h include/liblvgl/core/lv_global.h \
+bin/screen.cpp.o: src/screen.cpp include/main.h include/api.h \
+ include/pros/adi.h include/pros/ai_vision.h include/pros/colors.h \
+ include/pros/device.h include/pros/distance.h include/pros/error.h \
+ include/pros/ext_adi.h include/pros/adi.h include/pros/adi.h \
+ include/pros/gps.h include/pros/imu.h include/pros/link.h \
+ include/pros/llemu.h include/liblvgl/llemu.h include/liblvgl/lvgl.h \
+ include/liblvgl/lv_version.h include/liblvgl/lvgl_private.h \
+ include/liblvgl/core/lv_global.h \
  include/liblvgl/core/../lv_conf_internal.h \
+ include/liblvgl/core/../lv_conf_kconfig.h \
+ include/liblvgl/core/../lv_conf.h \
  include/liblvgl/core/../misc/lv_types.h \
+ include/liblvgl/core/../misc/../lv_conf_internal.h \
  include/liblvgl/core/../draw/lv_draw.h \
  include/liblvgl/core/../draw/../lv_conf_internal.h \
  include/liblvgl/core/../draw/../misc/lv_types.h \
  include/liblvgl/core/../draw/../misc/lv_style.h \
  include/liblvgl/core/../draw/../misc/../font/lv_font.h \
+ include/liblvgl/core/../draw/../misc/../font/../lv_conf_internal.h \
+ include/liblvgl/core/../draw/../misc/../font/../misc/lv_types.h \
+ include/liblvgl/core/../draw/../misc/../font/lv_symbol_def.h \
+ include/liblvgl/core/../draw/../misc/../font/../draw/lv_draw_buf.h \
+ include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_types.h \
+ include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_area.h \
+ C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h \
+ include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_types.h \
+ include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_math.h \
+ include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_color.h \
+ include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_assert.h \
+ include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_log.h \
+ C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/stdlib/lv_mem.h \
+ C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h \
+ C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/stdlib/lv_string.h \
+ C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_types.h \
+ include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_palette.h \
+ include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_color.h \
+ include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_color_op.h \
+ include/liblvgl/core/../draw/../misc/../font/../draw/../stdlib/lv_string.h \
+ include/liblvgl/core/../draw/../misc/../font/../draw/lv_image_dsc.h \
+ include/liblvgl/core/../draw/../misc/../font/../draw/../lv_conf_internal.h \
+ include/liblvgl/core/../draw/../misc/../font/../misc/lv_area.h \
+ include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache.h \
+ include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache_entry.h \
+ C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/osal/lv_os.h \
+ C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h \
+ C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_types.h \
+ C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/osal/lv_os_none.h \
+ include/liblvgl/core/../draw/../misc/../font/../misc/cache/../lv_types.h \
+ include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache_private.h \
+ include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache_lru_rb.h \
+ include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_image_cache.h \
+ C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h \
+ include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_image_header_cache.h \
  include/liblvgl/core/../draw/../misc/lv_color.h \
  include/liblvgl/core/../draw/../misc/lv_area.h \
  include/liblvgl/core/../draw/../misc/lv_anim.h \
@@ -511,7 +511,7 @@ bin/screen.cpp.o: src/screen.cpp include/liblvgl/font/lv_font.h \
  include/liblvgl/tick/lv_tick.h include/liblvgl/core/lv_obj.h \
  include/liblvgl/core/lv_group.h include/liblvgl/indev/lv_indev.h \
  include/liblvgl/core/lv_refr.h include/liblvgl/display/lv_display.h \
- include/liblvgl/font/lv_binfont_loader.h \
+ include/liblvgl/font/lv_font.h include/liblvgl/font/lv_binfont_loader.h \
  include/liblvgl/font/lv_font_fmt_txt.h \
  include/liblvgl/widgets/animimage/lv_animimage.h \
  include/liblvgl/widgets/arc/lv_arc.h \
@@ -677,46 +677,7 @@ bin/screen.cpp.o: src/screen.cpp include/liblvgl/font/lv_font.h \
  include/lemlib/logger/telemetrySink.hpp include/pros/apix.h \
  include/api.h include/pros/device.h include/pros/serial.h \
  include/pros/serial.hpp include/devices.h include/main.h \
- include/screen.h include/utils.h include/autons.h
-include/liblvgl/font/lv_font.h:
-include/liblvgl/font/../lv_conf_internal.h:
-include/liblvgl/font/../lv_conf_kconfig.h:
-include/liblvgl/font/../lv_conf.h:
-include/liblvgl/font/../misc/lv_types.h:
-include/liblvgl/font/../misc/../lv_conf_internal.h:
-include/liblvgl/font/lv_symbol_def.h:
-include/liblvgl/font/../draw/lv_draw_buf.h:
-include/liblvgl/font/../draw/../misc/lv_types.h:
-include/liblvgl/font/../draw/../misc/lv_area.h:
-include/liblvgl/font/../draw/../misc/../lv_conf_internal.h:
-include/liblvgl/font/../draw/../misc/lv_types.h:
-include/liblvgl/font/../draw/../misc/lv_math.h:
-include/liblvgl/font/../draw/../misc/lv_color.h:
-include/liblvgl/font/../draw/../misc/lv_assert.h:
-include/liblvgl/font/../draw/../misc/lv_log.h:
-include/liblvgl/font/../draw/../misc/../stdlib/lv_mem.h:
-include/liblvgl/font/../draw/../misc/../stdlib/../lv_conf_internal.h:
-include/liblvgl/font/../draw/../misc/../stdlib/lv_string.h:
-include/liblvgl/font/../draw/../misc/../stdlib/../misc/lv_types.h:
-include/liblvgl/font/../draw/../misc/lv_palette.h:
-include/liblvgl/font/../draw/../misc/lv_color.h:
-include/liblvgl/font/../draw/../misc/lv_color_op.h:
-include/liblvgl/font/../draw/../stdlib/lv_string.h:
-include/liblvgl/font/../draw/lv_image_dsc.h:
-include/liblvgl/font/../draw/../lv_conf_internal.h:
-include/liblvgl/font/../misc/lv_area.h:
-include/liblvgl/font/../misc/cache/lv_cache.h:
-include/liblvgl/font/../misc/cache/lv_cache_entry.h:
-include/liblvgl/font/../misc/cache/../../osal/lv_os.h:
-include/liblvgl/font/../misc/cache/../../osal/../lv_conf_internal.h:
-include/liblvgl/font/../misc/cache/../../osal/../misc/lv_types.h:
-include/liblvgl/font/../misc/cache/../../osal/lv_os_none.h:
-include/liblvgl/font/../misc/cache/../lv_types.h:
-include/liblvgl/font/../misc/cache/lv_cache_private.h:
-include/liblvgl/font/../misc/cache/lv_cache_lru_rb.h:
-include/liblvgl/font/../misc/cache/lv_image_cache.h:
-include/liblvgl/font/../misc/cache/../../lv_conf_internal.h:
-include/liblvgl/font/../misc/cache/lv_image_header_cache.h:
+ include/screen.h
 include/main.h:
 include/api.h:
 include/pros/adi.h:
@@ -738,12 +699,50 @@ include/liblvgl/lv_version.h:
 include/liblvgl/lvgl_private.h:
 include/liblvgl/core/lv_global.h:
 include/liblvgl/core/../lv_conf_internal.h:
+include/liblvgl/core/../lv_conf_kconfig.h:
+include/liblvgl/core/../lv_conf.h:
 include/liblvgl/core/../misc/lv_types.h:
+include/liblvgl/core/../misc/../lv_conf_internal.h:
 include/liblvgl/core/../draw/lv_draw.h:
 include/liblvgl/core/../draw/../lv_conf_internal.h:
 include/liblvgl/core/../draw/../misc/lv_types.h:
 include/liblvgl/core/../draw/../misc/lv_style.h:
 include/liblvgl/core/../draw/../misc/../font/lv_font.h:
+include/liblvgl/core/../draw/../misc/../font/../lv_conf_internal.h:
+include/liblvgl/core/../draw/../misc/../font/../misc/lv_types.h:
+include/liblvgl/core/../draw/../misc/../font/lv_symbol_def.h:
+include/liblvgl/core/../draw/../misc/../font/../draw/lv_draw_buf.h:
+include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_types.h:
+include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_area.h:
+C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h:
+include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_types.h:
+include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_math.h:
+include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_color.h:
+include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_assert.h:
+include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_log.h:
+C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/stdlib/lv_mem.h:
+C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h:
+C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/stdlib/lv_string.h:
+C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_types.h:
+include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_palette.h:
+include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_color.h:
+include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_color_op.h:
+include/liblvgl/core/../draw/../misc/../font/../draw/../stdlib/lv_string.h:
+include/liblvgl/core/../draw/../misc/../font/../draw/lv_image_dsc.h:
+include/liblvgl/core/../draw/../misc/../font/../draw/../lv_conf_internal.h:
+include/liblvgl/core/../draw/../misc/../font/../misc/lv_area.h:
+include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache.h:
+include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache_entry.h:
+C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/osal/lv_os.h:
+C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h:
+C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_types.h:
+C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/osal/lv_os_none.h:
+include/liblvgl/core/../draw/../misc/../font/../misc/cache/../lv_types.h:
+include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache_private.h:
+include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache_lru_rb.h:
+include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_image_cache.h:
+C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h:
+include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_image_header_cache.h:
 include/liblvgl/core/../draw/../misc/lv_color.h:
 include/liblvgl/core/../draw/../misc/lv_area.h:
 include/liblvgl/core/../draw/../misc/lv_anim.h:
@@ -1228,6 +1227,7 @@ include/liblvgl/core/lv_group.h:
 include/liblvgl/indev/lv_indev.h:
 include/liblvgl/core/lv_refr.h:
 include/liblvgl/display/lv_display.h:
+include/liblvgl/font/lv_font.h:
 include/liblvgl/font/lv_binfont_loader.h:
 include/liblvgl/font/lv_font_fmt_txt.h:
 include/liblvgl/widgets/animimage/lv_animimage.h:
@@ -1446,5 +1446,3 @@ include/pros/serial.hpp:
 include/devices.h:
 include/main.h:
 include/screen.h:
-include/utils.h:
-include/autons.h:

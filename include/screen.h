@@ -14,28 +14,31 @@ enum RobotState {
     DRIVER
 };
 
-extern int selectedAuton;
-
 class Screen {
     private:
         
         std::unique_ptr<pros::Task> update_task;
-        lv_obj_t* autonLabel;
-        lv_obj_t* infoLabel;
+        lv_obj_t* autonLabel = nullptr;
+        lv_obj_t* infoLabel = nullptr;
+        lv_obj_t* footerLabel = nullptr;
+        pros::Mutex uiMutex;
+        char autonText[64] = {0};
+        char infoText[192] = {0};
+        char footerText[64] = {0};
         Screen() = default;
         Screen(const Screen&) = delete;
         Screen& operator=(const Screen&) = delete;
         std::vector<std::string> autonNames;
-        std::vector<lv_obj_t*> buttons;
-
-    static void btn_event_cb(lv_event_t* e);
+        int lastPotValue = -1;
+        int lastDisplayedAuton = -1;
     public:
         inline static Screen& getInstance() {
             static Screen INSTANCE;
             return INSTANCE;
         }
         RobotState state = PRE_MATCH;
-        int selectedAuton = -1;
+        int selectedAuton = 0;
+        void setAutonNames(const std::vector<std::string>& names);
         void initialize();
         void (*auton)();
         void hideSelector();

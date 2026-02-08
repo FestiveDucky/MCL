@@ -1,102 +1,105 @@
-#include "liblvgl/font/lv_font.h"
 #include "main.h"
 #include "pros/rtos.hpp"
 #include "devices.h"
 #include "screen.h"
-#include "utils.h"
-#include "autons.h"
 
+#include <algorithm>
+#include <cstdio>
+#include <cstring>
 
-// void Screen::initialize() {
-//     update_task = std::make_unique<pros::Task>([this](){
-//         while(true) {
-//             update();
-//             pros::delay(20);
-//         }
-//     });
+namespace {
+constexpr int POT_MIN = 0;
+constexpr int POT_MAX = 4095;
+constexpr int POT_SPAN = POT_MAX - POT_MIN + 1;
+}
 
-//     autonLabel = lv_label_create(lv_screen_active());
-//     lv_label_set_text(autonLabel, "Auton: ~");
-//     lv_obj_set_style_text_color(autonLabel, lv_color_hex(0xffffff), LV_PART_MAIN);
-//     lv_obj_set_style_text_font(autonLabel, &lv_font_montserrat_48, 0);
-//     lv_obj_align(autonLabel, LV_ALIGN_CENTER, 0, 0);
-
-// }
-
-// void Screen::update() {
-    
-// }
-
-struct BtnData {
-    Screen* scr;
-    size_t id; // or other info
-};
-
-void Screen::btn_event_cb(lv_event_t* e) {
-    BtnData* data = static_cast<BtnData*>(lv_event_get_user_data(e));
-    Screen* scr = data->scr;
-    scr->selectedAuton = data->id;
-    lv_label_set_text_fmt(scr->autonLabel, "Auton: %s", scr->autonNames[scr->selectedAuton].c_str());
+void Screen::setAutonNames(const std::vector<std::string>& names) {
+    autonNames = names;
+    if (autonNames.empty()) selectedAuton = 0;
+    else if (selectedAuton >= static_cast<int>(autonNames.size())) selectedAuton = static_cast<int>(autonNames.size()) - 1;
 }
 
 void Screen::initialize() {
-    // static lv_style_t style_selected;
-    // lv_style_init(&style_selected);
-    // lv_style_set_bg_color(&style_selected, LV_STATE_DEFAULT, LV_COLOR_BLUE);
-    // lv_style_set_border_width(&style_selected, LV_STATE_DEFAULT, 3);
-    // lv_style_set_border_color(&style_selected, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-
-    infoLabel = lv_label_create(lv_screen_active());
-    lv_obj_set_style_text_color(infoLabel, lv_color_hex(0xffffff), LV_PART_MAIN);
-    lv_obj_align(infoLabel, LV_ALIGN_TOP_LEFT, 5, 5);
-
-    autonNames = {"Left", "Right", "Skills", "Nothing"};
-
-    update_task = std::make_unique<pros::Task>([this]() {
-        while(true) {
-            update();
-            pros::delay(20);
-        }
-    });
+    if (autonNames.empty()) autonNames = {"Left", "Right", "Skills", "Nothing"};
 
     autonLabel = lv_label_create(lv_screen_active());
-    lv_label_set_text(autonLabel, "Auton: ~");
     lv_obj_set_style_text_color(autonLabel, lv_color_hex(0xffffff), LV_PART_MAIN);
     lv_obj_set_style_text_font(autonLabel, &lv_font_montserrat_24, 0);
-    lv_obj_align(autonLabel, LV_ALIGN_TOP_MID, 0, 10);
+    lv_obj_align(autonLabel, LV_ALIGN_CENTER, 0, 14);
+    lv_label_set_text_static(autonLabel, autonText);
 
-    size_t num = 0;
-    for (size_t i = 0; i < floor(autonNames.size()/2.); i++) {
-        for (size_t j = 0; j < ceil(autonNames.size()/2.); j++) {
-            lv_obj_t* btn = lv_button_create(lv_screen_active());
-            lv_obj_set_size(btn, 180, 50);
-            lv_obj_align(btn, LV_ALIGN_TOP_LEFT, 50 + j * 190, 50 + i * 60);
+    infoLabel = lv_label_create(lv_screen_active());
+    lv_obj_set_style_text_color(infoLabel, lv_color_hex(0xcbd5e1), LV_PART_MAIN);
+    lv_obj_set_style_text_font(infoLabel, &lv_font_montserrat_14, 0);
+    lv_obj_align(infoLabel, LV_ALIGN_TOP_LEFT, 8, 8);
+    lv_label_set_text_static(infoLabel, infoText);
 
-            lv_obj_t* label = lv_label_create(btn);
-            lv_label_set_text(label, autonNames[num].c_str());
-            lv_obj_center(label);
+    footerLabel = lv_label_create(lv_screen_active());
+    lv_obj_set_style_text_color(footerLabel, lv_color_hex(0x94a3b8), LV_PART_MAIN);
+    lv_obj_set_style_text_font(footerLabel, &lv_font_montserrat_14, 0);
+    lv_obj_align(footerLabel, LV_ALIGN_BOTTOM_MID, 0, -6);
+    lv_label_set_text_static(footerLabel, footerText);
 
-            BtnData* data = new BtnData{this, num};
-            lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, data);
-
-            buttons.push_back(btn);
-            num++;
+    update_task = std::make_unique<pros::Task>([this]() {
+        while (true) {
+            update();
+            pros::delay(30);
         }
-    }
+    });
 }
 
 void Screen::update() {
-    // if (selectedAuton >= 0 && selectedAuton < (int)autonNames.size()) {
-    //     lv_label_set_text_fmt(autonLabel, "Auton: %s", autonNames[selectedAuton].c_str());
-    // }
+    if (autonNames.empty()) return;
+
+    const int raw = std::clamp(static_cast<int>(potentiometer.get_value()), POT_MIN, POT_MAX);
+    const int count = static_cast<int>(autonNames.size());
+
+    int idx = (static_cast<long long>(raw - POT_MIN) * count) / POT_SPAN;
+    if (idx < 0) idx = 0;
+    if (idx >= count) idx = count - 1;
+
+    selectedAuton = idx;
+
+    if (!uiMutex.take(20)) return;
+    if (idx != lastDisplayedAuton) {
+        std::snprintf(
+            autonText,
+            sizeof(autonText),
+            "%s\n(%d/%d)",
+            autonNames[idx].c_str(),
+            idx + 1,
+            count);
+        lv_label_set_text_static(autonLabel, autonText);
+        lastDisplayedAuton = idx;
+    }
+
+    // Keep this updated so the operator can see exactly where the selector is.
+    if (raw != lastPotValue) {
+        const int pct = ((raw - POT_MIN) * 100) / (POT_MAX - POT_MIN);
+        std::snprintf(footerText, sizeof(footerText), "Pot A: %4d (%3d%%)", raw, pct);
+        lv_label_set_text_static(footerLabel, footerText);
+        lastPotValue = raw;
+    }
+    uiMutex.give();
 }
 
 void Screen::hideSelector() {
-    for (auto btn : buttons) {
-        lv_obj_add_flag(btn, LV_OBJ_FLAG_HIDDEN);  // hides the button
-    }
+    if (!uiMutex.take(20)) return;
+    if (autonLabel != nullptr) lv_obj_add_flag(autonLabel, LV_OBJ_FLAG_HIDDEN);
+    if (footerLabel != nullptr) lv_obj_add_flag(footerLabel, LV_OBJ_FLAG_HIDDEN);
+    uiMutex.give();
 }
 
 void Screen::showInfoLabel(const char* text) {
-    lv_label_set_text(infoLabel, text);
+    if (!uiMutex.take(20)) return;
+    if (infoLabel != nullptr) {
+        const char* safeText = (text == nullptr) ? "" : text;
+        char nextInfo[sizeof(infoText)] = {0};
+        std::snprintf(nextInfo, sizeof(nextInfo), "%s", safeText);
+        if (std::strncmp(infoText, nextInfo, sizeof(infoText)) != 0) {
+            std::snprintf(infoText, sizeof(infoText), "%s", safeText);
+            lv_label_set_text_static(infoLabel, infoText);
+        }
+    }
+    uiMutex.give();
 }

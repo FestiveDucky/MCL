@@ -6,6 +6,41 @@
 #include "screen.h"
 #include "autons.h"
 #include "intake.h"
+#include <array>
+#include <atomic>
+#include <cstdio>
+#include <string>
+#include <vector>
+
+namespace {
+struct AutonOption {
+    const char* name;
+    void (*run)();
+};
+
+// Change this table to change auton count and mapping for the potentiometer selector.
+const std::array<AutonOption, 4> AUTONS = {{
+    {"Left", left},
+    {"Right", right},
+    {"Skills", skills},
+    {"Five Inch", fiveInch},
+}};
+
+std::vector<std::string> autonNamesFromTable() {
+    std::vector<std::string> names;
+    names.reserve(AUTONS.size());
+    for (const auto& auton : AUTONS) names.emplace_back(auton.name);
+    return names;
+}
+
+std::atomic_bool mclPaused{false};
+
+void setMCLPaused(bool pause) {
+    if (pause == mclPaused.load()) return;
+    lemlib::toggleMCL();
+    mclPaused.store(pause);
+}
+} // namespace
 
 
 int turn_divider = 1;
@@ -22,25 +57,41 @@ bool just_lowered_hood = false;
  */
 void initialize() {
 	vertical_rotation.reset();
-	pros::lcd::initialize();
+	// pros::lcd::initialize();
     chassis.calibrate();
+    // Keep MCL initialized/running, but paused until autonomous starts.
+    setMCLPaused(true);
 	controller.clear();
-	controller.set_text(0, 0, "Blub Blub");
-	// sc.initialize();
+	// controller.set_text(0, 0, "Blub Blub");
+	sc.setAutonNames(autonNamesFromTable());
+	sc.initialize();
 	intake.initialize();
 
     static pros::Task screen_task([&]() {
         while (true) {
+            if (mclPaused.load()) {
+                sc.showInfoLabel("MCL paused (enabled in autonomous)");
+                pros::delay(100);
+                continue;
+            }
+
 			lemlib::Pose poseMCL = chassis.getPose();
 			lemlib::Pose poseOLD = lemlib::getOldPose();
 			std::uint32_t calculationTime = lemlib::getCalculationTime();
 			std::int32_t confidenceFront = lemlib::getConfidence();
-			pros::lcd::print(0, "MCL X: %f Y: %f", poseMCL.x, poseMCL.y);
-			pros::lcd::print(1, "Theta: %f", poseMCL.theta);
-			pros::lcd::print(2, "OLD X: %f Y: %f", poseOLD.x, poseOLD.y);
-			pros::lcd::print(3, "Calculation Time: %d", calculationTime);
-			pros::lcd::print(4, "Front Sensor Confidence: %d", confidenceFront);
-            // sc.showInfoLabel(position.c_str());
+            char info[192];
+            std::snprintf(
+                info,
+                sizeof(info),
+                "MCL X: %.2f Y: %.2f\nTh: %.2f OldX: %.2f OldY: %.2f\nCalc Time: %u  FrontConf: %d",
+                poseMCL.x,
+                poseMCL.y,
+                poseMCL.theta,
+                poseOLD.x,
+                poseOLD.y,
+                static_cast<unsigned>(calculationTime),
+                static_cast<int>(confidenceFront));
+            sc.showInfoLabel(info);
             pros::delay(100); 
         }
     });
@@ -78,22 +129,11 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
-    printf("starti9gn auto\n");
-	// sc.state = RobotState::AUTONOMOUS;
-	// switch(sc.selectedAuton) {
-    //     case 0: left(); break;
-    //     case 1: right(); break;
-    //     case 2: skills(); break;
-    //     case 3: /* do nothing */ break;
-    //     default: break;
-    // }
-	// left();
-
-	skills();
-	// test();
-	// right9ball();
-	// fiveInch();
-	// left();
+    sc.state = RobotState::AUTONOMOUS;
+    setMCLPaused(false);
+    int idx = sc.selectedAuton;
+    if (idx < 0 || idx >= static_cast<int>(AUTONS.size())) idx = 0;
+    if (AUTONS[idx].run != nullptr) AUTONS[idx].run();
 }
 
 
@@ -111,19 +151,17 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	// sc.state = RobotState::DRIVER;
-	//sc.hideSelector();
+	sc.state = RobotState::DRIVER;
+	sc.hideSelector();
 
 	// right9ball();	
 	// test();
-	skills();
+	// skills();
 	// chassis.setPose(-48, -48, 0);
 	
 
 	//right();
 	descore.set_value(true);
-	
-	
 	while (true) {
 		// Potentiometer test 
 		// int at = potentiometer.get_value();
@@ -148,26 +186,22 @@ void opcontrol() {
 			top_score.set_value(false);
 			bottom_intake_voltage = 127;
 			top_intake_voltage = 127;
-			printf("running intake\n");
 		}
 
 		// Intake (Bottom)
 		if (controller.get_digital_new_press(DIGITAL_L1)) {
 			bottom_intake_voltage = 127;
-			printf("storing\n");
 		}
 
 		// Outtake
 		if (controller.get_digital_new_press(DIGITAL_Y)) {
 			bottom_intake_voltage = -127;
 			top_intake_voltage = -127;
-			printf("outtaking\n");
 		}
 
 		// Scraper (toggle)
 		if (controller.get_digital_new_press(DIGITAL_RIGHT)) {
 			scraper_piston.toggle();
-			printf("scraper\n");
 		}
 
 		// Descore (toggle)
