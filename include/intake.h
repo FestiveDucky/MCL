@@ -15,6 +15,8 @@ enum IntakeState {
 class Intake {
     private:
         std::unique_ptr<pros::Task> update_task;
+        int jam_timer_ms = 0;
+        int reverse_timer_ms = 0;
         Intake() = default;
         Intake(const Intake&) = delete;
         Intake& operator=(const Intake&) = delete;

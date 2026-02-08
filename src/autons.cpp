@@ -158,16 +158,13 @@ void right() {
 }
 
 void left() {
-    
+
 }
 
 void test() {
     chassis.setPose(24, -48, 0);
-    chassis.moveToPoint(24, -24, 3000);
-    chassis.waitUntilDone();
-    // intake.store(40);
-    // distanceResetLeft();
-    // pros::delay(100000);
+    intake.score(127);
+    pros::delay(100000);
 }
 
 void fiveInch() {

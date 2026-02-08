@@ -19,11 +19,12 @@ struct AutonOption {
 };
 
 // Change this table to change auton count and mapping for the potentiometer selector.
-const std::array<AutonOption, 4> AUTONS = {{
+const std::array<AutonOption, 5> AUTONS = {{
     {"Left", left},
     {"Right", right},
     {"Skills", skills},
     {"Five Inch", fiveInch},
+	{"Test", test}
 }};
 
 std::vector<std::string> autonNamesFromTable() {
