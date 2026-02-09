@@ -677,7 +677,7 @@ bin/intake.cpp.o: src/intake.cpp include/main.h include/api.h \
  include/lemlib/logger/telemetrySink.hpp include/pros/apix.h \
  include/api.h include/pros/device.h include/pros/serial.h \
  include/pros/serial.hpp include/devices.h include/main.h \
- include/intake.h include/utils.h
+ include/intake.h
 include/main.h:
 include/api.h:
 include/pros/adi.h:
@@ -1446,4 +1446,3 @@ include/pros/serial.hpp:
 include/devices.h:
 include/main.h:
 include/intake.h:
-include/utils.h:

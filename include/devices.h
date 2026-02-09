@@ -7,10 +7,7 @@
 extern pros::MotorGroup left_motor_group;
 extern pros::MotorGroup right_motor_group;
 
-extern pros::Distance left_distance;
-extern pros::Distance front_left_distance;
-extern double left_distance_offset;
-extern double front_left_distance_offset;
+extern lemlib::MCLSettings settings;
 
 extern pros::Motor bottom_intake;
 extern pros::Motor top_intake;
