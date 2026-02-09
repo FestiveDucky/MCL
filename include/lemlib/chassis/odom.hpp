@@ -8,7 +8,8 @@
 
 namespace lemlib {
     
-void setMCLSettings(lemlib::MCLSettings settings);
+void setMCLSettings(const lemlib::MCLSettings& settings);
+const lemlib::MCLSettings& getMCLSettings();
 /**
  * @brief Set the sensors to be used for odometry
  *

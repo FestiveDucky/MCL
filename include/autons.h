@@ -1,7 +1,6 @@
 #include "main.h"
 
 void right();
-void right9ball();
 void left();
 
 void test();
@@ -12,7 +11,3 @@ void skills();
 // void mill1left();
 // void mill1right();
 void fiveInch();
-
-
-
-void distanceResetLeft();

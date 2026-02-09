@@ -1,7 +1,6 @@
 #include "main.h"
 #include "devices.h"
 #include "intake.h"
-#include "utils.h"
 #include <cmath>
 
 namespace {

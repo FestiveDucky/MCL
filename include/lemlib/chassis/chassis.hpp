@@ -9,14 +9,76 @@
 #include "lemlib/pid.hpp"
 #include "lemlib/exitcondition.hpp"
 #include "lemlib/driveCurve.hpp"
+#include <vector>
 
 namespace lemlib {
 
 class MCLSettings {
     public:
-     MCLSettings(int particleCount);
-     int particleCount;
-     
+        struct DistanceSensorMount {
+                float xOffset;
+                float yOffset;
+                float headingOffset;
+        };
+
+        struct DistanceSensorConfig {
+                int port;
+                DistanceSensorMount mount;
+        };
+
+        explicit MCLSettings(int particleCount = 0);
+
+        int particleCount = 0;
+
+        std::vector<DistanceSensorConfig> distanceSensors{
+            {7, {-4.75f, 7.0f, 0.0f}},
+            {5, {-4.75f, 1.3f, -1.57079632679f}},
+            {6, {5.0f, 2.75f, 1.57079632679f}},
+        };
+
+        float sigma0XY = 0.05f;
+        float kDistXY = 0.50f;
+        float kTurnXY = 0.20f;
+        float maxStartPosErrorIn = 2.0f;
+
+        bool clampDeltaSForNoise = true;
+        float maxDeltaSForNoise = 3.0f;
+        bool clampSigmaXY = true;
+        float maxSigmaXY = 1.50f;
+
+        float estMsBandwidth = 4.0f;
+        int estMsIters = 6;
+        float estMsEpsStop = 0.1f;
+        bool estUseHuberRefinement = true;
+        int estHuberIters = 3;
+        float estHuberGateMult = 2.0f;
+        float estHuberDeltaMult = 0.5f;
+        float estAlphaMin = 0.15f;
+        float estAlphaMax = 0.88f;
+        float estSigmaLo = 1.5f;
+        float estSigmaHi = 9.0f;
+        float estJumpThresh = 15.0f;
+        float estAlphaJump = 0.92f;
+
+        bool clampOobParticles = true;
+        bool penalizeOobParticles = true;
+        double oobWeightMult = 1e-3;
+        bool useFieldMargin = true;
+        float fieldMarginIn = 5.5f;
+        bool useSensorConfidence = true;
+        float sensorConfMax = 63.0f;
+        bool useNoHitModel = true;
+        float noHitPenalty = 0.05f;
+
+        float fieldHalf = 70.75f;
+
+        float zMin = 0.1f;
+        float zMax = 85.0f;
+
+        float sigmaD = 10.0f;
+        double pFloor = 1e-4;
+        float wHit = 0.90f;
+        float wRand = 0.10f;
 };
 
 /**

@@ -1,16 +1,66 @@
 #include "main.h"
 #include "lemlib/chassis/chassis.hpp"
 
-lemlib::MCLSettings settings(200);
+namespace {
+lemlib::MCLSettings makeMCLSettings() {
+    lemlib::MCLSettings cfg(500); // Number of particles tracked by MCL.
+
+    cfg.distanceSensors = {
+        {7, {-4.75f, 7.0f, 0.0f}},            // Front sensor (old behavior): port 7.
+        {5, {-4.75f, 1.3f, -1.57079632679f}}, // Left sensor (old behavior): port 5.
+        {6, {5.0f, 2.75f, 1.57079632679f}},   // Right sensor (old behavior): port 6.
+    };
+
+    cfg.sigma0XY = 0.05f;         // Baseline XY process noise each cycle (in).
+    cfg.kDistXY = 0.50f;          // Extra XY noise per inch translated.
+    cfg.kTurnXY = 0.20f;          // Extra XY noise per radian turned.
+    cfg.maxStartPosErrorIn = 2.0f; // Initial particle spread radius (in).
+
+    cfg.clampDeltaSForNoise = true; // Caps translation before noise scaling.
+    cfg.maxDeltaSForNoise = 3.0f;   // Max translation used in noise model (in).
+    cfg.clampSigmaXY = true;        // Caps computed sigmaXY to prevent blowups.
+    cfg.maxSigmaXY = 1.50f;         // Upper bound for sigmaXY (in).
+
+    cfg.estMsBandwidth = 4.0f;      // Mean-shift kernel radius (in).
+    cfg.estMsIters = 6;             // Max mean-shift refinement iterations.
+    cfg.estMsEpsStop = 0.1f;        // Mean-shift convergence threshold (in).
+    cfg.estUseHuberRefinement = true; // Enables robust Huber refinement pass.
+    cfg.estHuberIters = 3;          // Max Huber refinement iterations.
+    cfg.estHuberGateMult = 2.0f;    // Huber neighborhood gate as bandwidth multiplier.
+    cfg.estHuberDeltaMult = 0.5f;   // Huber delta as bandwidth multiplier.
+    cfg.estAlphaMin = 0.15f;        // Min smoothing factor for final pose EMA.
+    cfg.estAlphaMax = 0.88f;        // Max smoothing factor for final pose EMA.
+    cfg.estSigmaLo = 1.5f;          // Spread where EMA starts using higher smoothing.
+    cfg.estSigmaHi = 9.0f;          // Spread where EMA reaches max smoothing.
+    cfg.estJumpThresh = 15.0f;      // Innovation threshold for jump suppression (in).
+    cfg.estAlphaJump = 0.92f;       // EMA alpha used when a jump is detected.
+
+    cfg.clampOobParticles = true;   // Clamps particles to field bounds if out of bounds.
+    cfg.penalizeOobParticles = true; // Downweights particles that leave bounds.
+    cfg.oobWeightMult = 1e-3;       // Weight multiplier applied to OOB particles.
+    cfg.useFieldMargin = true;      // Shrinks particle-valid region inward from walls.
+    cfg.fieldMarginIn = 5.5f;       // Margin size from field walls for particle bounds (in).
+    cfg.useSensorConfidence = true; // Uses sensor confidence to blend likelihood strength.
+    cfg.sensorConfMax = 63.0f;      // Confidence value mapped to full trust.
+    cfg.useNoHitModel = true;       // Treats >zMax as explicit "no wall hit" evidence.
+    cfg.noHitPenalty = 0.05f;       // Penalty if particle expected a wall during no-hit.
+
+    cfg.fieldHalf = 70.75f;         // Half field size from center to wall (in).
+    cfg.zMin = 0.1f;                // Minimum accepted distance measurement (in).
+    cfg.zMax = 85.0f;               // Maximum accepted distance measurement (in).
+    cfg.sigmaD = 10.0f;             // Sensor model triangle half-width scale (in).
+    cfg.pFloor = 1e-4;              // Minimum per-sensor likelihood floor.
+    cfg.wHit = 0.90f;               // Reserved hit-model blend weight (for future model variants).
+    cfg.wRand = 1.0f - cfg.wHit;    // Reserved random-model blend weight.
+
+    return cfg;
+}
+} // namespace
+
+lemlib::MCLSettings settings = makeMCLSettings();
 
 pros::MotorGroup left_motor_group({-11, 12, -13}, pros::MotorGears::blue);
 pros::MotorGroup right_motor_group({18, -19, 20}, pros::MotorGears::blue);
-
-// pros::Distance left_distance(0);
-// double left_distance_offset = 0.0; 
-// pros::Distance front_left_distance(0);
-// double front_left_distance_offset = 0.0;
-
 
 pros::Motor bottom_intake(-10, pros::MotorGears::blue);
 pros::Motor top_intake(9, pros::MotorGears::blue);

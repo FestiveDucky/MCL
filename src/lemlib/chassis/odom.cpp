@@ -7,6 +7,9 @@
 #include <random>
 #include <cmath>
 #include <algorithm>
+#include <cstdint>
+#include <limits>
+#include <memory>
 #include "pros/rtos.hpp"
 #include "lemlib/util.hpp"
 #include "lemlib/chassis/odom.hpp"
@@ -32,39 +35,53 @@ std::uint32_t updateTime = 0;
 std::uint32_t prev_time = 0;
 std::uint32_t frontConf = 0;
 bool paused = false;
-// pros::Mutex mclPoseMtx;
-// pros::Mutex oldPoseMtx;
 
-pros::Distance left_distance(5);
-pros::Distance right_distance(6);
-pros::Distance front_distance(7);
+namespace {
+constexpr float MM_TO_IN = 1.0f / 25.4f;
 
-// Motion Noise
-constexpr float SIGMA0_XY = 0.05f; // base noise (in)
-constexpr float K_DIST_XY = 0.50f; // in of std dev per in traveled
-constexpr float K_TURN_XY = 0.20f; // in of std dev per rad turned
-constexpr float MAX_START_POS_ERROR_IN = 2.0f; // Within this error 99.7% of the time (For the normal dist setting), o.w. just within +-this range for uniform
+std::vector<std::unique_ptr<pros::Distance>> distanceSensors;
+std::vector<Particle::SensorObservation> sensorObservations;
 
-// ---------- Feature toggles ----------
-constexpr bool MCL_CLAMP_DELTA_S_FOR_NOISE = true; // #7
-constexpr float MAX_DELTA_S_FOR_NOISE = 3.0f;
-constexpr bool MCL_CLAMP_SIGMA_XY = true;          // #7
-constexpr float MAX_SIGMA_XY = 1.50f;
+std::unique_ptr<pros::Distance> makeDistanceSensor(int port) {
+    if (port <= 0) return nullptr;
+    return std::make_unique<pros::Distance>(port);
+}
 
-// Pose estimator: mean-shift -> optional Huber refinement -> adaptive EMA.
-constexpr float EST_MS_BANDWIDTH = 4.0f;
-constexpr int EST_MS_ITERS = 6;
-constexpr float EST_MS_EPS_STOP = 0.1f;
-constexpr bool EST_USE_HUBER_REFINEMENT = true;
-constexpr int EST_HUBER_ITERS = 3;
-constexpr float EST_HUBER_GATE_MULT = 2.0f;
-constexpr float EST_HUBER_DELTA_MULT = 0.5f;
-constexpr float EST_ALPHA_MIN = 0.15f;
-constexpr float EST_ALPHA_MAX = 0.88f;
-constexpr float EST_SIGMA_LO = 1.5f;
-constexpr float EST_SIGMA_HI = 9.0f;
-constexpr float EST_JUMP_THRESH = 15.0f;
-constexpr float EST_ALPHA_JUMP = 0.92f;
+void configureDistanceSensors() {
+    distanceSensors.clear();
+    distanceSensors.reserve(mclSettings.distanceSensors.size());
+    for (const auto& sensorConfig : mclSettings.distanceSensors) {
+        distanceSensors.emplace_back(makeDistanceSensor(sensorConfig.port));
+    }
+
+    sensorObservations.clear();
+    sensorObservations.reserve(mclSettings.distanceSensors.size());
+}
+
+float readDistanceInches(const std::unique_ptr<pros::Distance>& sensor) {
+    if (sensor == nullptr) return std::numeric_limits<float>::quiet_NaN();
+    return sensor->get() * MM_TO_IN;
+}
+
+int readDistanceConfidence(const std::unique_ptr<pros::Distance>& sensor) {
+    if (sensor == nullptr) return 0;
+    return sensor->get_confidence();
+}
+
+bool inRange(float value, float min, float max) {
+    return value >= min && value <= max;
+}
+
+float clampf(float value, float min, float max) {
+    return std::max(min, std::min(value, max));
+}
+
+float confidenceToUnit(int confidence) {
+    if (!mclSettings.useSensorConfidence) return 1.0f;
+    const float denom = std::max(1e-6f, mclSettings.sensorConfMax);
+    return clampf(static_cast<float>(confidence) / denom, 0.0f, 1.0f);
+}
+} // namespace
 
 std::vector<Particle> particles; // The possible robot poses
 
@@ -88,8 +105,13 @@ std::uint32_t lemlib::getCalculationTime() {
     return updateTime;
 }
 
-void lemlib::setMCLSettings(lemlib::MCLSettings settings) {
+void lemlib::setMCLSettings(const lemlib::MCLSettings& settings) {
     mclSettings = settings;
+    configureDistanceSensors();
+}
+
+const lemlib::MCLSettings& lemlib::getMCLSettings() {
+    return mclSettings;
 }
 
 void lemlib::setSensors(lemlib::OdomSensors sensors, lemlib::Drivetrain drivetrain) {
@@ -245,14 +267,14 @@ void lemlib::update() {
     
     const float deltaS = std::hypot(dxField, dyField);
     const float deltaT = std::fabs(deltaHeading);
-    const float deltaSForNoise = MCL_CLAMP_DELTA_S_FOR_NOISE ? std::min(deltaS, MAX_DELTA_S_FOR_NOISE) : deltaS;
+    const float deltaSForNoise = mclSettings.clampDeltaSForNoise ? std::min(deltaS, mclSettings.maxDeltaSForNoise) : deltaS;
     float sigmaXY;
     if (paused) {
         // Only add minor amounts of error to positions if we are paused
-        sigmaXY = SIGMA0_XY;
+        sigmaXY = mclSettings.sigma0XY;
     } else {
-        sigmaXY = SIGMA0_XY + K_DIST_XY * deltaSForNoise + K_TURN_XY * deltaT;
-        if (MCL_CLAMP_SIGMA_XY) sigmaXY = std::min(sigmaXY, MAX_SIGMA_XY);
+        sigmaXY = mclSettings.sigma0XY + mclSettings.kDistXY * deltaSForNoise + mclSettings.kTurnXY * deltaT;
+        if (mclSettings.clampSigmaXY) sigmaXY = std::min(sigmaXY, mclSettings.maxSigmaXY);
     }
     
     // 1) Motion update: move every particle
@@ -269,42 +291,70 @@ void lemlib::update() {
     float estY = odomPose.y;
     if (shouldDoSensor) {
         prev_time = pros::millis();
-        // 2) Sensor update: update particle weights
-        float zF = front_distance.get() / 25.4;
-        float zL = left_distance.get() / 25.4;
-        float zR = right_distance.get() / 25.4;
+        // 2) Sensor update: build observations once per odom iteration.
+        sensorObservations.clear();
+        frontConf = 0;
 
-        int cF = front_distance.get_confidence();
-        int cL = left_distance.get_confidence();
-        int cR = right_distance.get_confidence();
+        const float sh = std::sin(heading);
+        const float ch = std::cos(heading);
 
-        frontConf = cF;
-    
-        for (auto& p : particles) {
-            p.sensorUpdate(zF, zL, zR, heading, cF, cL, cR);
+        const std::size_t sensorCount = std::min(distanceSensors.size(), mclSettings.distanceSensors.size());
+        for (std::size_t i = 0; i < sensorCount; i++) {
+            const auto& sensor = distanceSensors[i];
+            if (sensor == nullptr) continue;
+
+            const auto& sensorConfig = mclSettings.distanceSensors[i];
+            const float measuredDistanceIn = readDistanceInches(sensor);
+            const int confidence = readDistanceConfidence(sensor);
+
+            if (i == 0) frontConf = static_cast<std::uint32_t>(confidence);
+
+            const bool hasHit = inRange(measuredDistanceIn, mclSettings.zMin, mclSettings.zMax);
+            const bool hasNoHit = mclSettings.useNoHitModel && std::isfinite(measuredDistanceIn) &&
+                                  measuredDistanceIn > mclSettings.zMax;
+            if (!hasHit && !hasNoHit) continue;
+
+            // Transform mount offsets and ray direction once per update. These values are reused for every particle.
+            const float mountOffsetX = ch * sensorConfig.mount.xOffset + sh * sensorConfig.mount.yOffset;
+            const float mountOffsetY = -sh * sensorConfig.mount.xOffset + ch * sensorConfig.mount.yOffset;
+            const float rayAngle = heading + sensorConfig.mount.headingOffset;
+            const float rayDirX = std::sin(rayAngle);
+            const float rayDirY = std::cos(rayAngle);
+
+            sensorObservations.push_back({measuredDistanceIn, confidenceToUnit(confidence), hasHit, hasNoHit,
+                                          mountOffsetX, mountOffsetY, rayDirX, rayDirY});
         }
-        
-        // 3) Normalize weights
-        normalizeWeights(particles);
 
-        // Estimate pose from the posterior BEFORE resampling resets weights.
-        auto [preResampleX, preResampleY] = weightedMeanXY(particles);
-        estX = preResampleX;
-        estY = preResampleY;
-        
-        // 4) Neff check -> resample if needed
-        const double Neff = effectiveSampleSize(particles);
-        const double N = static_cast<double>(particles.size());
-        
-        // Typical threshold: 0.5N (tune)
-        // printf("N-Effective: %f, Threshold, %f\n", Neff, 0.5 * N);
-        if (Neff < 0.5 * N) {
-            particles = systematicResample(particles);
-    
-            // Optional: "roughening" / jitter here to prevent duplicates
-            // for (auto& p : particles) p.addSmallJitter(...);
+        if (!sensorObservations.empty()) {
+            for (auto& p : particles) {
+                p.sensorUpdate(sensorObservations);
+            }
+
+            // 3) Normalize weights
+            normalizeWeights(particles);
+
+            // Estimate pose from the posterior BEFORE resampling resets weights.
+            auto [preResampleX, preResampleY] = weightedMeanXY(particles);
+            estX = preResampleX;
+            estY = preResampleY;
+
+            // 4) Neff check -> resample if needed
+            const double Neff = effectiveSampleSize(particles);
+            const double N = static_cast<double>(particles.size());
+
+            // Typical threshold: 0.5N (tune)
+            // printf("N-Effective: %f, Threshold, %f\n", Neff, 0.5 * N);
+            if (Neff < 0.5 * N) {
+                particles = systematicResample(particles);
+
+                // Optional: "roughening" / jitter here to prevent duplicates
+                // for (auto& p : particles) p.addSmallJitter(...);
+            }
+        } else {
+            auto [noSensorX, noSensorY] = weightedMeanXY(particles);
+            estX = noSensorX;
+            estY = noSensorY;
         }
-        
     } else {
         // If you did not do sensor update, keep weights as-is (often uniform).
         // You could optionally skip resampling entirely here (recommended).
@@ -353,10 +403,10 @@ static std::pair<float, float> lemlib::weightedMeanXY(const std::vector<Particle
     double muY = seedY;
 
     // 1) Mean-shift with Epanechnikov kernel (no sqrt in inner loop).
-    const double h = EST_MS_BANDWIDTH;
+    const double h = mclSettings.estMsBandwidth;
     const double h2 = h * h;
-    const double epsStop2 = EST_MS_EPS_STOP * EST_MS_EPS_STOP;
-    for (int k = 0; k < EST_MS_ITERS; k++) {
+    const double epsStop2 = mclSettings.estMsEpsStop * mclSettings.estMsEpsStop;
+    for (int k = 0; k < mclSettings.estMsIters; k++) {
         double sumW = 0.0;
         double sumX = 0.0;
         double sumY = 0.0;
@@ -391,13 +441,13 @@ static std::pair<float, float> lemlib::weightedMeanXY(const std::vector<Particle
     // 2) Optional Huber local refinement to reduce tail/outlier pull.
     double robustX = muX;
     double robustY = muY;
-    if (EST_USE_HUBER_REFINEMENT) {
-        const double rGate = EST_HUBER_GATE_MULT * h;
+    if (mclSettings.estUseHuberRefinement) {
+        const double rGate = mclSettings.estHuberGateMult * h;
         const double rGate2 = rGate * rGate;
-        const double delta = EST_HUBER_DELTA_MULT * h;
+        const double delta = mclSettings.estHuberDeltaMult * h;
         const double delta2 = delta * delta;
 
-        for (int k = 0; k < EST_HUBER_ITERS; k++) {
+        for (int k = 0; k < mclSettings.estHuberIters; k++) {
             double sumW = 0.0;
             double sumX = 0.0;
             double sumY = 0.0;
@@ -449,13 +499,14 @@ static std::pair<float, float> lemlib::weightedMeanXY(const std::vector<Particle
     }
 
     // sigma is RMS local spread (inches); larger sigma => more smoothing.
-    const double sigma = (sumWVar > 1e-12) ? std::sqrt(sumR2 / sumWVar) : EST_SIGMA_HI;
-    const double t = std::max(0.0, std::min(1.0, (sigma - EST_SIGMA_LO) / (EST_SIGMA_HI - EST_SIGMA_LO)));
-    double alpha = EST_ALPHA_MIN + t * (EST_ALPHA_MAX - EST_ALPHA_MIN);
+    const double sigma = (sumWVar > 1e-12) ? std::sqrt(sumR2 / sumWVar) : mclSettings.estSigmaHi;
+    const double sigmaSpan = std::max(1e-9f, mclSettings.estSigmaHi - mclSettings.estSigmaLo);
+    const double t = std::max(0.0, std::min(1.0, (sigma - mclSettings.estSigmaLo) / sigmaSpan));
+    double alpha = mclSettings.estAlphaMin + t * (mclSettings.estAlphaMax - mclSettings.estAlphaMin);
 
     // Innovation gate: suppress one-frame jumps.
     const double innovation = std::hypot(robustX - seedX, robustY - seedY);
-    if (innovation > EST_JUMP_THRESH) alpha = std::max(alpha, static_cast<double>(EST_ALPHA_JUMP));
+    if (innovation > mclSettings.estJumpThresh) alpha = std::max(alpha, static_cast<double>(mclSettings.estAlphaJump));
 
     // printf("Innovation: %f, sigma: %f, alpha: %f\n", innovation, sigma, alpha);
 
@@ -510,6 +561,8 @@ static double lemlib::effectiveSampleSize(const std::vector<Particle>& particles
 }
 
 static void lemlib::normalizeWeights(std::vector<Particle>& particles) {
+    if (particles.empty()) return;
+
     double sumW = 0.0;
     for (auto& p : particles) sumW += p.weight_;
 
@@ -538,10 +591,13 @@ void lemlib::init() {
 
 void lemlib::initParticles() {
     particles.clear();
-    particles.reserve(mclSettings.particleCount);
-    
-    for (int i = 0; i < mclSettings.particleCount; ++i) {
-        particles.emplace_back(odomPose, 1.0 / static_cast<double>(mclSettings.particleCount));
-        particles[i].addError(MAX_START_POS_ERROR_IN / 3.0f);
+    const int particleCount = std::max(0, mclSettings.particleCount);
+    if (particleCount == 0) return;
+
+    particles.reserve(static_cast<std::size_t>(particleCount));
+
+    for (int i = 0; i < particleCount; ++i) {
+        particles.emplace_back(odomPose, 1.0 / static_cast<double>(particleCount));
+        particles[i].addError(mclSettings.maxStartPosErrorIn / 3.0f);
     }
 }
