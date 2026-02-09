@@ -31,9 +31,9 @@ class MCLSettings {
         int particleCount = 0;
 
         std::vector<DistanceSensorConfig> distanceSensors{
-            {5, {-4.75f, 7.0f, 0.0f}},
-            {6, {-4.75f, 1.3f, -1.57079632679f}},
-            {7, {5.0f, 2.75f, 1.57079632679f}},
+            {7, {-4.75f, 7.0f, 0.0f}},
+            {5, {-4.75f, 1.3f, -1.57079632679f}},
+            {6, {5.0f, 2.75f, 1.57079632679f}},
         };
 
         float sigma0XY = 0.05f;

@@ -152,8 +152,8 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	sc.state = RobotState::DRIVER;
-	sc.hideSelector();
+	// sc.state = RobotState::DRIVER;
+	// sc.hideSelector();
 
 	// right9ball();	
 	// test();

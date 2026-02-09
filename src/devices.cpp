@@ -3,12 +3,12 @@
 
 namespace {
 lemlib::MCLSettings makeMCLSettings() {
-    lemlib::MCLSettings cfg(200); // Number of particles tracked by MCL.
+    lemlib::MCLSettings cfg(500); // Number of particles tracked by MCL.
 
     cfg.distanceSensors = {
-        {5, {-4.75f, 7.0f, 0.0f}},          // Front sensor: port, x offset, y offset, heading offset (rad).
-        {6, {-4.75f, 1.3f, -1.57079632679f}}, // Left sensor.
-        {7, {5.0f, 2.75f, 1.57079632679f}}, // Right sensor.
+        {7, {-4.75f, 7.0f, 0.0f}},            // Front sensor (old behavior): port 7.
+        {5, {-4.75f, 1.3f, -1.57079632679f}}, // Left sensor (old behavior): port 5.
+        {6, {5.0f, 2.75f, 1.57079632679f}},   // Right sensor (old behavior): port 6.
     };
 
     cfg.sigma0XY = 0.05f;         // Baseline XY process noise each cycle (in).
