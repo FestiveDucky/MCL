@@ -10,7 +10,7 @@ lemlib::MCLSettings makeMCLSettings() {
         {17, {-4.6f, 6.5f, 0.0f}},            // Front sensor (old behavior): port 7.
         {15, {-5.8f, -2.3f, -1.57079632679f}}, // Left sensor (old behavior): port 5.
         {21, {5.8f, -2.3f, 1.57079632679f}},   // Right sensor (old behavior): port 6.
-        {3, {-5.3f, -3.2f, M_PI}}
+        {3, {3.5f, -3.2f, M_PI}} //back sensor
     };
 
     cfg.sigma0XY = 0.05f;         // Baseline XY process noise each cycle (in).
