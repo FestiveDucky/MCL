@@ -51,7 +51,9 @@ void Screen::initialize() {
 void Screen::update() {
     if (autonNames.empty()) return;
 
-    const int raw = std::clamp(static_cast<int>(potentiometer.get_value()), POT_MIN, POT_MAX);
+    //potentiometer code I got rid of
+    //const int raw = std::clamp(static_cast<int>(potentiometer.get_value()), POT_MIN, POT_MAX);
+    const int raw = 0;
     const int count = static_cast<int>(autonNames.size());
 
     int idx = (static_cast<long long>(raw - POT_MIN) * count) / POT_SPAN;

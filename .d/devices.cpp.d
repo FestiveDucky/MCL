@@ -22,16 +22,16 @@ bin/devices.cpp.o: src/devices.cpp include/main.h include/api.h \
  include/liblvgl/core/../draw/../misc/../font/../draw/lv_draw_buf.h \
  include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_types.h \
  include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_area.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/lv_conf_internal.h \
  include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_types.h \
  include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_math.h \
  include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_color.h \
  include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_assert.h \
  include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_log.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/stdlib/lv_mem.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/stdlib/lv_string.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_types.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/stdlib/lv_mem.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/lv_conf_internal.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/stdlib/lv_string.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_types.h \
  include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_palette.h \
  include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_color.h \
  include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_color_op.h \
@@ -41,15 +41,15 @@ bin/devices.cpp.o: src/devices.cpp include/main.h include/api.h \
  include/liblvgl/core/../draw/../misc/../font/../misc/lv_area.h \
  include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache.h \
  include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache_entry.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/osal/lv_os.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_types.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/osal/lv_os_none.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/osal/lv_os.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/lv_conf_internal.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_types.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/osal/lv_os_none.h \
  include/liblvgl/core/../draw/../misc/../font/../misc/cache/../lv_types.h \
  include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache_private.h \
  include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache_lru_rb.h \
  include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_image_cache.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/lv_conf_internal.h \
  include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_image_header_cache.h \
  include/liblvgl/core/../draw/../misc/lv_color.h \
  include/liblvgl/core/../draw/../misc/lv_area.h \
@@ -142,39 +142,39 @@ bin/devices.cpp.o: src/devices.cpp include/main.h include/api.h \
  include/liblvgl/core/../others/sysmon/lv_sysmon.h \
  include/liblvgl/core/../others/sysmon/../../misc/lv_timer.h \
  include/liblvgl/core/../others/sysmon/../../others/observer/lv_observer.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_types.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_style.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_area.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_color.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_assert.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_tree.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_anim.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/display/lv_display.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_pos.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_scroll.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_style.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_bidi.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_style_gen.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_style.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_draw.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/draw/lv_draw_rect.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/draw/lv_draw_label.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/draw/lv_draw_image.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/draw/lv_draw_line.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/draw/lv_draw_arc.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_class.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_property.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_event.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_event.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/indev/lv_indev.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_group.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_ll.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_area.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_timer.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_event.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_group.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/lv_conf_internal.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_types.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_style.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_area.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_color.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_assert.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_tree.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_anim.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/display/lv_display.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_pos.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_scroll.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_style.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_bidi.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_style_gen.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_style.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_draw.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/draw/lv_draw_rect.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/draw/lv_draw_label.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/draw/lv_draw_image.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/draw/lv_draw_line.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/draw/lv_draw_arc.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_class.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_property.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_event.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_event.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/indev/lv_indev.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_group.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_ll.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_area.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_timer.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_event.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_group.h \
  include/liblvgl/core/../stdlib/builtin/lv_tlsf.h \
  include/liblvgl/core/../stdlib/builtin/../../lv_conf_internal.h \
  include/liblvgl/core/../stdlib/builtin/../../osal/lv_os.h \
@@ -245,12 +245,12 @@ bin/devices.cpp.o: src/devices.cpp include/main.h include/api.h \
  include/liblvgl/libs/qrcode/lv_qrcode_private.h \
  include/liblvgl/libs/qrcode/../../widgets/canvas/lv_canvas_private.h \
  include/liblvgl/libs/qrcode/../../widgets/canvas/../image/lv_image_private.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_private.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_private.h \
  include/liblvgl/libs/qrcode/../../widgets/canvas/../image/lv_image.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_fs.h \
- C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/draw/lv_draw.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/lv_conf_internal.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_fs.h \
+ c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/draw/lv_draw.h \
  include/liblvgl/libs/qrcode/../../widgets/canvas/lv_canvas.h \
  include/liblvgl/libs/qrcode/../../widgets/canvas/../../lv_conf_internal.h \
  include/liblvgl/libs/qrcode/../../widgets/canvas/../image/lv_image.h \
@@ -713,16 +713,16 @@ include/liblvgl/core/../draw/../misc/../font/lv_symbol_def.h:
 include/liblvgl/core/../draw/../misc/../font/../draw/lv_draw_buf.h:
 include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_types.h:
 include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_area.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/lv_conf_internal.h:
 include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_types.h:
 include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_math.h:
 include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_color.h:
 include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_assert.h:
 include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_log.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/stdlib/lv_mem.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/stdlib/lv_string.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_types.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/stdlib/lv_mem.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/lv_conf_internal.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/stdlib/lv_string.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_types.h:
 include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_palette.h:
 include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_color.h:
 include/liblvgl/core/../draw/../misc/../font/../draw/../misc/lv_color_op.h:
@@ -732,15 +732,15 @@ include/liblvgl/core/../draw/../misc/../font/../draw/../lv_conf_internal.h:
 include/liblvgl/core/../draw/../misc/../font/../misc/lv_area.h:
 include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache.h:
 include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache_entry.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/osal/lv_os.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_types.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/osal/lv_os_none.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/osal/lv_os.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/lv_conf_internal.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_types.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/osal/lv_os_none.h:
 include/liblvgl/core/../draw/../misc/../font/../misc/cache/../lv_types.h:
 include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache_private.h:
 include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_cache_lru_rb.h:
 include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_image_cache.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/lv_conf_internal.h:
 include/liblvgl/core/../draw/../misc/../font/../misc/cache/lv_image_header_cache.h:
 include/liblvgl/core/../draw/../misc/lv_color.h:
 include/liblvgl/core/../draw/../misc/lv_area.h:
@@ -833,39 +833,39 @@ include/liblvgl/core/../osal/lv_os.h:
 include/liblvgl/core/../others/sysmon/lv_sysmon.h:
 include/liblvgl/core/../others/sysmon/../../misc/lv_timer.h:
 include/liblvgl/core/../others/sysmon/../../others/observer/lv_observer.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_types.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_style.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_area.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_color.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_assert.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_tree.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_anim.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/display/lv_display.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_pos.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_scroll.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_style.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_bidi.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_style_gen.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_style.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_draw.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/draw/lv_draw_rect.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/draw/lv_draw_label.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/draw/lv_draw_image.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/draw/lv_draw_line.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/draw/lv_draw_arc.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_class.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_property.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_event.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_event.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/indev/lv_indev.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_group.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_ll.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_area.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_timer.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_event.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_group.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/lv_conf_internal.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_types.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_style.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_area.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_color.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_assert.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_tree.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_anim.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/display/lv_display.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_pos.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_scroll.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_style.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_bidi.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_style_gen.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_style.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_draw.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/draw/lv_draw_rect.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/draw/lv_draw_label.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/draw/lv_draw_image.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/draw/lv_draw_line.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/draw/lv_draw_arc.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_class.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_property.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_event.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_event.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/indev/lv_indev.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_group.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_ll.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_area.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_timer.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_event.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_group.h:
 include/liblvgl/core/../stdlib/builtin/lv_tlsf.h:
 include/liblvgl/core/../stdlib/builtin/../../lv_conf_internal.h:
 include/liblvgl/core/../stdlib/builtin/../../osal/lv_os.h:
@@ -939,12 +939,12 @@ include/liblvgl/others/observer/lv_observer.h:
 include/liblvgl/libs/qrcode/lv_qrcode_private.h:
 include/liblvgl/libs/qrcode/../../widgets/canvas/lv_canvas_private.h:
 include/liblvgl/libs/qrcode/../../widgets/canvas/../image/lv_image_private.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj_private.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj_private.h:
 include/liblvgl/libs/qrcode/../../widgets/canvas/../image/lv_image.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/lv_conf_internal.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/core/lv_obj.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/misc/lv_fs.h:
-C:/Users/alexr/Documents/GitHub/testtesttest/include/liblvgl/draw/lv_draw.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/lv_conf_internal.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/core/lv_obj.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/misc/lv_fs.h:
+c:/Users/caris/OneDrive/Documents/GitHub/MCL/include/liblvgl/draw/lv_draw.h:
 include/liblvgl/libs/qrcode/../../widgets/canvas/lv_canvas.h:
 include/liblvgl/libs/qrcode/../../widgets/canvas/../../lv_conf_internal.h:
 include/liblvgl/libs/qrcode/../../widgets/canvas/../image/lv_image.h:

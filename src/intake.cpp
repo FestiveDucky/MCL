@@ -30,6 +30,8 @@ void Intake::initialize() {
 }
 
 void Intake::store(int power) {
+    flappy.set_value(false);
+    flappier.set_value(true);
     cooldown = 200;
     jam_timer_ms = 0;
     reverse_timer_ms = 0;
@@ -37,14 +39,16 @@ void Intake::store(int power) {
     Intake::power = power;
     state = IntakeState::STORING;
     bottom_intake.move(Intake::power);
-    top_intake.move(0);
+    top_intake.move(Intake::power);
 }
 
 void Intake::score(int power, bool middle) {
     if (middle) {
-        middlescore_piston.set_value(true);
+        flappy.set_value(true);
+        flappier.set_value(true);
     } else {
-        top_score.set_value(false);
+        flappier.set_value(false);
+        flappy.set_value(false);
     }
     cooldown = 200;
     jam_timer_ms = 0;
@@ -74,8 +78,8 @@ void Intake::stop() {
     reversed = false;
     bottom_intake.move(0);
     top_intake.move(0);
-    middlescore_piston.set_value(false);
-    top_score.set_value(true);
+    flappy.set_value(false);
+    flappier.set_value(true);
 }
 
 void Intake::update() {

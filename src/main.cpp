@@ -50,6 +50,17 @@ int left_voltage = 0;
 int bottom_intake_voltage = 0;
 int top_intake_voltage = 0;
 bool just_lowered_hood = false;
+
+bool removerActivated = false;
+bool wingActivated = false;
+bool hoodActivated = false;
+bool scraperActivated = false;
+
+// flingBlue = false;
+bool removerPressedLast = false;
+bool hoodPressedLast = false;
+bool scraperPressedLast = false;
+bool wingPressedLast = false;
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -162,7 +173,7 @@ void opcontrol() {
 	
 
 	//right();
-	descore.set_value(true);
+	wing.set_value(true);
 	while (true) {
 		// Potentiometer test 
 		// int at = potentiometer.get_value();
@@ -170,48 +181,63 @@ void opcontrol() {
 
 
 		// if (controller.get_digital_new_release(DIGITAL_R1) || controller.get_digital_new_release(DIGITAL_R2) || controller.get_digital_new_release(DIGITAL_L1) || controller.get_digital_new_release(DIGITAL_L2)) {
-		if (controller.get_digital_new_release(DIGITAL_L1) || controller.get_digital_new_release(DIGITAL_L2) || controller.get_digital_new_release(DIGITAL_Y) || controller.get_digital_new_release(DIGITAL_R2)) {
+		if (controller.get_digital_new_release(DIGITAL_L1) || controller.get_digital_new_release(DIGITAL_L2) || controller.get_digital_new_release(DIGITAL_R1) || controller.get_digital_new_release(DIGITAL_R2)) {
 			bottom_intake_voltage = 0;
 			top_intake_voltage = 0;
-			top_score.set_value(true);
-			middlescore_piston.set_value(false);
-		}
-		
-		// release descore
-		if (controller.get_digital_new_release(DIGITAL_R1)) {
-			descore.set_value(true);
+			flappier.set_value(true);
+			flappy.set_value(false);
 		}
 
-		// Intake (Both)
-		if (controller.get_digital_new_press(DIGITAL_L2)) {
-			top_score.set_value(false);
+		// Intake (top)
+		if (controller.get_digital_new_press(DIGITAL_L1)) {
+			flappier.set_value(false);
+			flappy.set_value(false);
 			bottom_intake_voltage = 127;
 			top_intake_voltage = 127;
 		}
 
-		// Intake (Bottom)
-		if (controller.get_digital_new_press(DIGITAL_L1)) {
+		//storage in
+		if (controller.get_digital_new_press(DIGITAL_R1)) {
+			flappier.set_value(true);
+			flappy.set_value(false);
 			bottom_intake_voltage = 127;
+			top_intake_voltage = 127;
 		}
 
-		// Outtake
-		if (controller.get_digital_new_press(DIGITAL_Y)) {
+		// Outtake (Bottom)
+		if (controller.get_digital_new_press(DIGITAL_R2)) {
 			bottom_intake_voltage = -127;
 			top_intake_voltage = -127;
+			flappy.set_value(false);
+    		flappier.set_value(true);
 		}
 
 		// Scraper (toggle)
-		if (controller.get_digital_new_press(DIGITAL_RIGHT)) {
-			scraper_piston.toggle();
+		bool scraperPressedNow =
+			controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP);
+
+		if (scraperPressedNow && !scraperPressedLast) {
+		// Toggle scraper
+		scraperActivated = !scraperActivated;
+		scraper.set_value(scraperActivated);
 		}
 
-		// Descore (toggle)
-		if (controller.get_digital_new_press(DIGITAL_R1)) {
-			descore.set_value(false);
+		scraperPressedLast = scraperPressedNow;
+
+		//descore
+		bool removerPressedNow =
+			controller.get_digital(pros::E_CONTROLLER_DIGITAL_B);
+
+		if (removerPressedNow && !removerPressedLast) {
+		// Toggle remover
+		removerActivated = !removerActivated;
+		wing.set_value(removerActivated);
 		}
 
-		if (controller.get_digital_new_press(DIGITAL_R2)) {
-			middlescore_piston.set_value(true);
+		//middle goal
+		if (controller.get_digital_new_press(DIGITAL_L2)) {
+			flappy.set_value(true);
+			flappier.set_value(true);
 			bottom_intake_voltage = 127;
 			top_intake_voltage = 127;
 		}

@@ -22,8 +22,11 @@ extern pros::Controller controller;
 extern pros::adi::AnalogIn potentiometer;
 
 extern pros::Rotation vertical_rotation;
+extern pros::Rotation horizontal_rotation;
 
-extern pros::adi::Pneumatics scraper_piston;
-extern pros::adi::Pneumatics descore;
-extern pros::adi::Pneumatics middlescore_piston;
-extern pros::adi::Pneumatics top_score;
+extern pros::adi::DigitalOut scraper;
+extern pros::adi::DigitalOut wing;
+extern pros::adi::DigitalOut horLift;
+extern pros::adi::DigitalOut verLift;
+extern pros::adi::DigitalOut flappier;
+extern pros::adi::DigitalOut flappy;
