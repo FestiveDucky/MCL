@@ -175,10 +175,6 @@ void opcontrol() {
 	//right();
 	wing.set_value(true);
 	while (true) {
-		// Potentiometer test 
-		// int at = potentiometer.get_value();
-		// pros::lcd::print(3, "Potentiometer Value: %d", at);
-
 
 		// if (controller.get_digital_new_release(DIGITAL_R1) || controller.get_digital_new_release(DIGITAL_R2) || controller.get_digital_new_release(DIGITAL_L1) || controller.get_digital_new_release(DIGITAL_L2)) {
 		if (controller.get_digital_new_release(DIGITAL_L1) || controller.get_digital_new_release(DIGITAL_L2) || controller.get_digital_new_release(DIGITAL_R1) || controller.get_digital_new_release(DIGITAL_R2)) {
@@ -190,26 +186,29 @@ void opcontrol() {
 
 		// Intake (top)
 		if (controller.get_digital_new_press(DIGITAL_L1)) {
-			flappier.set_value(false);
-			flappy.set_value(false);
-			bottom_intake_voltage = 127;
-			top_intake_voltage = 127;
+			intake.score(127);
+			// flappier.set_value(false);
+			// flappy.set_value(false);
+			// bottom_intake_voltage = 127;
+			// top_intake_voltage = 127;
 		}
 
 		//storage in
 		if (controller.get_digital_new_press(DIGITAL_R1)) {
-			flappier.set_value(true);
-			flappy.set_value(false);
-			bottom_intake_voltage = 127;
-			top_intake_voltage = 127;
+			intake.store(127);
+			// flappier.set_value(true);
+			// flappy.set_value(false);
+			// bottom_intake_voltage = 127;
+			// top_intake_voltage = 127;
 		}
 
 		// Outtake (Bottom)
 		if (controller.get_digital_new_press(DIGITAL_R2)) {
-			bottom_intake_voltage = -127;
-			top_intake_voltage = -127;
-			flappy.set_value(false);
-    		flappier.set_value(true);
+			intake.outtake(127);
+			// bottom_intake_voltage = -127;
+			// top_intake_voltage = -127;
+			// flappy.set_value(false);
+    		// flappier.set_value(true);
 		}
 
 		// Scraper (toggle)
@@ -236,10 +235,11 @@ void opcontrol() {
 
 		//middle goal
 		if (controller.get_digital_new_press(DIGITAL_L2)) {
-			flappy.set_value(true);
-			flappier.set_value(true);
-			bottom_intake_voltage = 127;
-			top_intake_voltage = 127;
+			intake.score(127, true);
+			// flappy.set_value(true);
+			// flappier.set_value(true);
+			// bottom_intake_voltage = 127;
+			// top_intake_voltage = 127;
 		}
 
 

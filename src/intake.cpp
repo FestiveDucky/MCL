@@ -147,3 +147,31 @@ void Intake::update() {
     bottom_intake.move(reverseForPower(bottom_command, kReversePower));
     top_intake.move(reverseForPower(top_command, kReversePower));
 }
+
+// void stopIntake() {
+//     top_intake.brake();
+//     bottom_intake.brake();
+// }
+
+// void scoreTop() {
+//     flappier.set_value(false);
+//     flappy.set_value(false);
+//     top_intake.move(127);
+//     bottom_intake.move(127);
+// }
+
+// void scoreMiddle() {
+//     //intaking = true;
+//     flappy.set_value(true);
+//     flappier.set_value(true);
+//     top_intake.move(127); 
+//     bottom_intake.move(127);
+// }
+
+// void scoreBottom()
+// {   
+//     flappy.set_value(false);
+//     flappier.set_value(true);
+//     top_intake.move(-127);
+//     bottom_intake.move(-127);
+// }
