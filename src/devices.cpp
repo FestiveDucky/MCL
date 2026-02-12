@@ -6,9 +6,9 @@ lemlib::MCLSettings makeMCLSettings() {
     lemlib::MCLSettings cfg(500); // Number of particles tracked by MCL.
 
     cfg.distanceSensors = {
-        {7, {-4.75f, 7.0f, 0.0f}},            // Front sensor (old behavior): port 7.
-        {5, {-4.75f, 1.3f, -1.57079632679f}}, // Left sensor (old behavior): port 5.
-        {6, {5.0f, 2.75f, 1.57079632679f}},   // Right sensor (old behavior): port 6.
+        {14, {-4.75f, 7.0f, 0.0f}},            // Front sensor (old behavior): port 7.
+        {4, {-4.75f, 1.3f, -1.57079632679f}}, // Left sensor (old behavior): port 5.
+        {20, {5.0f, 2.75f, 1.57079632679f}},   // Right sensor (old behavior): port 6.
     };
 
     cfg.sigma0XY = 0.05f;         // Baseline XY process noise each cycle (in).
@@ -59,11 +59,11 @@ lemlib::MCLSettings makeMCLSettings() {
 
 lemlib::MCLSettings settings = makeMCLSettings();
 
-pros::MotorGroup left_motor_group({-11, 12, -13}, pros::MotorGears::blue);
-pros::MotorGroup right_motor_group({18, -19, 20}, pros::MotorGears::blue);
+pros::MotorGroup left_motor_group({11, -15, -13}, pros::MotorGears::blue);
+pros::MotorGroup right_motor_group({13, -17, 19}, pros::MotorGears::blue);
 
 pros::Motor bottom_intake(-10, pros::MotorGears::blue);
-pros::Motor top_intake(9, pros::MotorGears::blue);
+pros::Motor top_intake(2, pros::MotorGears::blue);
 
 // drivetrain settings
 lemlib::Drivetrain drivetrain(&left_motor_group, // left motor group
@@ -76,7 +76,7 @@ lemlib::Drivetrain drivetrain(&left_motor_group, // left motor group
 
 // imu
 pros::Imu imu(1);
-pros::Rotation vertical_rotation(-17);
+pros::Rotation vertical_rotation(-12);
 // vertical tracking wheel
 lemlib::TrackingWheel vertical_tracking_wheel(&vertical_rotation, lemlib::Omniwheel::NEW_275, 0.25);
 
@@ -93,10 +93,10 @@ lemlib::ControllerSettings lateral_controller(3.8, // proportional gain (kP)  //
                                               0, // integral gain (kI)
                                               24, // derivative gain (kD)    //was 10
                                               3, // anti windup
-                                              0.1, // small error range, in inches
-                                              200, // small error range timeout, in milliseconds
+                                              0.5, // small error range, in inches
+                                              150, // small error range timeout, in milliseconds
                                               1, // large error range, in inches
-                                              500, // large error range timeout, in milliseconds
+                                              300, // large error range timeout, in milliseconds
                                               15 // maximum acceleration (slew)
 );
 
@@ -137,7 +137,7 @@ pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 pros::adi::AnalogIn potentiometer ('A'); // Auton selector
 
-pros::adi::Pneumatics scraper_piston = pros::adi::Pneumatics('G', false);
+pros::adi::Pneumatics scraper_piston = pros::adi::Pneumatics('H', false);
 pros::adi::Pneumatics descore = pros::adi::Pneumatics('F', false);
-pros::adi::Pneumatics middlescore_piston = pros::adi::Pneumatics('H', false);
+pros::adi::Pneumatics middlescore_piston = pros::adi::Pneumatics('G', false);
 pros::adi::Pneumatics top_score = pros::adi::Pneumatics('E', true);
