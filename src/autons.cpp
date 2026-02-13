@@ -13,13 +13,12 @@ void soloAWP() {
     int scraperTimeout = 800;
     float matchLoaderSpeed = 60;
     int scraperDelay = 0;
-    int scoreDelay = 1500;
+    int scoreDelay = 1000;
 
     // First match loader
-    chassis.moveToPoint(-46.5, -48, 1500, {}, false);
-    chassis.turnToPoint(-46.5, -scraperDist, 800, {}, false);
+    chassis.moveToPoint(-46.5, -48, 1000, {}, false);
     scraper_piston.toggle();
-    pros::delay(500);
+    chassis.turnToPoint(-46.5, -scraperDist, 800, {}, false);
     intake.store(127);
     chassis.moveToPoint(-46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
     pros::delay(scraperDelay);
@@ -32,27 +31,36 @@ void soloAWP() {
     intake.stop();
 
     // Intake center 3 balls
-    chassis.moveToPoint(-48, -48, 1000, {}, false);
-    pros::delay(2000);
+    chassis.moveToPoint(-46, -46, 1000, {}, false);
     chassis.turnToPoint(-18, -18, 800, {}, false);
     intake.store(100);
-    lemlib::toggleMCL();
-    chassis.moveToPoint(-18, -18, 1500, {}, false);
-    pros::delay(500);
-    intake.stop();
+    chassis.moveToPoint(-18, -18, 1500, {.headingCorrection=5}, false);
 
+
+    lemlib::toggleMCL();
     // Score middle
     chassis.turnToPoint(-4, -4, 800, {.forwards=false}, false);
+    intake.stop();
     chassis.moveToPoint(-4, -4, 1000, {.forwards=false}, false);
     intake.score(127, true);
     pros::delay(scoreDelay);
     intake.stop();
 
     // Go to second set of 3 balls
-    chassis.moveToPoint(-24, -24, 1000, {}, false);
+    chassis.moveToPoint(-26, -26, 1000, {}, false);
     lemlib::toggleMCL();
+    chassis.turnToPoint(24, -24, 800, {}, false);
+    intake.store(127);
+    chassis.moveToPoint(26, -24, 2000, {.headingCorrection=5}, false);
 
-
+    // Go to second long goal
+    chassis.turnToPoint(48, -48, 800, {}, false);
+    chassis.moveToPoint(48, -48, 1500, {}, false);
+    intake.stop();
+    chassis.turnToPoint(48, -24, 800, {.forwards=false}, false);
+    chassis.moveToPoint(48, -24, 1000, {.forwards=false, .maxSpeed=70}, false);
+    intake.score(127);
+    pros::delay(5000);
 
 }
 
@@ -161,7 +169,7 @@ void skills() {
     // Turn to middle and score
     chassis.moveToPoint(-24, -24, 1000, {.forwards = false}, false);
     chassis.turnToPoint(-5, -5, 800, {.forwards = false}, false);
-    chassis.moveToPoint(-5, -5, 1500, {.forwards = false, .maxSpeed=40, .headingCorrection=true}, false);
+    chassis.moveToPoint(-5, -5, 1500, {.forwards = false, .maxSpeed=40, .headingCorrection=0}, false);
     scraper_piston.toggle();
     bottom_intake.move(-60);
     top_intake.move(-127);
@@ -191,7 +199,44 @@ void skills() {
 }
 
 void right() {
+    chassis.setPose(16, -47, 0);
+    descore.set_value(true);
 
+    int scraperDist = 66;
+    int scraperTimeout = 800;
+    float matchLoaderSpeed = 60;
+    int scraperDelay = 0;
+    int scoreDelay = 1000;
+
+    // Get first set of 3 balls
+    chassis.turnToPoint(26, -18, 800, {}, false);
+    intake.store(127);
+    chassis.moveToPoint(26, -18, 800, {}, false);
+
+    //POSSIBLY DROP SCRAPER WITH DISABLING ASYNC AND JUST USING A PROS::DELAY TO TIME IT
+
+    // Go to matchloader
+    chassis.turnToPoint(46.5, -48, 1000, {}, false);
+    intake.stop();
+    chassis.moveToPoint(46.5, -48, 1000, {}, false);
+    scraper_piston.toggle();
+    chassis.turnToPoint(46.5, -scraperDist, 800, {}, false);
+    intake.store(127);
+    chassis.moveToPoint(46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
+    pros::delay(scraperDelay);
+    intake.stop();
+
+    // Score in long goal
+    scraper_piston.toggle();
+    chassis.moveToPoint(48, -24, 1200, {.forwards=false, .maxSpeed=70}, false);
+    intake.score(127);
+    pros::delay(scoreDelay);
+    intake.stop();
+
+    // Push with deosicourwing
+    chassis.swingToPoint(39, -5, lemlib::DriveSide::RIGHT, 1000, {}, false);
+    descore.set_value(false);
+    chassis.moveToPoint(39, -5, 1000, {}, false);
 }
 
 void left() {

@@ -40,6 +40,7 @@ class MCLSettings {
         float kDistXY = 0.50f;
         float kTurnXY = 0.20f;
         float maxStartPosErrorIn = 2.0f;
+        float neffResampleThreshold = 0.50f;
 
         bool clampDeltaSForNoise = true;
         float maxDeltaSForNoise = 3.0f;
@@ -50,6 +51,7 @@ class MCLSettings {
         int estMsIters = 6;
         float estMsEpsStop = 0.1f;
         bool estUseHuberRefinement = true;
+        bool estUseEmaSmoothing = true;
         int estHuberIters = 3;
         float estHuberGateMult = 2.0f;
         float estHuberDeltaMult = 0.5f;
@@ -391,7 +393,8 @@ struct MoveToPointParams {
         /** distance between the robot and target point where the movement will exit. Only has an effect if minSpeed is
          * non-zero.*/
         float earlyExitRange = 0;
-        bool headingCorrection = true;
+        /** lateral error bound where angular correction is disabled. 0 keeps heading correction always on by default */
+        int headingCorrection = 0;
 };
 
 // default drive curve

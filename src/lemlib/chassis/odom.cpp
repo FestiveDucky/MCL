@@ -341,10 +341,11 @@ void lemlib::update() {
             // 4) Neff check -> resample if needed
             const double Neff = effectiveSampleSize(particles);
             const double N = static_cast<double>(particles.size());
+            const double neffThreshold = static_cast<double>(mclSettings.neffResampleThreshold) * N;
 
-            // Typical threshold: 0.5N (tune)
-            // printf("N-Effective: %f, Threshold, %f\n", Neff, 0.5 * N);
-            if (Neff < 0.5 * N) {
+            // Typical threshold: 0.5N (tune via mclSettings.neffResampleThreshold)
+            // printf("N-Effective: %f, Threshold, %f\n", Neff, neffThreshold);
+            if (Neff < neffThreshold) {
                 particles = systematicResample(particles);
 
                 // Optional: "roughening" / jitter here to prevent duplicates
@@ -482,6 +483,10 @@ static std::pair<float, float> lemlib::weightedMeanXY(const std::vector<Particle
             robustY = nextY;
             if ((ddx * ddx + ddy * ddy) <= 1e-4) break;
         }
+    }
+
+    if (!mclSettings.estUseEmaSmoothing) {
+        return {static_cast<float>(robustX), static_cast<float>(robustY)};
     }
 
     // 3) Adaptive EMA smoothing based on local spread around robust estimate.
