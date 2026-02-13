@@ -7,7 +7,7 @@
 
 void soloAWP() {
     chassis.setPose(-13, -47, -90);
-    descore.set_value(true);
+    // descore.set_value(true);
 
     int scraperDist = 66;
     int scraperTimeout = 800;
@@ -17,14 +17,14 @@ void soloAWP() {
 
     // First match loader
     chassis.moveToPoint(-46.5, -48, 1000, {}, false);
-    scraper_piston.toggle();
+    // scraper.toggle();
     chassis.turnToPoint(-46.5, -scraperDist, 800, {}, false);
     intake.store(127);
     chassis.moveToPoint(-46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
     pros::delay(scraperDelay);
 
     // Score in long goal
-    scraper_piston.toggle();
+    // scraper.toggle();
     chassis.moveToPoint(-48, -24, 1200, {.forwards=false, .maxSpeed=70}, false);
     intake.score(127);
     pros::delay(scoreDelay);
@@ -76,8 +76,9 @@ void skills() {
 
     // First match loader
     chassis.moveToPoint(-46.5, -48, 2000, {}, false);
-    chassis.turnToPoint(-46.5, -scraperDist, 800, {}, false);
-    scraper_piston.toggle();
+    // chassis.turnToPoint(-46.5, -scraperDist, 800, {}, false);
+    chassis.turnToHeading(-180, 800);
+    // scraper.toggle();
     pros::delay(500);
     intake.store(127);
     chassis.moveToPoint(-46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
@@ -156,7 +157,7 @@ void skills() {
     // Get first set of 4 center balls
     chassis.moveToPoint(48, -48, 1000, {}, false);
     chassis.turnToPoint(18, -18, 800, {}, false);
-    scraper_piston.toggle();
+    // scraper.toggle();
     intake.store(127);
     chassis.moveToPoint(18, -18, 1500, {.maxSpeed=55}, false);
 
@@ -170,14 +171,14 @@ void skills() {
     chassis.moveToPoint(-24, -24, 1000, {.forwards = false}, false);
     chassis.turnToPoint(-5, -5, 800, {.forwards = false}, false);
     chassis.moveToPoint(-5, -5, 1500, {.forwards = false, .maxSpeed=40, .headingCorrection=0}, false);
-    scraper_piston.toggle();
+    // scraper.toggle();
     bottom_intake.move(-60);
     top_intake.move(-127);
     pros::delay(800);
     intake.score(127, true);
     pros::delay(scoreDelay + 1000);
     intake.stop();
-    scraper_piston.toggle();
+    // scraper.toggle();
 
     // Move to park zone and Park
     chassis.moveToPoint(-48, -48, 3000, {.maxSpeed=40}, false);
@@ -187,14 +188,14 @@ void skills() {
     chassis.moveToPoint(-20, -62, 1300, {.maxSpeed=40}, false);
     chassis.turnToHeading(100, 800, {}, false);
     // chassis.moveToPose(-20, -60, 100, 1250, {.minSpeed=40, .earlyExitRange=5}, false);
-    scraper_piston.toggle();
+    // scraper.toggle();
     bottom_intake.move(-127);
     pros::delay(500);
     
     chassis.tank(127, 127, true);
     pros::delay(550);
     chassis.tank(0, 0, true);
-    scraper_piston.toggle();
+    // scraper.toggle();
     pros::delay(10000);
 }
 
@@ -219,7 +220,7 @@ void right() {
     chassis.turnToPoint(46.5, -48, 1000, {}, false);
     intake.stop();
     chassis.moveToPoint(46.5, -48, 1000, {}, false);
-    scraper_piston.toggle();
+    // scraper.toggle();
     chassis.turnToPoint(46.5, -scraperDist, 800, {}, false);
     intake.store(127);
     chassis.moveToPoint(46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
@@ -227,7 +228,7 @@ void right() {
     intake.stop();
 
     // Score in long goal
-    scraper_piston.toggle();
+    // scraper.toggle();
     chassis.moveToPoint(48, -24, 1200, {.forwards=false, .maxSpeed=70}, false);
     intake.score(127);
     pros::delay(scoreDelay);

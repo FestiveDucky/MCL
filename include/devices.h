@@ -30,3 +30,4 @@ extern pros::adi::DigitalOut horLift;
 extern pros::adi::DigitalOut verLift;
 extern pros::adi::DigitalOut flappier;
 extern pros::adi::DigitalOut flappy;
+extern pros::adi::DigitalOut descore;

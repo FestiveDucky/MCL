@@ -70,14 +70,15 @@ bool wingPressedLast = false;
  */
 void initialize() {
 	vertical_rotation.reset();
+	horizontal_rotation.reset();
 	// pros::lcd::initialize();
     chassis.calibrate();
     // Keep MCL initialized/running, but paused until autonomous starts.
     setMCLPaused(true);
 	controller.clear();
 	// controller.set_text(0, 0, "Blub Blub");
-	sc.setAutonNames(autonNamesFromTable());
-	sc.initialize();
+	// sc.setAutonNames(autonNamesFromTable());
+	// sc.initialize();
 	intake.initialize();
 
     static pros::Task screen_task([&]() {
@@ -144,9 +145,10 @@ void competition_initialize() {
 void autonomous() {
     sc.state = RobotState::AUTONOMOUS;
     setMCLPaused(false);
-    int idx = sc.selectedAuton;
-    if (idx < 0 || idx >= static_cast<int>(AUTONS.size())) idx = 0;
-    if (AUTONS[idx].run != nullptr) AUTONS[idx].run();
+		skills();
+    // int idx = sc.selectedAuton;
+    // if (idx < 0 || idx >= static_cast<int>(AUTONS.size())) idx = 0;
+    // if (AUTONS[idx].run != nullptr) AUTONS[idx].run();
 }
 
 
