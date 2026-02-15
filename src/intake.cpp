@@ -123,29 +123,9 @@ void Intake::update() {
         return;
     }
 
-    const bool command_active = std::abs(bottom_command) > 0;
-    const int current_ma = std::abs(bottom_intake.get_current_draw());
-    const double velocity_rpm = std::abs(bottom_intake.get_actual_velocity());
-    const bool jam_candidate =
-        command_active &&
-        current_ma > kJamCurrentThresholdMa &&
-        velocity_rpm < kJamVelocityThresholdRpm;
-
-    if (!jam_candidate) {
-        jam_timer_ms = 0;
-        return;
-    }
-
-    jam_timer_ms += kUpdatePeriodMs;
-    if (jam_timer_ms < kJamDetectTimeMs) {
-        return;
-    }
-
-    jam_timer_ms = 0;
-    reversed = true;
-    reverse_timer_ms = kReverseDurationMs;
-    bottom_intake.move(reverseForPower(bottom_command, kReversePower));
-    top_intake.move(reverseForPower(top_command, kReversePower));
+    // Anti-jam disabled
+    (void)bottom_command;
+    (void)top_command;
 }
 
 // void stopIntake() {

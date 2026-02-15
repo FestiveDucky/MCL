@@ -78,7 +78,7 @@ void initialize() {
 	controller.clear();
 	// controller.set_text(0, 0, "Blub Blub");
 	// sc.setAutonNames(autonNamesFromTable());
-	// sc.initialize();
+	sc.initialize();
 	intake.initialize();
 
     static pros::Task screen_task([&]() {
@@ -145,7 +145,7 @@ void competition_initialize() {
 void autonomous() {
     sc.state = RobotState::AUTONOMOUS;
     setMCLPaused(false);
-		skills();
+		skills2();
     // int idx = sc.selectedAuton;
     // if (idx < 0 || idx >= static_cast<int>(AUTONS.size())) idx = 0;
     // if (AUTONS[idx].run != nullptr) AUTONS[idx].run();
@@ -190,6 +190,14 @@ void opcontrol() {
 		// Intake (top)
 		if (controller.get_digital_new_press(DIGITAL_L1)) {
 			intake.score(127);
+			// flappier.set_value(false);
+			// flappy.set_value(false);
+			// bottom_intake_voltage = 127;
+			// top_intake_voltage = 127;
+		}
+
+		if (controller.get_digital_new_press(DIGITAL_L1)) {
+			intake.score(90, true);
 			// flappier.set_value(false);
 			// flappy.set_value(false);
 			// bottom_intake_voltage = 127;

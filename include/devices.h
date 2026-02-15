@@ -2,6 +2,7 @@
 
 #include "main.h"
 #include "pros/adi.hpp"
+#include "pros/imu.hpp"
 #include "pros/misc.hpp"
 
 extern pros::MotorGroup left_motor_group;
@@ -13,6 +14,7 @@ extern pros::Motor bottom_intake;
 extern pros::Motor top_intake;
 
 extern lemlib::Chassis chassis;
+extern pros::Imu imu;
 
 extern lemlib::ControllerSettings lateral_controller;
 extern lemlib::ControllerSettings angular_controller;
