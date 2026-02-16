@@ -19,13 +19,14 @@ struct AutonOption {
 };
 
 // Change this table to change auton count and mapping for the potentiometer selector.
-const std::array<AutonOption, 6> AUTONS = {{
+const std::array<AutonOption, 7> AUTONS = {{
     {"Left", left},
     {"Right", right},
     {"Skills", skills},
     {"Five Inch", fiveInch},
 	{"Test", test},
-	{"Solo AWP", soloAWP}
+	{"Solo AWP", soloAWP},
+	{"Skills 2", skills2}
 }};
 
 std::vector<std::string> autonNamesFromTable() {
@@ -203,6 +204,7 @@ void opcontrol() {
 
 		// Scraper (toggle)
 		if (controller.get_digital_new_press(DIGITAL_RIGHT)) {
+			// scraper_piston.set_value(true);
 			scraper_piston.toggle();
 		}
 

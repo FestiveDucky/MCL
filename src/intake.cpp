@@ -29,7 +29,7 @@ void Intake::initialize() {
 
 }
 
-void Intake::store(int power) {
+void Intake::store(int power, bool includeTop) {
     cooldown = 200;
     jam_timer_ms = 0;
     reverse_timer_ms = 0;
@@ -37,7 +37,12 @@ void Intake::store(int power) {
     Intake::power = power;
     state = IntakeState::STORING;
     bottom_intake.move(Intake::power);
-    top_intake.move(0);
+    if (includeTop) {
+        top_intake.move(30);
+    } else {
+        top_intake.move(0);
+    }
+    
 }
 
 void Intake::score(int power, bool middle) {

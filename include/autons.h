@@ -3,6 +3,7 @@
 void right();
 void left();
 void soloAWP();
+void skills2();
 void test();
 // void right();
 void skills();

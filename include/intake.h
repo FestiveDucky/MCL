@@ -32,7 +32,7 @@ class Intake {
         IntakeState state = STOPPED;
         void initialize();
 
-        void store(int power);
+        void store(int power, bool includeTop=false);
         void score(int power, bool middle=false);
         void outtake(int power);
         void stop();
