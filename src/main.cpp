@@ -3,6 +3,8 @@
 #include "lemlib/chassis/odom.hpp"
 #include "liblvgl/lv_conf_internal.h"
 #include "liblvgl/misc/lv_area.h"
+#include "pros/abstract_motor.hpp"
+#include "pros/motors.h"
 #include "screen.h"
 #include "autons.h"
 #include "intake.h"
@@ -144,6 +146,8 @@ void competition_initialize() {
  */
 void autonomous() {
     sc.state = RobotState::AUTONOMOUS;
+		left_motor_group.set_brake_mode(MOTOR_BRAKE_HOLD);
+		right_motor_group.set_brake_mode(MOTOR_BRAKE_HOLD);
     setMCLPaused(false);
 		skills2();
     // int idx = sc.selectedAuton;
