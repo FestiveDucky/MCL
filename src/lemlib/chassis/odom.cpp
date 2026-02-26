@@ -105,6 +105,16 @@ std::uint32_t lemlib::getCalculationTime() {
     return updateTime;
 }
 
+// PROS distance sensor returns 9999 mm when no object is detected (not PROS_ERR)
+constexpr std::int32_t DISTANCE_NO_OBJECT_MM = 9999;
+
+float lemlib::getDistanceInchesByIndex(std::size_t index) {
+    if (index >= distanceSensors.size() || distanceSensors[index] == nullptr) return std::numeric_limits<float>::quiet_NaN();
+    std::int32_t mm = distanceSensors[index]->get_distance();
+    if (mm == PROS_ERR || mm >= DISTANCE_NO_OBJECT_MM) return std::numeric_limits<float>::quiet_NaN();
+    return mm * MM_TO_IN;
+}
+
 void lemlib::setMCLSettings(const lemlib::MCLSettings& settings) {
     mclSettings = settings;
     configureDistanceSensors();

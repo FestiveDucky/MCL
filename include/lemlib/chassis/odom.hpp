@@ -70,6 +70,8 @@ void initParticles();
 std::uint32_t getCalculationTime();
 std::uint32_t getConfidence();
 void toggleMCL();
+/** @brief Read distance in inches from MCL distance sensor by index (0=first in config, e.g. front). Returns NaN if invalid. */
+float getDistanceInchesByIndex(std::size_t index);
 
 static double effectiveSampleSize(const std::vector<Particle>& particles);
 static std::vector<Particle> systematicResample(const std::vector<Particle>& particles);
