@@ -69,7 +69,8 @@ void lemlib::Chassis::moveToPoint(float x, float y, int timeout, MoveToPointPara
         // calculate error
         const float adjustedRobotTheta = params.forwards ? pose.theta : pose.theta + M_PI;
         const float angularError = angleError(adjustedRobotTheta, pose.angle(target));
-        float lateralError = pose.distance(target) * cos(angleError(pose.theta, pose.angle(target)));
+        float lateralError = pose.distance(target) 
+        * cos(angleError(pose.theta, pose.angle(target)));
 
         // update exit conditions
         lateralSmallExit.update(lateralError);
