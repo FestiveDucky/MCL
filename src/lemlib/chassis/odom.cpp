@@ -271,7 +271,7 @@ void lemlib::update() {
     float sigmaXY;
     if (paused) {
         // Only add minor amounts of error to positions if we are paused
-        sigmaXY = mclSettings.sigma0XY;
+        sigmaXY = mclSettings.sigma0XY / 2;
     } else {
         sigmaXY = mclSettings.sigma0XY + mclSettings.kDistXY * deltaSForNoise + mclSettings.kTurnXY * deltaT;
         if (mclSettings.clampSigmaXY) sigmaXY = std::min(sigmaXY, mclSettings.maxSigmaXY);

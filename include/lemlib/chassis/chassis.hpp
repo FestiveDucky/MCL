@@ -397,6 +397,63 @@ struct MoveToPointParams {
         int headingCorrection = 0;
 };
 
+/**
+ * @brief Parameters for Chassis::moveToPointRamsete
+ *
+ * Uses a profiled straight-line reference with RAMSETE pose stabilization and
+ * wheel-voltage feedforward.
+ */
+struct MoveToPointRamseteParams {
+        /** whether the robot should drive to the point forwards or backwards. True by default */
+        bool forwards = true;
+        /** max linear speed as a percentage of drivetrain theoretical max speed. Value between 0-127. 90 by default */
+        float maxSpeed = 90;
+        /** max linear acceleration of the reference profile, in inches/s^2. 40 by default */
+        float maxAccel = 40;
+        /** RAMSETE aggressiveness gain. 1.2 by default */
+        float b = 1.2;
+        /** RAMSETE damping ratio. 0.9 by default */
+        float zeta = 0.9;
+        /** if true, prioritize translation first then settle final heading near the goal. True by default */
+        bool pointFirstThenTurn = true;
+        /** allows limited opposite-direction linear correction near the goal. True by default */
+        bool allowReverseNearGoal = true;
+        /** distance to goal where opposite-direction linear correction can be enabled, in inches. 6 by default */
+        float reverseEnableDist = 6;
+        /** maximum opposite-direction linear correction speed near the goal, in inches/s. 8 by default */
+        float maxReverseSpeed = 8;
+        /** distance-to-goal threshold to enter final-turn phase, in inches. 3 by default */
+        float turnPhaseEnterDist = 3;
+        /** profile speed threshold to enter final-turn phase, in inches/s. 8 by default */
+        float turnPhaseEnterSpeed = 8;
+        /** max linear hold speed in final-turn phase, in inches/s. 10 by default */
+        float finalHoldMaxSpeed = 10;
+        /** max angular speed in translate phase, in rad/s. 4.19 (~240 deg/s) by default */
+        float maxOmegaTranslate = 4.19;
+        /** max angular speed in final-turn phase, in rad/s. 2.62 (~150 deg/s) by default */
+        float maxOmegaFinal = 2.62;
+        /** final-turn heading P gain, in rad/s per rad. 2.8 by default */
+        float finalHeadingK = 2.8;
+        /** path progress where heading begins blending to final heading. Value between 0-1. 1.0 by default */
+        float headingBlendStart = 1.0;
+        /** pose EMA smoothing factor (0-1). Higher is less smoothing. 0.3 by default */
+        float poseFilterAlpha = 0.3;
+        /** lateral RAMSETE deadband in inches to reduce buzz around the setpoint. 0.2 by default */
+        float lateralDeadband = 0.2;
+        /** max per-side output voltage in mV. 12000 by default */
+        float maxVoltage = 12000;
+        /** max per nominal 10ms-loop voltage change in mV. 900 by default */
+        float voltageSlew = 900;
+        /** static feedforward gain in mV. 450 by default */
+        float kS = 450;
+        /** velocity feedforward gain in mV / (in/s). 0 auto-computes from drivetrain max speed */
+        float kV = 0;
+        /** acceleration feedforward gain in mV / (in/s^2) */
+        float kA = 0;
+        /** velocity feedback gain in mV / (in/s). 22 by default */
+        float kP = 22;
+};
+
 // default drive curve
 extern ExpoDriveCurve defaultDriveCurve;
 
@@ -754,6 +811,21 @@ class Chassis {
          * @endcode
          */
         void moveToPoint(float x, float y, int timeout, MoveToPointParams params = {}, bool async = true);
+        /**
+         * @brief Move to a target point with a target final heading
+         *
+         * Uses a profiled straight-line reference, RAMSETE pose feedback, and
+         * wheel-voltage feedforward.
+         *
+         * @param x target x location
+         * @param y target y location
+         * @param theta target heading in degrees (same convention as other chassis APIs)
+         * @param timeout longest time the robot can spend moving
+         * @param params struct to simulate named parameters
+         * @param async whether the function should be run asynchronously. true by default
+         */
+        void moveToPointRamsete(float x, float y, float theta, int timeout, MoveToPointRamseteParams params = {},
+                                bool async = true);
         /**
          * @brief Move the chassis along a path
          *

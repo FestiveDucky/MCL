@@ -81,7 +81,7 @@ lemlib::MCLSettings makeMCLSettings() {
     cfg.clampSigmaXY = true;        // Caps computed sigmaXY to prevent blowups.
     cfg.maxSigmaXY = 1.75f;         // Upper bound for sigmaXY (in).
 
-    cfg.estMsBandwidth = 4.5f;      // Mean-shift kernel radius (in).
+    cfg.estMsBandwidth = 8.5f;      // Mean-shift kernel radius (in).
     cfg.estMsIters = 6;             // Max mean-shift refinement iterations.
     cfg.estMsEpsStop = 0.1f;        // Mean-shift convergence threshold (in).
     cfg.estUseHuberRefinement = true; // Enables robust Huber refinement pass.
@@ -120,8 +120,8 @@ lemlib::MCLSettings makeMCLSettings() {
 
 lemlib::MCLSettings settings = makeMCLSettings();
 
-pros::MotorGroup left_motor_group({-5, 11, -18}, pros::MotorGears::blue);
-pros::MotorGroup right_motor_group({9, -17, 13}, pros::MotorGears::blue);
+pros::MotorGroup left_motor_group({-1, 11, -13}, pros::MotorGears::blue);
+pros::MotorGroup right_motor_group({9, -17, 12}, pros::MotorGears::blue);
 
 pros::Motor bottom_intake(-10, pros::MotorGears::blue);
 pros::Motor top_intake(2, pros::MotorGears::blue);
@@ -136,10 +136,10 @@ lemlib::Drivetrain drivetrain(&left_motor_group, // left motor group
 );
 
 // imu
-pros::Imu imu(1);
-pros::Rotation vertical_rotation(-12);
+pros::Imu imu(5);
+pros::Rotation vertical_rotation(-18);
 // vertical tracking wheel
-lemlib::TrackingWheel vertical_tracking_wheel(&vertical_rotation, lemlib::Omniwheel::NEW_275, 0.25);
+lemlib::TrackingWheel vertical_tracking_wheel(&vertical_rotation, lemlib::Omniwheel::NEW_275, 0.6);
 
 // odometry settings
 lemlib::OdomSensors sensors(&vertical_tracking_wheel, // vertical tracking wheel 1 &vertical_tracking_wheel
@@ -157,7 +157,7 @@ lemlib::ControllerSettings lateral_controller(3.8, // proportional gain (kP)  //
                                               0.5, // small error range, in inches
                                               150, // small error range timeout, in milliseconds
                                               1, // large error range, in inches
-                                              300, // large error range timeout, in milliseconds
+                                              200, // large error range timeout, in milliseconds
                                               15 // maximum acceleration (slew)
 );
 
@@ -167,9 +167,9 @@ lemlib::ControllerSettings angular_controller(1.82, // proportional gain (kP) 1.
                                               12.5, // derivative gain (kD) // was 16
                                               3, // anti windup
                                               1, // small error range, in degrees
-                                              200, // small error range timeout, in milliseconds
-                                              3, // large error range, in degrees
-                                              500, // large error range timeout, in milliseconds
+                                              100, // small error range timeout, in milliseconds
+                                              2, // large error range, in degrees
+                                              200, // large error range timeout, in milliseconds
                                               15 // maximum acceleration (slew)
 );
 

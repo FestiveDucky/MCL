@@ -165,6 +165,7 @@ void opcontrol() {
 
 	//right();
 	descore.set_value(true);
+	intake.stop();
 	while (true) {
 		// Potentiometer test 
 		// int at = potentiometer.get_value();
@@ -213,10 +214,11 @@ void opcontrol() {
 			descore.set_value(false);
 		}
 
+		// Middle Score
 		if (controller.get_digital_new_press(DIGITAL_R2)) {
 			middlescore_piston.set_value(true);
 			bottom_intake_voltage = 127;
-			top_intake_voltage = 127;
+			top_intake_voltage = 60;
 		}
 
 

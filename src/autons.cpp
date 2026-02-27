@@ -14,7 +14,7 @@ void move(double power, double turn, bool swing=false, double time=10000) {
     if (swing && right < 0) {right = 0;}
 
     left_motor_group.move(left);
-    right_motor_group.move(left);
+    right_motor_group.move(right);
     pros::delay(time);
     left_motor_group.brake();
     right_motor_group.brake();
@@ -45,7 +45,8 @@ void soloAWP() {
 
     // Score in long goal
     scraper_piston.toggle();
-    chassis.moveToPoint(48, -24, 1200, {.forwards=false, .maxSpeed=70}, false);
+    chassis.moveToPoint(48, -24, 1000, {.forwards=false, .maxSpeed=70}, true);
+    pros::delay(650);
     intake.score(127);
     pros::delay(scoreDelay);
     intake.stop();
@@ -61,8 +62,8 @@ void soloAWP() {
     // Move to second set of 3 balls
     chassis.turnToPoint(-24, -24, 400, {}, false);
     scraper_piston.toggle();
-    chassis.moveToPoint(-24, -24, 1500, {}, true);
-    pros::delay(950);
+    chassis.moveToPoint(-24, -24, 1100, {}, true);
+    pros::delay(900);
     scraper_piston.toggle();
     intake.stop();
 
@@ -70,9 +71,10 @@ void soloAWP() {
     lemlib::toggleMCL();
     chassis.turnToPoint(-6, -6, 600, {.forwards=false}, false);
     top_intake.move(-100);
-    bottom_intake.move(-50);
-    chassis.moveToPoint(-6, -6, 1000, {.forwards=false}, false);
-    intake.score(100, true);
+    bottom_intake.move(-20);
+    chassis.moveToPoint(-6, -6, 800, {.forwards=false}, true);
+    pros::delay(700);
+    intake.score(127, true);
     pros::delay(scoreDelay);
     intake.stop();
 
@@ -264,10 +266,10 @@ void left() {
     descore.set_value(true);
 
     int scraperDist = 70;
-    int scraperTimeout = 900;
-    float matchLoaderSpeed = 60;
-    int scraperDelay = 0;
-    int scoreDelay = 1000;
+    int scraperTimeout = 700;
+    float matchLoaderSpeed = 40;
+    int scraperDelay = 700;
+    int scoreDelay = 1100;
 
     // First match loader
     chassis.moveToPoint(-46.5, -48, 1000, {}, false);
@@ -275,44 +277,50 @@ void left() {
     chassis.turnToPoint(-46.5, -scraperDist, 800, {}, false);
     intake.store(127);
     chassis.moveToPoint(-46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
-    pros::delay(scraperDelay);
+    move(20, 0, false, scraperDelay);
 
     // Score in long goal
     scraper_piston.toggle();
-    chassis.moveToPoint(-48, -24, 1200, {.forwards=false, .maxSpeed=70}, false);
+    chassis.moveToPoint(-48, -10, 1200, {.forwards=false, .maxSpeed=75}, true);
+    pros::delay(650);
     intake.score(127);
-    pros::delay(scoreDelay);
+    move(-10, 0, false, scoreDelay);
     intake.stop();
 
     // Intake center 3 balls
-    chassis.moveToPoint(-46, -46, 1000, {}, false);
-    chassis.turnToPoint(-18, -18, 800, {}, false);
-    intake.store(100);
-    chassis.moveToPoint(-18, -18, 1500, {.headingCorrection=5}, false);
+    chassis.turnToPoint(-20, -24, 800, {.direction=lemlib::AngularDirection::CCW_COUNTERCLOCKWISE}, true);
+    intake.store(127);
+    chassis.moveToPoint(-20, -24, 1500, {.maxSpeed=70}, true);
+    chassis.turnToPoint(-4, -2, 800, {.forwards = false}, false);
 
     lemlib::toggleMCL();
-    // Score middle
-    chassis.turnToPoint(-4, -4, 800, {.forwards=false}, false);
     intake.stop();
     top_intake.move(-100);
-    chassis.moveToPoint(-4, -4, 1000, {.forwards=false}, false);
-    intake.score(100, true);
-    pros::delay(scoreDelay);
+    bottom_intake.move(-20);
+    chassis.moveToPoint(-4, -2, 1000, {.forwards = false}, false);
+    intake.score(127, true);
+    move(-20,0,false, 1500);
     intake.stop();
 
     // Push with deosicourwing
-    chassis.moveToPoint(-37, -37, 1200, {}, false);
-    lemlib::toggleMCL();
+    chassis.moveToPoint(-38, -26, 1200, {}, false);
+    // lemlib::toggleMCL();
     descore.set_value(false);
-    chassis.turnToHeading(0, 1000, {.direction=AngularDirection::CW_CLOCKWISE}, false);
-    chassis.moveToPoint(-37, -8, 1000, {}, false);
+    chassis.turnToHeading(-5, 1000, {.direction=AngularDirection::CW_CLOCKWISE}, true);
+    chassis.moveToPoint(-40, -6, 1000, {}, true);
+    chassis.turnToHeading(60, 1000, {}, false);
     
 }
 
+// ASSET(path1_txt);
 void test() {
-    chassis.setPose(24, -48, 0);
-    intake.score(127);
-    pros::delay(100000);
+    chassis.setPose(-24, -48, -90);
+    // chassis.moveToPointRamsete(-48, -48, -180, 5000, {.maxSpeed=110, .maxAccel=15, .zeta=2, .headingBlendStart=0.9, .poseFilterAlpha=0.3, .lateralDeadband=0.5, .voltageSlew=1000, .kS=15, .kP=10}, false);
+    // chassis.moveToPointRamsete(-48, -48, -180, 5000, {}, false);
+    // chassis.moveToPoint(-48, -48, 5000, {}, true);
+    // chassis.turnToPoint(-48, -70, 5000, {}, true);
+    // chassis.follow(path1_txt, 10, 100000, false);
+
 }
 
 void fiveInch() {
@@ -326,54 +334,56 @@ void skills2() {
     chassis.setPose(-5, -46, 0);
     descore.set_value(true);
 
-    int scraperDist = 65;
+    int scraperDist = 67;
     int scraperTimeout = 1200;
     float matchLoaderSpeed = 50;
     int scraperDelay = 1500;
     int scoreDelay = 2500;
-      // Get first 4 balls & score in middle
-    // chassis.moveToPose(-22, -22, -45, 1500, {.lead = .3}, false);
-    intake.store(127);
-    chassis.turnToPoint(-21,-25,800,{},false);
-    chassis.moveToPoint(-21,-25,1000,{},false);
+    int goalPosition = 25;
+
+
+    // Get first 4 balls & score in middle
+    intake.store(100);
+    chassis.turnToPoint(-24, -24, 800, {}, true);
+    chassis.moveToPoint(-24, -24, 1000,{}, true);
+    pros::delay(525);
+    scraper_piston.toggle();
+    pros::delay(200);
+
     lemlib::toggleMCL();
-
+    chassis.turnToPoint(-2, -8, 800, {.forwards = false}, false);
     intake.stop();
-    chassis.turnToPoint(-9.37,-7.63, 800, {.forwards = false}, false);
-    top_intake.move(-60);
-    chassis.moveToPoint(-9.37,-7.63, 1000, {.forwards = false}, false);
-    // scoreMiddle();
-    intake.score(90, true);
+    top_intake.move(-100);
+    bottom_intake.move(-20);
+    chassis.moveToPoint(-2, -8, 1000, {.forwards = false}, false);
+    intake.score(127, true);
+    move(-20,0,false, 1500);
+    // The above takes 6.6s
 
-    move(-20,0,false, 600);
-    pros::delay(300);
-
-// //     // First match loader
-    chassis.turnToPoint(-48, -48, 800, {}, false);
+    // First match loader
+    intake.stop();
     intake.store(127);
-    chassis.moveToPoint(-48, -48, 1000, {}, false);
-    chassis.turnToHeading(-180,800,{}, false);
+    chassis.moveToPoint(-50, -50, 900, {}, false);
     lemlib::toggleMCL();
     scraper_piston.set_value(true);
-    pros::delay(800);
     intake.store(127);
+    chassis.turnToPoint(-46.5, -scraperDist, 800, {}, true);
     chassis.moveToPoint(-46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
-    move(40, 0, false, scraperDelay);
-    // pros::delay(scraperDelay);
+    move(30, 0, false, scraperDelay);
 
     // Move through tunnel
-    chassis.moveToPoint(-46.5, -47, 800, {.forwards = false, .maxSpeed=90},false);
-    chassis.turnToPoint(-61.5, -36, 650,{.forwards = false},false);
+    chassis.moveToPoint(-46.5, -47, 800, {.forwards = false},true);
+    chassis.turnToPoint(-61.5, -36, 650,{.forwards = false}, true);
     intake.stop();
-    chassis.moveToPoint(-61.5, -36, 800,{.forwards = false, .maxSpeed = 90},false);
-    chassis.turnToPoint(-61.5, 36, 650,{.forwards = false},false);
-    chassis.moveToPoint(-61.5, 36, 2000,{.forwards = false, .maxSpeed = 90},false);
-    chassis.turnToPoint(-48, 36,800, {},false);
-    chassis.moveToPoint(-48, 36, 800, {.maxSpeed = 70}, false);
+    chassis.moveToPoint(-61.5, -36, 800,{.forwards = false},true);
+    chassis.turnToPoint(-61.5, 36, 650,{.forwards = false},true);
+    chassis.moveToPoint(-61.5, 36, 2000,{.forwards = false},true);
+    chassis.turnToPoint(-48, 36,800, {},true);
+    chassis.moveToPoint(-48, 36, 800, {}, true);
 
     // Score first 6 balls
-    chassis.turnToPoint(-48, 24, 800, {.forwards = false}, false);
-    chassis.moveToPoint(-48, 24, 800, {.forwards = false}, false);
+    chassis.turnToPoint(-48, goalPosition, 800, {.forwards = false}, false);
+    chassis.moveToPoint(-48, goalPosition, 800, {.forwards = false}, false);
     intake.score(127);
     pros::delay(scoreDelay);
     intake.stop();
@@ -382,18 +392,117 @@ void skills2() {
     scraper_piston.set_value(true);
     intake.store(127);
     chassis.moveToPoint(-46.5, scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed}, false);
-    move(40, 0, false, scraperDelay);
+    move(30, 0, false, scraperDelay);
     // pros::delay(scraperDelay);
     
     // Score second set of 6 balls
-    chassis.moveToPoint(-48, 23, 1500, {.forwards = false}, false);
-    intake.score(127);
+    chassis.moveToPoint(-48, goalPosition, 1500, {.forwards = false}, false);
+    intake.score(100);
     pros::delay(scoreDelay);
     intake.stop();
-    scraper_piston.set_value(false);
-    move(40, 0, false, 400);
-    move(-45, 0, false, 500);
 
+    // SHOULD BE AT 25s 
+
+    // THIS SHOULD TAKE 20s
+
+    // Move across field 
+    chassis.turnToPoint(46.5, 36, 800,{.direction=lemlib::AngularDirection::CW_CLOCKWISE}, true);
+    chassis.moveToPoint(46.5, 36, 2000,{}, true);
+
+    // Third match loader
+    chassis.turnToPoint(46.5, scraperDist, 800, {}, true);
+    scraper_piston.set_value(true);
+    intake.store(127);
+    chassis.moveToPoint(46.5, scraperDist, scraperTimeout,{.maxSpeed=matchLoaderSpeed}, false);
+    move(30, 0, false, scraperDelay);
+    // pros::delay(scraperDelay);
+
+    // Move through tunnel
+    chassis.moveToPoint(46.5, 47, 800,{.forwards=false}, true);
+    chassis.turnToPoint(61.5, 36, 600,{.forwards = false}, true);
+    chassis.moveToPoint(61.5, 36, 800,{.forwards = false}, true);
+    chassis.turnToPoint(61.5, -36, 800,{.forwards = false}, true);
+    intake.stop();
+    chassis.moveToPoint(61.5, -36, 2000,{.forwards = false}, true);
+    chassis.turnToPoint(48, -36, 800, {}, true);
+    chassis.moveToPoint(48, -36, 800, {},  true);
+
+    // Score third set of 6 balls
+    chassis.turnToPoint(48, -goalPosition, 800, {.forwards = false}, true);
+    chassis.moveToPoint(48, -goalPosition, 800, {.forwards = false}, false);
+    intake.score(127);
+    pros::delay(scoreDelay);
+
+    // Fourth match loader
+    scraper_piston.set_value(true);
+    intake.store(127);
+    chassis.moveToPoint(44.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed}, false);
+    move(30, 0, false, scraperDelay);
+    
+    // Score fourth set of 6 balls
+    chassis.moveToPoint(48, -goalPosition, 1500, {.forwards = false}, false);
+    intake.score(100);
+    scraper_piston.set_value(false);
+    pros::delay(scoreDelay);
+    intake.stop();
+
+    // chassis.setPose(48, -26, -180);
+    // descore.set_value(true);
+
+    chassis.moveToPoint(48, -53, 700, {}, true);
+    chassis.turnToPoint(13, -64, 600, {}, true);
+    chassis.moveToPoint(13, -64, 900, {}, true);
+    pros::delay(700);
+    scraper_piston.set_value(true);
+    intake.store(127);
+    pros::delay(200);
+    
+    move(122, 5, false, 450);
+    scraper_piston.set_value(false);
+
+    // ---------------- END --------------------
+
+
+
+
+
+
+
+
+    // Park ball intake
+    // chassis.moveToPoint(48, -53, 700, {}, true);
+    // chassis.turnToPoint(13, -64, 600, {}, true);
+    // chassis.moveToPoint(13, -64, 900, {}, true);
+    // pros::delay(810);
+    // scraper_piston.set_value(true);
+    // intake.store(127);
+    // pros::delay(50);
+    // left_motor_group.move(90);
+    // right_motor_group.move(100);
+    // // 105, 125
+    // pros::delay(150);
+    // scraper_piston.set_value(false);
+    // pros::delay(200);
+    // left_motor_group.move(105);
+    // right_motor_group.move(125);
+    // pros::delay(800);
+    // // move(115, -10, false, 650);
+    // scraper_piston.set_value(true);
+    
+    
+    // pros::delay(200);
+    // left_motor_group.brake();
+    // right_motor_group.brake();
+
+
+
+
+
+
+
+
+
+    // OLD MIDDLE
     // // chassis.setPose(-48,23,0);
 
     // // chassis.moveToPose(-17, 63.5, 82, 1500, {.lead = 0.3}, false);
@@ -422,61 +531,7 @@ void skills2() {
     // // lemlib::toggleMCL();
     // // chassis.turnToPoint(21, 25, 800,{},false);
     // // scraper.set_value(true);
-
-    // Move across field 
-    chassis.moveToPoint(-48, 36, 900, {}, false);
-    chassis.turnToPoint(46.5, 36, 800,{},false);
-    intake.score(127);
-    chassis.moveToPoint(46.5, 36, 2000,{},false);
-
-    // Third match loader
-    chassis.turnToPoint(46.5, scraperDist, 800, {}, false);
-    scraper_piston.set_value(true);
-    intake.store(127);
-    chassis.moveToPoint(46.5, scraperDist, scraperTimeout,{.maxSpeed=matchLoaderSpeed},false);
-    move(40, 0, false, scraperDelay);
-    // pros::delay(scraperDelay);
-
-    // Move through tunnel
-    chassis.moveToPoint(46.5, 47, 800,{.forwards=false}, false);
-    chassis.turnToPoint(61.5, 36, 600,{.forwards = false},false);
-    // scraper.set_value(false);
-    chassis.moveToPoint(61.5, 36, 800,{.forwards = false, .maxSpeed = 90},false);
-    chassis.turnToPoint(61.5, -36, 800,{.forwards = false},false);
-    intake.stop();
-    chassis.moveToPoint(61.5, -36, 2000,{.forwards = false},false);
-    chassis.turnToPoint(48, -36, 800, {},false);
-    chassis.moveToPoint(48, -36, 800, {.maxSpeed = 70}, false);
-
-    // Score third set of 6 balls
-    chassis.turnToPoint(48, -24, 800, {.forwards = false}, false);
-    chassis.moveToPoint(48, -24, 800, {.forwards = false}, false);
-    intake.score(127);
-    pros::delay(scoreDelay);
-
-    // Fourth match loader
-    scraper_piston.set_value(true);
-    intake.store(127);
-    chassis.moveToPoint(44.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed}, false);
-    move(40, 0, false, scraperDelay);
-    // pros::delay(scraperDelay);
     
-    // Score fourth set of 6 balls/
-    chassis.moveToPoint(48, -24, 1500, {.forwards = false}, false);
-    intake.score(127);
-    scraper_piston.set_value(false);
-    pros::delay(scoreDelay);
-    intake.stop();
-    move(40, 0, false, 450);
-    move(-45, 0, false, 450);
-
-    chassis.moveToPose(17, -64, -82, 1500, {.lead = 0.3}, false);
-    pros::delay(200);
-    intake.store(127);
-
-    pros::delay(200);
-    move(100,0,false,100);
-    scraper_piston.set_value(true);
-    move(127,6,false,700);
-    scraper_piston.set_value(false);
 }
+
+
