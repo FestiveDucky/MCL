@@ -5,9 +5,9 @@ void left();
 void soloAWP();
 void test();
 // void right();
-void skills();
+void skills70();
 void skills96();
-void skills104();
+void skills106();
 
 
 // void sevenRight();

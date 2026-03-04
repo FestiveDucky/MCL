@@ -24,7 +24,7 @@ struct AutonOption {
 const std::array<AutonOption, 6> AUTONS = {{
     {"Left", left},
     {"Right", right},
-    {"Skills", skills},
+    {"Skills", skills96},
     {"Five Inch", fiveInch},
 	{"Test", test},
 	{"Solo AWP", soloAWP}
@@ -149,7 +149,7 @@ void autonomous() {
 		left_motor_group.set_brake_mode(MOTOR_BRAKE_HOLD);
 		right_motor_group.set_brake_mode(MOTOR_BRAKE_HOLD);
     setMCLPaused(false);
-		skills96();
+		skills106();
     // int idx = sc.selectedAuton;
     // if (idx < 0 || idx >= static_cast<int>(AUTONS.size())) idx = 0;
     // if (AUTONS[idx].run != nullptr) AUTONS[idx].run();
