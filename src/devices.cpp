@@ -65,9 +65,9 @@ lemlib::MCLSettings makeMCLSettings() {
     lemlib::MCLSettings cfg(500); // Number of particles tracked by MCL.
 
     cfg.distanceSensors = {
-        {14, {-4.75f, 7.0f, 0.0f}},            // Front sensor (old behavior): port 7.
-        {4, {-4.75f, 1.3f, -1.57079632679f}}, // Left sensor (old behavior): port 5.
-        {20, {5.0f, 2.75f, 1.57079632679f}},   // Right sensor (old behavior): port 6.
+        {2, {-4.75f, 7.0f, 0.0f}},            // Front sensor (old behavior): port 7.
+        {10, {-4.75f, 1.3f, -1.57079632679f}}, // Left sensor (old behavior): port 5.
+        {17, {5.0f, 2.75f, 1.57079632679f}},   // Right sensor (old behavior): port 6.
     };
 
     cfg.sigma0XY = 0.06f;         // Baseline XY process noise each cycle (in).
@@ -120,11 +120,11 @@ lemlib::MCLSettings makeMCLSettings() {
 
 lemlib::MCLSettings settings = makeMCLSettings();
 
-pros::MotorGroup left_motor_group({-1, 11, -13}, pros::MotorGears::blue);
-pros::MotorGroup right_motor_group({9, -17, 12}, pros::MotorGears::blue);
+pros::MotorGroup left_motor_group({-1, 12, -14}, pros::MotorGears::blue);
+pros::MotorGroup right_motor_group({13, -16, 18}, pros::MotorGears::blue);
 
-pros::Motor bottom_intake(-10, pros::MotorGears::blue);
-pros::Motor top_intake(2, pros::MotorGears::blue);
+pros::Motor bottom_intake(-7, pros::MotorGears::blue);
+pros::Motor top_intake(6, pros::MotorGears::blue);
 
 // drivetrain settings
 lemlib::Drivetrain drivetrain(&left_motor_group, // left motor group
@@ -136,8 +136,8 @@ lemlib::Drivetrain drivetrain(&left_motor_group, // left motor group
 );
 
 // imu
-pros::Imu imu(5);
-pros::Rotation vertical_rotation(-18);
+pros::Imu imu(11);
+pros::Rotation vertical_rotation(-15);
 // vertical tracking wheel
 lemlib::TrackingWheel vertical_tracking_wheel(&vertical_rotation, lemlib::Omniwheel::NEW_275, 0.6);
 
@@ -196,9 +196,9 @@ lemlib::Chassis chassis(drivetrain, // drivetrain settings
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
-pros::adi::AnalogIn potentiometer ('A'); // Auton selector
+pros::adi::AnalogIn potentiometer ('E'); // Auton selector
 
-pros::adi::Pneumatics scraper_piston = pros::adi::Pneumatics('H', false);
-pros::adi::Pneumatics descore = pros::adi::Pneumatics('F', false);
-pros::adi::Pneumatics middlescore_piston = pros::adi::Pneumatics('G', false);
-pros::adi::Pneumatics top_score = pros::adi::Pneumatics('E', true);
+pros::adi::Pneumatics scraper_piston = pros::adi::Pneumatics('B', true);
+pros::adi::Pneumatics descore = pros::adi::Pneumatics('G', false);
+pros::adi::Pneumatics middlescore_piston = pros::adi::Pneumatics('A', true);
+pros::adi::Pneumatics top_score = pros::adi::Pneumatics('C', true);

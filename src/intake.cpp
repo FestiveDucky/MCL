@@ -47,7 +47,7 @@ void Intake::store(int power, bool includeTop) {
 
 void Intake::score(int power, bool middle) {
     if (middle) {
-        middlescore_piston.set_value(true);
+        middlescore_piston.set_value(false);
     } else {
         top_score.set_value(false);
     }
@@ -79,7 +79,7 @@ void Intake::stop() {
     reversed = false;
     bottom_intake.move(0);
     top_intake.move(0);
-    middlescore_piston.set_value(false);
+    middlescore_piston.set_value(true);
     top_score.set_value(true);
 }
 

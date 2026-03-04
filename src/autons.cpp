@@ -31,7 +31,7 @@ void soloAWP() {
 
     int scraperDist = 66;
     int scraperTimeout = 900;
-    float matchLoaderSpeed = 60;
+    float matchLoaderSpeed = 52.5;
     int scraperDelay = 0;
     int scoreDelay = 800;
 
@@ -44,9 +44,9 @@ void soloAWP() {
     pros::delay(scraperDelay);
 
     // Score in long goal
-    scraper_piston.toggle();
     chassis.moveToPoint(48, -24, 1000, {.forwards=false, .maxSpeed=70}, true);
-    pros::delay(650);
+    pros::delay(700);
+    scraper_piston.toggle();
     intake.score(127);
     pros::delay(scoreDelay);
     intake.stop();
@@ -74,14 +74,16 @@ void soloAWP() {
     bottom_intake.move(-20);
     chassis.moveToPoint(-6, -6, 800, {.forwards=false}, true);
     pros::delay(700);
-    intake.score(127, true);
-    pros::delay(scoreDelay);
-    intake.stop();
+    intake.score(100, true);
+    pros::delay(scoreDelay + 50);
+    intake.outtake(40);
 
-    chassis.moveToPoint(-48, -48, 1200, {}, false);
+    chassis.moveToPoint(-48, -48, 1200, {}, true);
+    pros::delay(150);
+    intake.stop();
+    chassis.turnToPoint(-48, -24, 800, {.forwards=false}, true);
     intake.store(127);
     lemlib::toggleMCL();
-    chassis.turnToPoint(-48, -24, 800, {.forwards=false}, false);
     chassis.moveToPoint(-48, -24, 1200, {.forwards=false, .maxSpeed=70}, false);
     intake.score(127);
     pros::delay(5000);
@@ -270,6 +272,7 @@ void left() {
     float matchLoaderSpeed = 40;
     int scraperDelay = 700;
     int scoreDelay = 1100;
+    int iterTime = 100;
 
     // First match loader
     chassis.moveToPoint(-46.5, -48, 1000, {}, false);
@@ -277,7 +280,11 @@ void left() {
     chassis.turnToPoint(-46.5, -scraperDist, 800, {}, false);
     intake.store(127);
     chassis.moveToPoint(-46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
-    move(20, 0, false, scraperDelay);
+    // Jiggle
+    for (int i = 0; i < scraperDelay/iterTime; i++) {
+        int sign = i % 2 ? -1 : 1; 
+        move(sign * 30, 0, false, iterTime + sign * 30);
+    }
 
     // Score in long goal
     scraper_piston.toggle();
@@ -291,6 +298,8 @@ void left() {
     chassis.turnToPoint(-20, -24, 800, {.direction=lemlib::AngularDirection::CCW_COUNTERCLOCKWISE}, true);
     intake.store(127);
     chassis.moveToPoint(-20, -24, 1500, {.maxSpeed=70}, true);
+    pros::delay(400);
+    scraper_piston.toggle();
     chassis.turnToPoint(-4, -2, 800, {.forwards = false}, false);
 
     lemlib::toggleMCL();
@@ -298,9 +307,10 @@ void left() {
     top_intake.move(-100);
     bottom_intake.move(-20);
     chassis.moveToPoint(-4, -2, 1000, {.forwards = false}, false);
-    intake.score(127, true);
+    intake.score(95, true);
     move(-20,0,false, 1500);
     intake.stop();
+    scraper_piston.toggle();
 
     // Push with deosicourwing
     chassis.moveToPoint(-38, -26, 1200, {}, false);
@@ -314,7 +324,25 @@ void left() {
 
 // ASSET(path1_txt);
 void test() {
-    chassis.setPose(-24, -48, -90);
+    // chassis.setPose(0, 0, 0);
+    // lemlib::toggleMCL();
+    // chassis.turnToHeading(90, 1000, {}, false);
+
+    chassis.setPose(48, -26, -180);
+    descore.set_value(true);
+
+    chassis.moveToPoint(48, -53, 700, {}, true);
+    chassis.turnToPoint(13, -64, 600, {}, true);
+    chassis.moveToPoint(13, -64, 900, {}, true);
+    pros::delay(750);
+    scraper_piston.set_value(true);
+    intake.store(127);
+    pros::delay(150);
+    
+    move(122, 5, false, 400);
+    scraper_piston.set_value(false);
+
+
     // chassis.moveToPointRamsete(-48, -48, -180, 5000, {.maxSpeed=110, .maxAccel=15, .zeta=2, .headingBlendStart=0.9, .poseFilterAlpha=0.3, .lateralDeadband=0.5, .voltageSlew=1000, .kS=15, .kP=10}, false);
     // chassis.moveToPointRamsete(-48, -48, -180, 5000, {}, false);
     // chassis.moveToPoint(-48, -48, 5000, {}, true);
@@ -325,7 +353,8 @@ void test() {
 
 void fiveInch() {
     chassis.setPose(0, 0, 0);
-    chassis.moveToPoint(0, 5, 4000);
+    lemlib::toggleMCL();
+    chassis.moveToPoint(0, 8, 4000);
     chassis.waitUntilDone();
 }
 
@@ -334,12 +363,13 @@ void skills2() {
     chassis.setPose(-5, -46, 0);
     descore.set_value(true);
 
-    int scraperDist = 67;
-    int scraperTimeout = 1200;
-    float matchLoaderSpeed = 50;
-    int scraperDelay = 1500;
+    int scraperDist = 70;
+    int scraperTimeout = 1000;
+    float matchLoaderSpeed = 55;
+    int scraperDelay = 1900;
     int scoreDelay = 2500;
     int goalPosition = 25;
+    int iterTime = 100;
 
 
     // Get first 4 balls & score in middle
@@ -351,25 +381,32 @@ void skills2() {
     pros::delay(200);
 
     lemlib::toggleMCL();
-    chassis.turnToPoint(-2, -8, 800, {.forwards = false}, false);
+    chassis.turnToPoint(-3, -6, 800, {.forwards = false}, false);
     intake.stop();
     top_intake.move(-100);
     bottom_intake.move(-20);
-    chassis.moveToPoint(-2, -8, 1000, {.forwards = false}, false);
+    chassis.moveToPoint(-3, -6, 1000, {.forwards = false}, false);
     intake.score(127, true);
     move(-20,0,false, 1500);
     // The above takes 6.6s
 
     // First match loader
+    chassis.moveToPoint(-50, -50, 900, {}, false);
     intake.stop();
     intake.store(127);
-    chassis.moveToPoint(-50, -50, 900, {}, false);
-    lemlib::toggleMCL();
+    lemlib::toggleMCL();  
     scraper_piston.set_value(true);
     intake.store(127);
     chassis.turnToPoint(-46.5, -scraperDist, 800, {}, true);
     chassis.moveToPoint(-46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
-    move(30, 0, false, scraperDelay);
+    
+    // move(30, 0, false, scraperDelay);
+    // Jiggle
+    for (int i = 0; i < scraperDelay/iterTime; i++) {
+        int sign = i % 2 ? -1 : 1; 
+        move(sign * 30, 0, false, iterTime + sign * 30);
+    }
+    
 
     // Move through tunnel
     chassis.moveToPoint(-46.5, -47, 800, {.forwards = false},true);
@@ -392,8 +429,12 @@ void skills2() {
     scraper_piston.set_value(true);
     intake.store(127);
     chassis.moveToPoint(-46.5, scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed}, false);
-    move(30, 0, false, scraperDelay);
-    // pros::delay(scraperDelay);
+    // move(30, 0, false, scraperDelay);
+    // Jiggle
+    for (int i = 0; i < scraperDelay/iterTime; i++) {
+        int sign = i % 2 ? -1 : 1; 
+        move(sign * 30, 0, false, iterTime + sign * 30);
+    }
     
     // Score second set of 6 balls
     chassis.moveToPoint(-48, goalPosition, 1500, {.forwards = false}, false);
@@ -402,8 +443,6 @@ void skills2() {
     intake.stop();
 
     // SHOULD BE AT 25s 
-
-    // THIS SHOULD TAKE 20s
 
     // Move across field 
     chassis.turnToPoint(46.5, 36, 800,{.direction=lemlib::AngularDirection::CW_CLOCKWISE}, true);
@@ -414,8 +453,12 @@ void skills2() {
     scraper_piston.set_value(true);
     intake.store(127);
     chassis.moveToPoint(46.5, scraperDist, scraperTimeout,{.maxSpeed=matchLoaderSpeed}, false);
-    move(30, 0, false, scraperDelay);
-    // pros::delay(scraperDelay);
+    // move(30, 0, false, scraperDelay);
+    // Jiggle
+    for (int i = 0; i < scraperDelay/iterTime; i++) {
+        int sign = i % 2 ? -1 : 1; 
+        move(sign * 30, 0, false, iterTime + sign * 30);
+    }
 
     // Move through tunnel
     chassis.moveToPoint(46.5, 47, 800,{.forwards=false}, true);
@@ -437,7 +480,12 @@ void skills2() {
     scraper_piston.set_value(true);
     intake.store(127);
     chassis.moveToPoint(44.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed}, false);
-    move(30, 0, false, scraperDelay);
+    // move(30, 0, false, scraperDelay);
+    // Jiggle
+    for (int i = 0; i < scraperDelay/iterTime; i++) {
+        int sign = i % 2 ? -1 : 1; 
+        move(sign * 30, 0, false, iterTime + sign * 30);
+    }
     
     // Score fourth set of 6 balls
     chassis.moveToPoint(48, -goalPosition, 1500, {.forwards = false}, false);
@@ -452,12 +500,12 @@ void skills2() {
     chassis.moveToPoint(48, -53, 700, {}, true);
     chassis.turnToPoint(13, -64, 600, {}, true);
     chassis.moveToPoint(13, -64, 900, {}, true);
-    pros::delay(700);
+    pros::delay(750);
     scraper_piston.set_value(true);
     intake.store(127);
-    pros::delay(200);
+    pros::delay(150);
     
-    move(122, 5, false, 450);
+    move(122, 5, false, 400);
     scraper_piston.set_value(false);
 
     // ---------------- END --------------------

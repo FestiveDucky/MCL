@@ -177,7 +177,7 @@ void opcontrol() {
 			bottom_intake_voltage = 0;
 			top_intake_voltage = 0;
 			top_score.set_value(true);
-			middlescore_piston.set_value(false);
+			middlescore_piston.set_value(true);
 		}
 		
 		// release descore
@@ -216,7 +216,7 @@ void opcontrol() {
 
 		// Middle Score
 		if (controller.get_digital_new_press(DIGITAL_R2)) {
-			middlescore_piston.set_value(true);
+			middlescore_piston.set_value(false);
 			bottom_intake_voltage = 127;
 			top_intake_voltage = 60;
 		}
