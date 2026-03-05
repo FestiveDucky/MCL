@@ -5,8 +5,11 @@ void left();
 void soloAWP();
 void test();
 // void right();
-void skills();
-void skills2();
+void skills70();
+void skills96();
+void skills106();
+
+
 // void sevenRight();
 // void odom();
 // void mill1left();

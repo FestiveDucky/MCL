@@ -3,6 +3,8 @@
 #include "lemlib/chassis/odom.hpp"
 #include "liblvgl/lv_conf_internal.h"
 #include "liblvgl/misc/lv_area.h"
+#include "pros/abstract_motor.hpp"
+#include "pros/motors.h"
 #include "screen.h"
 #include "autons.h"
 #include "intake.h"
@@ -22,7 +24,7 @@ struct AutonOption {
 const std::array<AutonOption, 6> AUTONS = {{
     {"Left", left},
     {"Right", right},
-    {"Skills", skills},
+    {"Skills", skills96},
     {"Five Inch", fiveInch},
 	{"Test", test},
 	{"Solo AWP", soloAWP}
@@ -144,8 +146,10 @@ void competition_initialize() {
  */
 void autonomous() {
     sc.state = RobotState::AUTONOMOUS;
+		left_motor_group.set_brake_mode(MOTOR_BRAKE_HOLD);
+		right_motor_group.set_brake_mode(MOTOR_BRAKE_HOLD);
     setMCLPaused(false);
-		skills2();
+		skills106();
     // int idx = sc.selectedAuton;
     // if (idx < 0 || idx >= static_cast<int>(AUTONS.size())) idx = 0;
     // if (AUTONS[idx].run != nullptr) AUTONS[idx].run();
@@ -189,37 +193,33 @@ void opcontrol() {
 
 		// Intake (top)
 		if (controller.get_digital_new_press(DIGITAL_L1)) {
-			intake.score(127);
-			// flappier.set_value(false);
-			// flappy.set_value(false);
-			// bottom_intake_voltage = 127;
-			// top_intake_voltage = 127;
+			flappier.set_value(false);
+			flappy.set_value(false);
+			bottom_intake_voltage = 127;
+			top_intake_voltage = 127;
 		}
 
 		if (controller.get_digital_new_press(DIGITAL_L1)) {
-			intake.score(90, true);
-			// flappier.set_value(false);
-			// flappy.set_value(false);
-			// bottom_intake_voltage = 127;
-			// top_intake_voltage = 127;
+        flappy.set_value(true);
+        flappier.set_value(true);
+				bottom_intake_voltage = 127;
+				top_intake_voltage = 127;
 		}
 
 		//storage in
 		if (controller.get_digital_new_press(DIGITAL_R1)) {
-			intake.store(127);
-			// flappier.set_value(true);
-			// flappy.set_value(false);
-			// bottom_intake_voltage = 127;
-			// top_intake_voltage = 127;
+			flappier.set_value(true);
+			flappy.set_value(false);
+			bottom_intake_voltage = 127;
+			top_intake_voltage = 127;
 		}
 
 		// Outtake (Bottom)
 		if (controller.get_digital_new_press(DIGITAL_R2)) {
-			intake.outtake(127);
-			// bottom_intake_voltage = -127;
-			// top_intake_voltage = -127;
-			// flappy.set_value(false);
-    		// flappier.set_value(true);
+			bottom_intake_voltage = -127;
+			top_intake_voltage = -127;
+			flappy.set_value(false);
+    	flappier.set_value(true);
 		}
 
 		// Scraper (toggle)
