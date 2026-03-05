@@ -136,7 +136,7 @@ lemlib::Drivetrain drivetrain(&left_motor_group, // left motor group
 );
 
 // imu
-pros::Imu imu(11);
+pros::Imu imu(5);
 pros::Rotation vertical_rotation(-15);
 // vertical tracking wheel
 lemlib::TrackingWheel vertical_tracking_wheel(&vertical_rotation, lemlib::Omniwheel::NEW_275, 0.6);
