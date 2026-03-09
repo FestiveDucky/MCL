@@ -146,4 +146,5 @@ pros::adi::DigitalOut horLift('D', false);
 pros::adi::DigitalOut verLift('G',false);
 pros::adi::DigitalOut flappy ('A', false);
 pros::adi::DigitalOut flappier ('B', false);
+pros::adi::DigitalOut descore('H', false);
 // pros::adi::DigitalOut descore('C', false);
