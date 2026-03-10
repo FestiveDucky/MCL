@@ -572,7 +572,7 @@ void skills106(){
     // verLift.set_value(false);
 
     // // // // Distance Reset 
-    chassis.turnToHeading(90, 500,{}, false);
+    chassis.turnToHeading(90, 400,{}, false);
     resetPositionLeft();
     resetPositionFront();
 
@@ -592,7 +592,7 @@ void skills106(){
     // // // MCL OFF
     lemlib::toggleMCL();
 
-        chassis.turnToPoint(18.5, 17.5, 750, {.forwards = false, .maxSpeed = 90});
+        chassis.turnToPoint(18.5, 17.5, 550, {.forwards = false, .maxSpeed = 90});
     chassis.moveToPoint(18.5, 17.5, 1000, {.forwards = false,.maxSpeed = 90});
     chassis.turnToPoint(8.5, 7.5, 650, {.forwards = false});
     chassis.moveToPoint(8.5, 7.5, 800, {.forwards = false},false);
