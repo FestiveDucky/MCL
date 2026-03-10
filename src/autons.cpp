@@ -399,12 +399,12 @@ void skills2() {
     chassis.setPose(-5, -46, 0);
     descore.set_value(true);
 
-    int scraperDist = 70;
-    int scraperTimeout = 1000;
-    float matchLoaderSpeed = 55;
+    int scraperDist = 72;   //was 70
+    int scraperTimeout = 5000;
+    float matchLoaderSpeed = 60;    //was 55
     int scraperDelay = 1900;
     int scoreDelay = 2500;
-    int goalPosition = 25;
+    int goalPosition = 30;
     int iterTime = 100;
 
 
@@ -419,8 +419,8 @@ void skills2() {
     lemlib::toggleMCL();
     chassis.turnToPoint(-3, -6, 800, {.forwards = false}, false);
     intake.stop();
-    top_intake.move(-100);
-    bottom_intake.move(-20);
+    top_intake.move(-80);
+    bottom_intake.move(-40);
     chassis.moveToPoint(-3, -6, 1000, {.forwards = false}, false);
     intake.score(100, true);
     move(-20,0,false, 1500);
@@ -437,11 +437,11 @@ void skills2() {
     chassis.moveToPoint(-46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
     
     // move(30, 0, false, scraperDelay);
-    // Jiggle
-    for (int i = 0; i < scraperDelay/iterTime; i++) {
-        int sign = i % 2 ? -1 : 1; 
-        move(sign * 30, 0, false, iterTime + sign * 30);
-    }
+    // // Jiggle
+    // for (int i = 0; i < scraperDelay/iterTime; i++) {
+    //     int sign = i % 2 ? -1 : 1; 
+    //     move(sign * 30, 0, false, iterTime + sign * 30);
+    // }
     
 
     // Move through tunnel
@@ -466,11 +466,11 @@ void skills2() {
     intake.store(127);
     chassis.moveToPoint(-46.5, scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed}, false);
     // move(30, 0, false, scraperDelay);
-    // Jiggle
-    for (int i = 0; i < scraperDelay/iterTime; i++) {
-        int sign = i % 2 ? -1 : 1; 
-        move(sign * 30, 0, false, iterTime + sign * 30);
-    }
+    // // Jiggle
+    // for (int i = 0; i < scraperDelay/iterTime; i++) {
+    //     int sign = i % 2 ? -1 : 1; 
+    //     move(sign * 30, 0, false, iterTime + sign * 30);
+    // }
     
     // Score second set of 6 balls
     chassis.moveToPoint(-48, goalPosition, 1500, {.forwards = false}, false);
@@ -517,11 +517,11 @@ void skills2() {
     intake.store(127);
     chassis.moveToPoint(44.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed}, false);
     // move(30, 0, false, scraperDelay);
-    // Jiggle
-    for (int i = 0; i < scraperDelay/iterTime; i++) {
-        int sign = i % 2 ? -1 : 1; 
-        move(sign * 30, 0, false, iterTime + sign * 30);
-    }
+    // // Jiggle
+    // for (int i = 0; i < scraperDelay/iterTime; i++) {
+    //     int sign = i % 2 ? -1 : 1; 
+    //     move(sign * 30, 0, false, iterTime + sign * 30);
+    // }
     
     // Score fourth set of 6 balls
     chassis.moveToPoint(48, -goalPosition, 1500, {.forwards = false}, false);
