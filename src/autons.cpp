@@ -465,7 +465,7 @@ void skills106(){
     // Get first 4 balls
     chassis.turnToPoint(-21,-25,300,{});
     chassis.moveToPoint(-21,-25,700,{});
-    pros::delay(400);
+    pros::delay(550);
     scraper.set_value(true);
     
 
@@ -477,9 +477,9 @@ void skills106(){
     chassis.turnToPoint(-8,-8, 500, {.forwards = false});
     chassis.moveToPoint(-8,-8, 900, {.forwards = false,.minSpeed=20},false);
     // pros::delay(350);
-    intake.score(100, true);
+    intake.score(110, true);
     chassis.waitUntilDone();
-    pros::delay(450);
+    pros::delay(350);
     // Move to First Goal
     chassis.turnToPoint(-50, -47.1, 500, {});
     intake.stop();
@@ -523,10 +523,12 @@ void skills106(){
 
     
     // Score second set of 6 balls
-    chassis.moveToPoint(-48.5, 23, 1000, {.forwards = false, .minSpeed = 60}, false);
+    chassis.moveToPoint(-48.5, 23, 1000, {.forwards = false, .minSpeed = 50});
+    pros::delay(600);
     intake.score(127);
     move(-15,0,false, scoreDelay);
     scraper.set_value(false);
+
  
     
     // MCL OFF
@@ -537,15 +539,16 @@ void skills106(){
     chassis.turnToHeading(97, 900);
     chassis.moveToPoint(-25, 24, 600);
     pros::delay(100);
-    scraper.set_value(true);
+    // scraper.set_value(true);
     chassis.turnToPoint(-13, 14, 500, {});
-    scraper.set_value(false);
+    // scraper.set_value(false);
     chassis.moveToPoint(-13, 14, 950, {});
+    // descore.set_value(true);
     pros::delay(300);
     intake.outtake(100);
     pros::delay(800);
 
-    // intake.stop();
+    // // intake.stop();
 
     // Move to barrier
     chassis.turnToPoint(-36.1, 61.4, 600, {.forwards = false,.minSpeed=90});
@@ -559,7 +562,7 @@ void skills106(){
     intake.store(127);
 
     // // Going Over barrier 
-    move(74,-8,false,1450);
+    move(74,-8,false,1500);
     scraper.set_value(true);
     move(60,-8,false,250);
 
@@ -568,7 +571,7 @@ void skills106(){
     // verLift.set_value(false);
 
     // // // // Distance Reset 
-    chassis.turnToHeading(90, 300,{}, false);
+    chassis.turnToHeading(90, 500,{}, false);
     resetPositionLeft();
     resetPositionFront();
 
@@ -664,19 +667,20 @@ void skills106(){
 
     // Low Goal 
     chassis.turnToHeading(-83, 900);
-    chassis.moveToPoint(25,-24, 600);
+    chassis.moveToPoint(25, -24, 600);
     pros::delay(100);
-    scraper.set_value(true);
+    // scraper.set_value(true);
     chassis.turnToPoint(13, -14, 500, {});
-    scraper.set_value(false);
+    // scraper.set_value(false);
     chassis.moveToPoint(13, -14, 950, {});
+    // descore.set_value(true);
     pros::delay(300);
-    intake.outtake(100);
+    intake.outtake(110);
     pros::delay(800);
 
 
     chassis.turnToPoint(36.1, -61.4, 600, {.forwards = false,.minSpeed=60});
-    descore.set_value(false);
+    // descore.set_value(false);
     chassis.moveToPoint(36.1, -61.4, 1000,{.forwards = false, .minSpeed=60});
     chassis.turnToPoint(20, -65, 400, {.minSpeed=60});
     chassis.moveToPoint(20, -65, 700, {.minSpeed=60},false);
