@@ -477,13 +477,13 @@ void skills106(){
     chassis.turnToPoint(-8,-8, 500, {.forwards = false});
     chassis.moveToPoint(-8,-8, 900, {.forwards = false,.minSpeed=20},false);
     // pros::delay(350);
-    intake.score(110, true);
+    intake.score(115, true);
     chassis.waitUntilDone();
-    pros::delay(350);
+    pros::delay(250);
     // Move to First Goal
     chassis.turnToPoint(-50, -47.1, 500, {});
     intake.stop();
-    chassis.moveToPoint(-50, -47.1, 1000, {.minSpeed=60});
+    chassis.moveToPoint(-50, -47.1, 900, {.minSpeed=60});
     flappier.set_value(false);
     flappy.set_value(false);
     chassis.turnToPoint(-51, -29.1, 600, {.forwards = false});
@@ -536,7 +536,7 @@ void skills106(){
     intake.store(127);
 
     // Low Goal 
-    chassis.turnToHeading(97, 900);
+    chassis.turnToHeading(97, 750);
     chassis.moveToPoint(-25, 24, 600);
     pros::delay(100);
     // scraper.set_value(true);
@@ -551,9 +551,9 @@ void skills106(){
     // // intake.stop();
 
     // Move to barrier
-    chassis.turnToPoint(-36.1, 61.4, 600, {.forwards = false,.minSpeed=90});
-    // descore.set_value(false);
-    chassis.moveToPoint(-36.1, 61.4, 1000,{.forwards = false, .minSpeed=90});
+    chassis.turnToPoint(-36.1, 61.4, 500, {.forwards = false,.minSpeed=90}, true);
+    //descore.set_value(false);
+    chassis.moveToPoint(-36.1, 61.4, 1000,{.forwards = false, .minSpeed=90}, true);
     chassis.turnToPoint(-20, 65, 400, {.minSpeed=60});
     chassis.moveToPoint(-20, 65, 700, {.minSpeed=60},false);
     // chassis.turnToHeading(78, 300,{},false);
@@ -562,9 +562,10 @@ void skills106(){
     intake.store(127);
 
     // // Going Over barrier 
-    move(74,-8,false,1500);
+    move(74,-8,false,1100);
     scraper.set_value(true);
-    move(60,-8,false,250);
+    move(74,-8,false,400);
+    move(60,-8,false,300);
 
 
     horLift.set_value(false);
@@ -591,10 +592,9 @@ void skills106(){
     // // // MCL OFF
     lemlib::toggleMCL();
 
-    // // Move to Middle Goal
-    chassis.turnToPoint(18.5, 17.5, 750, {.forwards = false, .maxSpeed = 90});
+        chassis.turnToPoint(18.5, 17.5, 750, {.forwards = false, .maxSpeed = 90});
     chassis.moveToPoint(18.5, 17.5, 1000, {.forwards = false,.maxSpeed = 90});
-    chassis.turnToPoint(8.5, 7.5, 700, {.forwards = false});
+    chassis.turnToPoint(8.5, 7.5, 650, {.forwards = false});
     chassis.moveToPoint(8.5, 7.5, 800, {.forwards = false},false);
 
 
@@ -607,16 +607,19 @@ void skills106(){
     
     // // // // // Score Middle Goal 
     intake.score(127, true);
-    move(-15,0,false, 600);
+    move(-15,0,false, 300);
     intake.score(60, true);
+    move(-15,0,false, 300);
     pros::delay(1500);
-    chassis.turnToPoint(48.5, 51, 300,{},false);
+
     intake.store(127);
-    pros::delay(100);
+    pros::delay(250);
+    scraper.set_value(false);
 
 
     // Move to High Goal
-    chassis.moveToPoint(48.5, 51, 900, {.minSpeed=60});
+    chassis.turnToPoint(48.5, 51, 300,{},true);
+    chassis.moveToPoint(48.5, 51, 900, {.minSpeed=60}, true);
     pros::delay(250);
     scraper.set_value(true);
     chassis.waitUntilDone();
@@ -673,28 +676,27 @@ void skills106(){
     chassis.turnToPoint(13, -14, 500, {});
     // scraper.set_value(false);
     chassis.moveToPoint(13, -14, 950, {});
-    // descore.set_value(true);
+    //descore.set_value(true);
     pros::delay(300);
     intake.outtake(110);
     pros::delay(800);
 
 
-    chassis.turnToPoint(36.1, -61.4, 600, {.forwards = false,.minSpeed=60});
-    // descore.set_value(false);
-    chassis.moveToPoint(36.1, -61.4, 1000,{.forwards = false, .minSpeed=60});
-    chassis.turnToPoint(20, -65, 400, {.minSpeed=60});
-    chassis.moveToPoint(20, -65, 700, {.minSpeed=60},false);
+    chassis.turnToPoint(36.1, -61.4, 500, {.forwards = false,.minSpeed=60}, true);
+    //descore.set_value(false);
+    chassis.moveToPoint(36.1, -61.4, 1000,{.forwards = false, .minSpeed=60}, true);
+    chassis.turnToPoint(20, -67, 400, {.minSpeed=60});
+    chassis.moveToPoint(20, -67, 700, {.minSpeed=60},false);
     // chassis.moveToPose(17, -64, -82, 1500, {.lead = 0.3}, false);
 
 
     horLift.set_value(true);
     // verLift.set_value(true);
-    intake.store(100);
-
+    intake.score(127);
 
     move(100,0,false,100);
     scraper.set_value(true);
-    move(127,6,false,550);
+    move(127,6,false,600);
     scraper.set_value(false);
 }
 
