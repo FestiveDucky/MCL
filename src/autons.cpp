@@ -38,9 +38,9 @@ void soloAWP() {
     // First match loader
     chassis.moveToPoint(46.5, -48, 1000, {}, false);
     scraper_piston.toggle();
-    chassis.turnToPoint(46.5, -scraperDist, 800, {}, false);
+    chassis.turnToPoint(46.5, -67, 800, {}, false);
     intake.store(127);
-    chassis.moveToPoint(46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
+    chassis.moveToPoint(46.5, -67, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
     pros::delay(scraperDelay);
 
     // Score in long goal
@@ -56,7 +56,7 @@ void soloAWP() {
     chassis.turnToPoint(18, -18, 800, {}, false);
     intake.store(127);
     chassis.moveToPoint(18, -24, 800, {}, true);
-    pros::delay(600);
+    pros::delay(700);
     scraper_piston.toggle();
     
     // Move to second set of 3 balls
@@ -69,22 +69,34 @@ void soloAWP() {
 
     // Score middle
     lemlib::toggleMCL();
-    chassis.turnToPoint(-6, -6, 600, {.forwards=false}, false);
+    chassis.turnToPoint(-4, -4, 600, {.forwards=false}, false); //was -6, -6
     top_intake.move(-100);
     bottom_intake.move(-20);
-    chassis.moveToPoint(-6, -6, 800, {.forwards=false}, true);
-    pros::delay(700);
+    chassis.moveToPoint(-4, -4, 750, {.forwards=false}, true); // was -6, -6
+    chassis.moveToPoint(-6, -6, 750, {}, true);
+    // chassis.moveToPoint(-4, -4, 750, {.forwards=false}, true);
     intake.score(100, true);
     pros::delay(scoreDelay + 50);
-    intake.outtake(40);
+    //intake.outtake(40);
+    middlescore_piston.set_value(true);
+    top_score.set_value(true);
+    bottom_intake.move(127);
 
-    chassis.moveToPoint(-48, -48, 1200, {}, true);
+
+    //Second match loader
+    chassis.moveToPoint(-43, -48, 1200, {}, true);
     pros::delay(150);
-    intake.stop();
-    chassis.turnToPoint(-48, -24, 800, {.forwards=false}, true);
+    chassis.turnToPoint(-43, -65, 1200, {}, true);
+    pros::delay(150);
+    chassis.moveToPoint(-43, -65, 1200, {}, true);
+    pros::delay(150);
+
+    //score on second long goal
+    chassis.turnToPoint(-45, -24, 800, {.forwards=false}, true);
+
     intake.store(127);
     lemlib::toggleMCL();
-    chassis.moveToPoint(-48, -24, 1200, {.forwards=false, .maxSpeed=70}, false);
+    chassis.moveToPoint(-45, -24, 1200, {.forwards=false, .maxSpeed=70}, false);
     intake.score(127);
     pros::delay(5000);
 
