@@ -78,8 +78,8 @@ void Intake::stop() {
     reversed = false;
     bottom_intake.move(0);
     top_intake.move(0);
-    flappy.set_value(false);
-    flappier.set_value(true);
+    // flappy.set_value(false);
+    // flappier.set_value(true);
 }
 
 void Intake::update() {
