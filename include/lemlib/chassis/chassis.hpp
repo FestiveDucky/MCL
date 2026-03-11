@@ -55,8 +55,10 @@ class MCLSettings {
         int estHuberIters = 3;
         float estHuberGateMult = 2.0f;
         float estHuberDeltaMult = 0.5f;
+
         float estAlphaMin = 0.15f;
         float estAlphaMax = 0.88f;
+        
         float estSigmaLo = 1.5f;
         float estSigmaHi = 9.0f;
         float estJumpThresh = 15.0f;

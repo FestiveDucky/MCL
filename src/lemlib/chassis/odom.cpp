@@ -295,7 +295,9 @@ void lemlib::update() {
     
     // TODO -> if robot rotates in place this never executes add a delta heading value
     // Possibly sensor update once every 0.5s even if we standing still to prevent particles from spreading out too much
-    // const bool shouldDoSensor = (deltaS > 0.01f) || (pros::millis() - prev_time > 200);
+    
+    
+    //const bool shouldDoSensor = (deltaS > 0.01f) || (pros::millis() - prev_time > 200);
     const bool shouldDoSensor = !paused;
     float estX = odomPose.x;
     float estY = odomPose.y;
