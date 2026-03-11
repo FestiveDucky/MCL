@@ -1163,11 +1163,11 @@
             "-funwind-tables",
             "--std=gnu++23",
             "-o",
-            "bin/autons.cpp.o",
-            "src/autons.cpp"
+            "bin/main.cpp.o",
+            "src/main.cpp"
         ],
         "directory": "/Users/veerchander/Desktop/MCL",
-        "file": "src/autons.cpp"
+        "file": "src/main.cpp"
     },
     {
         "arguments": [
@@ -1202,10 +1202,10 @@
             "-funwind-tables",
             "--std=gnu++23",
             "-o",
-            "bin/main.cpp.o",
-            "src/main.cpp"
+            "bin/autons.cpp.o",
+            "src/autons.cpp"
         ],
         "directory": "/Users/veerchander/Desktop/MCL",
-        "file": "src/main.cpp"
+        "file": "src/autons.cpp"
     }
 ]
