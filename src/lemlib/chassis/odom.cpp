@@ -537,7 +537,6 @@ static std::vector<Particle> lemlib::systematicResample(const std::vector<Partic
     cdf[N - 1] = 1.0;
 
     // One random offset r in [0, 1/N)
-    // TODO check if we can reuse the particle random device
     static thread_local std::mt19937 rng{std::random_device{}()};
     std::uniform_real_distribution<double> unif(0.0, 1.0 / N);
     const double r = unif(rng);

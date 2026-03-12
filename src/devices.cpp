@@ -73,7 +73,7 @@ lemlib::MCLSettings makeMCLSettings() {
     cfg.sigma0XY = 0.06f;         // Baseline XY process noise each cycle (in).
     cfg.kDistXY = 0.58f;          // Extra XY noise per inch translated.
     cfg.kTurnXY = 0.24f;          // Extra XY noise per radian turned.
-    cfg.maxStartPosErrorIn = 2.0f; // Initial particle spread radius (in).
+    cfg.maxStartPosErrorIn = 5.0f; // Initial particle spread radius (in).
     cfg.neffResampleThreshold = 0.80f; // Resample when Neff drops below this fraction of particle count.
 
     cfg.clampDeltaSForNoise = true; // Caps translation before noise scaling.

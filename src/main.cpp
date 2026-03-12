@@ -189,7 +189,7 @@ void opcontrol() {
 		if (controller.get_digital_new_press(DIGITAL_L2)) {
 			top_score.set_value(false);
 			bottom_intake_voltage = 127;
-			top_intake_voltage = 127;
+			top_intake_voltage = 110;
 		}
 
 		// Intake (Bottom)
@@ -217,7 +217,7 @@ void opcontrol() {
 		// Middle Score
 		if (controller.get_digital_new_press(DIGITAL_R2)) {
 			middlescore_piston.set_value(false);
-			bottom_intake_voltage = 127;
+			bottom_intake_voltage = 80;
 			top_intake_voltage = 60;
 		}
 
