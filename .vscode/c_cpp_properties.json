@@ -6,20 +6,21 @@
         "${workspaceFolder}/**",
         "c:\\Users\\alexr\\Documents\\GitHub\\testtesttest\\include",
         "c:\\Users\\caris\\OneDrive\\Documents\\GitHub\\MCL\\include",
-        "/Users/veerchander/Desktop/MCL/include"
+        "/Users/veerchander/Desktop/MCL/include",
+        "/Users/alsnchang/Documents/GitHub/MCL/include"
       ],
       "defines": [
         "_DEBUG",
         "UNICODE",
         "_UNICODE"
       ],
-      "compilerPath": "c:\\Users\\caris\\AppData\\Roaming\\Code\\User\\globalStorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\arm-none-eabi-g++",
+      "compilerPath": "/Users/alsnchang/Library/Application Support/Code/User/globalStorage/sigbots.pros/install/pros-toolchain-macos/bin/arm-none-eabi-g++",
       "cStandard": "gnu11",
       "cppStandard": "gnu++20",
       "intelliSenseMode": "gcc-arm",
       "browse": {
         "path": [
-          "c:\\Users\\caris\\OneDrive\\Documents\\GitHub\\MCL"
+          "/Users/alsnchang/Documents/GitHub/MCL"
         ],
         "limitSymbolsToIncludedHeaders": true,
         "databaseFilename": ""
