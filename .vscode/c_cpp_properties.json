@@ -14,13 +14,13 @@
         "UNICODE",
         "_UNICODE"
       ],
-      "compilerPath": "/Users/alsnchang/Library/Application Support/Code/User/globalStorage/sigbots.pros/install/pros-toolchain-macos/bin/arm-none-eabi-g++",
+      "compilerPath": "/Users/veerchander/Library/Application Support/Code/User/globalStorage/sigbots.pros/install/pros-toolchain-macos/bin/arm-none-eabi-g++",
       "cStandard": "gnu11",
       "cppStandard": "gnu++20",
       "intelliSenseMode": "gcc-arm",
       "browse": {
         "path": [
-          "/Users/alsnchang/Documents/GitHub/MCL"
+          "/Users/veerchander/Desktop/MCL"
         ],
         "limitSymbolsToIncludedHeaders": true,
         "databaseFilename": ""
