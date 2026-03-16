@@ -33,16 +33,16 @@ void soloAWP() {
     chassis.setPose(17, -52, -90);
     // descore.set_value(true);
 
-    int scraperDist = 66;
-    int scraperTimeout = 800;
+    int scraperDist = 70;
+    int scraperTimeout = 700;
     float matchLoaderSpeed = 60;
-    int scraperDelay = 0;
+    int scraperDelay = 200;
     int scoreDelay = 1000;
 
     // First match loader
     intake.store(127);
-    chassis.tank(-127, -110);
-    pros::delay(460);
+    chassis.tank(-127, -127);
+    pros::delay(410);
     chassis.tank(0, 0);
 
 
@@ -50,21 +50,28 @@ void soloAWP() {
     // chassis.moveToPoint(46.5, -40, 600, {.forwards = false, .minSpeed = 127});
     // pros::delay(100);
     scraper.set_value(true);
-    // chassis.turnToPoint(46.5, -scraperDist, 100, {});
-    chassis.turnToHeading(-200, 400);
-    chassis.moveToPoint(46.5, -scraperDist, scraperTimeout, {});
+    // chassis.turnToPoint(46.5, -scraperDist, 300, {});
+    
+    // chassis.turnToHeading(-200, 450);
+    chassis.moveToPoint(46.5, -scraperDist, scraperTimeout, {}, false);
     // // // move(52, double turn)
-    pros::delay(scraperDelay);
+    move(52, 0, false, scoreDelay);
 
     // // Score in long goal
     // // scraper.toggle();
-    chassis.moveToPoint(48, -25, 600, {.forwards=false, .minSpeed=127});
+    chassis.tank(-127, -127);
     pros::delay(400);
+    chassis.tank(0, 0);
+    chassis.moveToPoint(48, -23, 220, {.forwards=false, .maxSpeed=90, .minSpeed=70}, false);
+    // pros::delay(400);
     intake.score(127);
-    pros::delay(scoreDelay);
+    move(-15, 0, false, scoreDelay);
+    // pros::delay(scoreDelay);
     intake.stop();
 
     // // Intake center 3 balls
+    scraper.set_value(false);
+    chassis.turnToPoint(24, 24, 600, {.direction=lemlib::AngularDirection::CW_CLOCKWISE});
     // chassis.moveToPoint(-46, -46, 1000, {}, false);
     // chassis.turnToPoint(-18, -18, 800, {}, false);
     // intake.store(100);
