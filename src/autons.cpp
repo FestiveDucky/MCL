@@ -30,7 +30,7 @@ void move(double power, double turn, bool swing=false, double time=10000) {
 }
 
 void soloAWP() {
-    chassis.setPose(-13, -47, -90);
+    chassis.setPose(17, -52, -90);
     // descore.set_value(true);
 
     int scraperDist = 66;
@@ -40,51 +40,61 @@ void soloAWP() {
     int scoreDelay = 1000;
 
     // First match loader
-    chassis.moveToPoint(-46.5, -48, 1000, {}, false);
-    // scraper.toggle();
-    chassis.turnToPoint(-46.5, -scraperDist, 800, {}, false);
     intake.store(127);
-    chassis.moveToPoint(-46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
+    chassis.tank(-127, -110);
+    pros::delay(460);
+    chassis.tank(0, 0);
+
+
+
+    // chassis.moveToPoint(46.5, -40, 600, {.forwards = false, .minSpeed = 127});
+    // pros::delay(100);
+    scraper.set_value(true);
+    // chassis.turnToPoint(46.5, -scraperDist, 100, {});
+    chassis.turnToHeading(-200, 400);
+    chassis.moveToPoint(46.5, -scraperDist, scraperTimeout, {});
+    // // // move(52, double turn)
     pros::delay(scraperDelay);
 
-    // Score in long goal
-    // scraper.toggle();
-    chassis.moveToPoint(-48, -24, 1200, {.forwards=false, .maxSpeed=70}, false);
+    // // Score in long goal
+    // // scraper.toggle();
+    chassis.moveToPoint(48, -25, 600, {.forwards=false, .minSpeed=127});
+    pros::delay(400);
     intake.score(127);
     pros::delay(scoreDelay);
     intake.stop();
 
-    // Intake center 3 balls
-    chassis.moveToPoint(-46, -46, 1000, {}, false);
-    chassis.turnToPoint(-18, -18, 800, {}, false);
-    intake.store(100);
-    chassis.moveToPoint(-18, -18, 1500, {.headingCorrection=5}, false);
+    // // Intake center 3 balls
+    // chassis.moveToPoint(-46, -46, 1000, {}, false);
+    // chassis.turnToPoint(-18, -18, 800, {}, false);
+    // intake.store(100);
+    // chassis.moveToPoint(-18, -18, 1500, {.headingCorrection=5}, false);
 
 
-    lemlib::toggleMCL();
-    // Score middle
-    chassis.turnToPoint(-4, -4, 800, {.forwards=false}, false);
-    intake.stop();
-    chassis.moveToPoint(-4, -4, 1000, {.forwards=false}, false);
-    intake.score(127, true);
-    pros::delay(scoreDelay);
-    intake.stop();
+    // lemlib::toggleMCL();
+    // // Score middle
+    // chassis.turnToPoint(-4, -4, 800, {.forwards=false}, false);
+    // intake.stop();
+    // chassis.moveToPoint(-4, -4, 1000, {.forwards=false}, false);
+    // intake.score(127, true);
+    // pros::delay(scoreDelay);
+    // intake.stop();
 
-    // Go to second set of 3 balls
-    chassis.moveToPoint(-26, -26, 1000, {}, false);
-    lemlib::toggleMCL();
-    chassis.turnToPoint(24, -24, 800, {}, false);
-    intake.store(127);
-    chassis.moveToPoint(26, -24, 2000, {.headingCorrection=5}, false);
+    // // Go to second set of 3 balls
+    // chassis.moveToPoint(-26, -26, 1000, {}, false);
+    // lemlib::toggleMCL();
+    // chassis.turnToPoint(24, -24, 800, {}, false);
+    // intake.store(127);
+    // chassis.moveToPoint(26, -24, 2000, {.headingCorrection=5}, false);
 
-    // Go to second long goal
-    chassis.turnToPoint(48, -48, 800, {}, false);
-    chassis.moveToPoint(48, -48, 1500, {}, false);
-    intake.stop();
-    chassis.turnToPoint(48, -24, 800, {.forwards=false}, false);
-    chassis.moveToPoint(48, -24, 1000, {.forwards=false, .maxSpeed=70}, false);
-    intake.score(127);
-    pros::delay(5000);
+    // // Go to second long goal
+    // chassis.turnToPoint(48, -48, 800, {}, false);
+    // chassis.moveToPoint(48, -48, 1500, {}, false);
+    // intake.stop();
+    // chassis.turnToPoint(48, -24, 800, {.forwards=false}, false);
+    // chassis.moveToPoint(48, -24, 1000, {.forwards=false, .maxSpeed=70}, false);
+    // intake.score(127);
+    // pros::delay(5000);
 
 }
 
@@ -460,7 +470,7 @@ void skills106(){
     int scraperTimeout = 1200;
     float matchLoaderSpeed = 50;
     int scraperDelay = 1500;
-    int scoreDelay = 2300;
+    int scoreDelay = 2100;
 
     // Get first 4 balls
     chassis.turnToPoint(-21,-25,300,{});
@@ -512,7 +522,7 @@ void skills106(){
     chassis.moveToPoint(-48, 23, 1200, {.forwards = false});
     pros::delay(650);
     intake.score(127);
-    move(-15,0,false, scoreDelay);
+    move(-20,0,false, scoreDelay);
 
     intake.store(127);
     chassis.moveToPoint(-46.0, scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed}, false);
@@ -523,14 +533,14 @@ void skills106(){
 
     
     // Score second set of 6 balls
-    chassis.moveToPoint(-48.5, 23, 1000, {.forwards = false, .minSpeed = 50});
+    chassis.moveToPoint(-48, 23, 1000, {.forwards = false, .minSpeed = 50});
     pros::delay(600);
     intake.score(127);
-    move(-15,0,false, 1600);
+    move(-20,0,false, scoreDelay);
     scraper.set_value(false);
 
-    move(35,0,false, 350);
-    move(-22,0,false, 600);
+    move(40,0,false, 380);
+    move(-25,0,false, 600);
 
     // MCL OFF
     lemlib::toggleMCL();
@@ -555,6 +565,7 @@ void skills106(){
 
     // Move to barrier
     chassis.turnToPoint(-36.1, 61.4, 600, {.forwards = false});
+    intake.score(127);
     // descore.set_value(false);
     chassis.moveToPoint(-36.1, 61.4, 1500,{.forwards = false, .minSpeed=60});
     chassis.turnToPoint(-20, 65, 400, {});
@@ -565,9 +576,9 @@ void skills106(){
     intake.store(127);
 
     // // Going Over barrier 
-    move(70,-8,false,1600);
+    move(74,-8,false,1650);
     scraper.set_value(true);
-    move(60,-8,false,310);
+    move(60,-8,false,320);
 
 
     horLift.set_value(false);
@@ -596,12 +607,11 @@ void skills106(){
     // intake.stop();
 
     // // Move to Middle Goal
-    chassis.turnToPoint(21, 18.5, 750, {.forwards = false});
-    chassis.moveToPoint(21, 18.5, 1200, {.forwards = false,.maxSpeed = 90});
-    chassis.turnToPoint(9.5, 7.5, 700, {.forwards = false});
-    chassis.moveToPoint(9.5, 7.5, 800, {.forwards = false},false);
+    chassis.turnToPoint(20.5, 18.5, 750, {.forwards = false});
+    chassis.moveToPoint(20.5, 18.5, 1200, {.forwards = false,.maxSpeed = 90});
+    chassis.turnToPoint(8.5, 7.5, 700, {.forwards = false});
+    chassis.moveToPoint(8.5, 7.5, 800, {.forwards = false},false);
 
-    // og 20.5 and 8.5 for the x coords that kinda worked on skills fields
 
 
 
@@ -612,8 +622,9 @@ void skills106(){
     
     intake.score(127, true);
     move(-20,0,false, 200);
-    intake.score(65, true);
+    intake.score(105, true);
     chassis.turnToPoint(48.5, 51, 300,{});
+    intake.score(70, true);
     pros::delay(2000);
     intake.store(127);
     pros::delay(300);
@@ -656,20 +667,20 @@ void skills106(){
 
     // Fourth match loader
     intake.store(127);
-    chassis.moveToPoint(46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed}, false);
+    chassis.moveToPoint(47, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed}, false);
     move(40, 0, false, scraperDelay);
     intake.stop();
     flappy.set_value(false);
     flappier.set_value(false);
 
-    chassis.moveToPoint(49, -23, 1000, {.forwards = false, .minSpeed = 60}, false);
+    chassis.moveToPoint(48, -23, 1000, {.forwards = false, .minSpeed = 60}, false);
     intake.score(127);
     move(-15,0,false, scoreDelay);
     scraper.set_value(false);
 
 
-    move(40,0,false, 300);
-    move(-30,0,false, 500);
+    move(40,0,false, 380);
+    move(-25,0,false, 610);
 
     // // MCL OFF
     // lemlib::toggleMCL();
@@ -699,7 +710,7 @@ void skills106(){
 
     horLift.set_value(true);
     // verLift.set_value(true);
-    intake.store(127);
+    intake.score(127);
 
     //park
     move(100,0,false,60);
