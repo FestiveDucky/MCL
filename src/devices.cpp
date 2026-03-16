@@ -1,5 +1,9 @@
 #include "main.h"
+#include "devices.h"
 #include "lemlib/chassis/chassis.hpp"
+#include "lemlib/chassis/odom.hpp"
+#include <cmath>
+#include <limits>
 
 // namespace {
 // lemlib::MCLSettings makeMCLSettings() {
@@ -202,3 +206,195 @@ pros::adi::Pneumatics scraper_piston = pros::adi::Pneumatics('B', true);
 pros::adi::Pneumatics descore = pros::adi::Pneumatics('G', false);
 pros::adi::Pneumatics middlescore_piston = pros::adi::Pneumatics('A', true);
 pros::adi::Pneumatics top_score = pros::adi::Pneumatics('C', true);
+
+namespace {
+constexpr float DISTANCE_RESET_MAX_IN = 200.0f;
+constexpr float DISTANCE_RESET_RAY_EPS = 1e-5f;
+constexpr float DEG_TO_RAD = 0.01745329251994329577f;
+
+struct WallHit {
+    bool valid = false;
+    bool solvesX = false; // true => x wall (x = +/-fieldHalf), false => y wall.
+    float wallCoord = 0.0f;
+};
+
+struct AxisEstimate {
+    bool hasX = false;
+    bool hasY = false;
+    float x = 0.0f;
+    float y = 0.0f;
+};
+
+bool inRange(float value, float min, float max) {
+    return value >= min && value <= max;
+}
+
+// Select the wall this ray most likely hits first, using current pose as the wall-selection seed.
+WallHit raycastWall(float x0, float y0, float dx, float dy, float wallMin, float wallMax) {
+    float bestT = std::numeric_limits<float>::infinity();
+    WallHit hit{};
+
+    if (std::fabs(dx) > DISTANCE_RESET_RAY_EPS) {
+        float t = (wallMin - x0) / dx;
+        if (t >= 0.0f) {
+            const float y = y0 + t * dy;
+            if (inRange(y, wallMin, wallMax) && t < bestT) {
+                bestT = t;
+                hit = {true, true, wallMin};
+            }
+        }
+
+        t = (wallMax - x0) / dx;
+        if (t >= 0.0f) {
+            const float y = y0 + t * dy;
+            if (inRange(y, wallMin, wallMax) && t < bestT) {
+                bestT = t;
+                hit = {true, true, wallMax};
+            }
+        }
+    }
+
+    if (std::fabs(dy) > DISTANCE_RESET_RAY_EPS) {
+        float t = (wallMin - y0) / dy;
+        if (t >= 0.0f) {
+            const float x = x0 + t * dx;
+            if (inRange(x, wallMin, wallMax) && t < bestT) {
+                bestT = t;
+                hit = {true, false, wallMin};
+            }
+        }
+
+        t = (wallMax - y0) / dy;
+        if (t >= 0.0f) {
+            const float x = x0 + t * dx;
+            if (inRange(x, wallMin, wallMax) && t < bestT) {
+                bestT = t;
+                hit = {true, false, wallMax};
+            }
+        }
+    }
+
+    return hit;
+}
+
+AxisEstimate estimateAxisFromSensor(std::size_t sensorIndex, const lemlib::Pose& currentPoseDeg) {
+    AxisEstimate estimate{};
+    const auto& cfg = lemlib::getMCLSettings();
+    if (sensorIndex >= cfg.distanceSensors.size()) return estimate;
+
+    const float readingIn = lemlib::getDistanceInchesByIndex(sensorIndex);
+    if (!std::isfinite(readingIn) || readingIn <= 0.0f || readingIn > DISTANCE_RESET_MAX_IN) return estimate;
+
+    const auto& mount = cfg.distanceSensors[sensorIndex].mount;
+    const float headingRad = static_cast<float>(currentPoseDeg.theta) * DEG_TO_RAD;
+    const float sh = std::sin(headingRad);
+    const float ch = std::cos(headingRad);
+
+    // Robot-frame mount offset transformed to field frame (same convention as MCL update code).
+    const float mountOffsetX = ch * mount.xOffset + sh * mount.yOffset;
+    const float mountOffsetY = -sh * mount.xOffset + ch * mount.yOffset;
+
+    const float sensorX = static_cast<float>(currentPoseDeg.x) + mountOffsetX;
+    const float sensorY = static_cast<float>(currentPoseDeg.y) + mountOffsetY;
+
+    const float rayAngle = headingRad + mount.headingOffset;
+    const float rayDirX = std::sin(rayAngle);
+    const float rayDirY = std::cos(rayAngle);
+
+    const WallHit hit = raycastWall(sensorX, sensorY, rayDirX, rayDirY, -cfg.fieldHalf, cfg.fieldHalf);
+    if (!hit.valid) return estimate;
+
+    // If we hit a vertical wall, solve x. If horizontal wall, solve y.
+    if (hit.solvesX) {
+        estimate.hasX = true;
+        estimate.x = hit.wallCoord - (mountOffsetX + readingIn * rayDirX);
+    } else {
+        estimate.hasY = true;
+        estimate.y = hit.wallCoord - (mountOffsetY + readingIn * rayDirY);
+    }
+
+    return estimate;
+}
+} // namespace
+
+bool resetPositionFromDistanceSensor(std::size_t sensorIndex) {
+    const lemlib::Pose currentPoseDeg = chassis.getPose(false);
+    const AxisEstimate estimate = estimateAxisFromSensor(sensorIndex, currentPoseDeg);
+    if (!estimate.hasX && !estimate.hasY) return false;
+
+    const float newX = estimate.hasX ? estimate.x : currentPoseDeg.x;
+    const float newY = estimate.hasY ? estimate.y : currentPoseDeg.y;
+
+    // Use setPose so odom pose and MCL particles are re-seeded around this trusted reset point.
+    chassis.setPose(newX, newY, currentPoseDeg.theta, false);
+    return true;
+}
+
+bool resetPositionFromTwoDistanceSensors(std::size_t sensorA, std::size_t sensorB) {
+    if (sensorA == sensorB) return resetPositionFromDistanceSensor(sensorA);
+
+    const lemlib::Pose currentPoseDeg = chassis.getPose(false);
+    const AxisEstimate estimateA = estimateAxisFromSensor(sensorA, currentPoseDeg);
+    const AxisEstimate estimateB = estimateAxisFromSensor(sensorB, currentPoseDeg);
+
+    double sumX = 0.0;
+    double sumY = 0.0;
+    int xCount = 0;
+    int yCount = 0;
+
+    if (estimateA.hasX) {
+        sumX += estimateA.x;
+        xCount++;
+    }
+    if (estimateA.hasY) {
+        sumY += estimateA.y;
+        yCount++;
+    }
+    if (estimateB.hasX) {
+        sumX += estimateB.x;
+        xCount++;
+    }
+    if (estimateB.hasY) {
+        sumY += estimateB.y;
+        yCount++;
+    }
+
+    if (xCount == 0 && yCount == 0) return false;
+
+    const float newX = (xCount > 0) ? static_cast<float>(sumX / xCount) : currentPoseDeg.x;
+    const float newY = (yCount > 0) ? static_cast<float>(sumY / yCount) : currentPoseDeg.y;
+
+    chassis.setPose(newX, newY, currentPoseDeg.theta, false);
+    return true;
+}
+
+bool resetPositionFromDistanceSensors() {
+    const auto& cfg = lemlib::getMCLSettings();
+    if (cfg.distanceSensors.empty()) return false;
+
+    const lemlib::Pose currentPoseDeg = chassis.getPose(false);
+    double sumX = 0.0;
+    double sumY = 0.0;
+    int xCount = 0;
+    int yCount = 0;
+
+    for (std::size_t i = 0; i < cfg.distanceSensors.size(); i++) {
+        const AxisEstimate estimate = estimateAxisFromSensor(i, currentPoseDeg);
+        if (estimate.hasX) {
+            sumX += estimate.x;
+            xCount++;
+        }
+        if (estimate.hasY) {
+            sumY += estimate.y;
+            yCount++;
+        }
+    }
+
+    if (xCount == 0 && yCount == 0) return false;
+
+    const float newX = (xCount > 0) ? static_cast<float>(sumX / xCount) : currentPoseDeg.x;
+    const float newY = (yCount > 0) ? static_cast<float>(sumY / yCount) : currentPoseDeg.y;
+
+    chassis.setPose(newX, newY, currentPoseDeg.theta, false);
+    return true;
+}

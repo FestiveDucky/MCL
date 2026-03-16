@@ -105,6 +105,15 @@ std::uint32_t lemlib::getCalculationTime() {
     return updateTime;
 }
 
+std::size_t lemlib::getDistanceSensorCount() {
+    return distanceSensors.size();
+}
+
+float lemlib::getDistanceInchesByIndex(std::size_t index) {
+    if (index >= distanceSensors.size()) return std::numeric_limits<float>::quiet_NaN();
+    return readDistanceInches(distanceSensors[index]);
+}
+
 void lemlib::setMCLSettings(const lemlib::MCLSettings& settings) {
     mclSettings = settings;
     configureDistanceSensors();

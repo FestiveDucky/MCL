@@ -9,8 +9,8 @@ constexpr int kDirectionSwapCooldownMs = 120;
 constexpr int kJamCurrentThresholdMa = 1200;
 constexpr double kJamVelocityThresholdRpm = 18.0;
 constexpr int kJamDetectTimeMs = 120;
-constexpr int kReverseDurationMs = 180;
-constexpr int kReversePower = 40;
+constexpr int kReverseDurationMs = 150;
+constexpr int kReversePower = 65;
 
 int reverseForPower(int commandedPower, int reversePower) {
     if (commandedPower > 0) return -reversePower;

@@ -3,6 +3,7 @@
 #include "lemlib/chassis/chassis.hpp"
 #include "lemlib/pose.hpp"
 #include "particle.h"
+#include <cstddef>
 #include <shared_mutex>
 #include <mutex>
 
@@ -70,6 +71,8 @@ void initParticles();
 std::uint32_t getCalculationTime();
 std::uint32_t getConfidence();
 void toggleMCL();
+std::size_t getDistanceSensorCount();
+float getDistanceInchesByIndex(std::size_t index);
 
 static double effectiveSampleSize(const std::vector<Particle>& particles);
 static std::vector<Particle> systematicResample(const std::vector<Particle>& particles);
