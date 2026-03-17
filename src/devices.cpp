@@ -6,10 +6,10 @@ lemlib::MCLSettings makeMCLSettings() {
     lemlib::MCLSettings cfg(500); // Number of particles tracked by MCL.
 
     cfg.distanceSensors = {
-        {17, {4.6f, 6.8f, 0.0f}},            // Front sensor (old behavior): port 7.
-        {15, {-5.8f, -2.3f, -1.57079632679f}}, // Left sensor (old behavior): port 5.
-        {10, {5.8f, -2.1f, 1.57079632679f}},   // Right sensor (old behavior): port 6.
-        {3, {3.5f, -3.2f, M_PI}} //back sensor
+        {9, {3, 7.5, 0.0f}},            // Front sensor (old behavior): port 7.
+        {1, {-5, -3, -1.57079632679f}}, // Left sensor (old behavior): port 5.
+        {8, {5.3, -3, 1.57079632679f}},   // Right sensor (old behavior): port 6.
+        // {3, {3.5f, -3.2f, M_PI}} //back sensor
     };
 
     cfg.sigma0XY = 0.06f;         // Baseline XY process noise each cycle (in).
@@ -62,57 +62,58 @@ lemlib::MCLSettings makeMCLSettings() {
 
 lemlib::MCLSettings settings = makeMCLSettings();
 
-pros::MotorGroup left_motor_group({-5, -4, -11}, pros::MotorGears::blue);
-pros::MotorGroup right_motor_group({19, 9, 20}, pros::MotorGears::blue);
+pros::MotorGroup left_motor_group({-12, 14, 13}, pros::MotorGears::blue);
+pros::MotorGroup right_motor_group({-20, 19, -18}, pros::MotorGears::blue);
 
-pros::Motor bottom_intake(1, pros::MotorGears::blue);
-pros::Motor top_intake(-12, pros::MotorGears::blue);
+pros::Motor bottom_intake(21, pros::MotorGears::blue);
+pros::Motor mid_intake(11, pros::MotorGears::blue);
+pros::Motor top_intake(10, pros::MotorGears::blue);
 
 
 // drivetrain settings
 lemlib::Drivetrain drivetrain(&left_motor_group, // left motor group
                               &right_motor_group, // right motor group
-                              12, // track width
+                              9.9, // track width
                               lemlib::Omniwheel::NEW_325,
                               450, // drivetrain rpm
                               2 // horizontal drift
 );
 
-pros::Imu imu(7);
-pros::Rotation vertical_rotation(18);
-pros::Rotation horizontal_rotation(16);
+pros::Imu imu(2);
+// pros::Rotation vertical_rotation(18);
+// pros::Rotation horizontal_rotation(16);
 // vertical tracking wheel
-lemlib::TrackingWheel vertical_tracking_wheel(&vertical_rotation, lemlib::Omniwheel::NEW_2, -1.875);
-lemlib::TrackingWheel horizontal_tracking_wheel(&horizontal_rotation, lemlib::Omniwheel::NEW_2, .125);
+// lemlib::TrackingWheel vertical_tracking_wheel(&vertical_rotation, lemlib::Omniwheel::NEW_2, -1.875);
+// lemlib::TrackingWheel horizontal_tracking_wheel(&horizontal_rotation, lemlib::Omniwheel::NEW_2, .125);
 // odometry settings
-lemlib::OdomSensors sensors(&vertical_tracking_wheel, // vertical tracking wheel 1 &vertical_tracking_wheel
+lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel 1 &vertical_tracking_wheel
                             nullptr, // vertical tracking wheel 2
-                            &horizontal_tracking_wheel, // horizontal tracking wheel 1
+                           nullptr, // horizontal tracking wheel 1
                             nullptr, // horizontal tracking wheel 2
                             &imu // inertial sensor
 );
 
 // lateral PID controller
-lemlib::ControllerSettings lateral_controller(4.23, // proportional gain (kP)
+lemlib::ControllerSettings lateral_controller(14, // proportional gain (kP)
                                             0, // integral gain (kI)
-                                            9, // derivative gain (kD)
-                                            0, // anti windup
-                                            .25, // small error range, in inches
-                                            500, // small error range timeout, in milliseconds
-                                            .7, // large error range, in inches
-                                            2000, // large error range timeout, in milliseconds
-                                            20 // maximum acceleration (slew)
+                                            120, // derivative gain (kD)
+                                            1, // anti windup
+                                            .5, // small error range, in inches
+                                            250, // small error range timeout, in milliseconds
+                                            .5, // large error range, in inches
+                                            250, // large error range timeout, in milliseconds
+                                            0 // maximum acceleration (slew)
 );
 
 // angular PID controller
-lemlib::ControllerSettings angular_controller(3.175, // proportional gain (kP)
-                                             0, // integral gain (kI)
-                                             14, // derivative gain (kD)
-                                             3, // anti windup
+lemlib::ControllerSettings angular_controller(3.1, // proportional gain (kP)
+                                             0.067, // integral gain (kI)
+                                             21.3, // derivative gain (kD)
+                                             5, // anti windup
                                              .5, // small error range, in degrees
-                                             500, // small error range timeout, in milliseconds
+                                             100, // small error range timeout, in milliseconds
                                              1, // large error range, in degrees
-                                             800, // large error range timeout, in milliseconds
+                                             250, // large error range timeout, in milliseconds
                                              0 // maximum acceleration (slew)
 );
 
@@ -140,11 +141,10 @@ lemlib::Chassis chassis(drivetrain, // drivetrain settings
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 
-pros::adi::DigitalOut scraper('F', false);
-pros::adi::DigitalOut wing('E', false);
-pros::adi::DigitalOut horLift('D', false);
-pros::adi::DigitalOut verLift('G',false);
+pros::adi::DigitalOut scraper('G', false);
+pros::adi::DigitalOut wing('C', false);
+pros::adi::DigitalOut horLift('H', false);
+pros::adi::DigitalOut verLift('H',false);
 pros::adi::DigitalOut flappy ('A', false);
-pros::adi::DigitalOut flappier ('B', false);
+pros::adi::DigitalOut flappier ('H', false);
 pros::adi::DigitalOut descore('H', false);
-// pros::adi::DigitalOut descore('C', false);

@@ -71,8 +71,8 @@ bool wingPressedLast = false;
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	vertical_rotation.reset();
-	horizontal_rotation.reset();
+	// vertical_rotation.reset();
+	// horizontal_rotation.reset();
 	// pros::lcd::initialize();
     chassis.calibrate();
     // Keep MCL initialized/running, but paused until autonomous starts.
@@ -149,7 +149,7 @@ void autonomous() {
 		left_motor_group.set_brake_mode(MOTOR_BRAKE_HOLD);
 		right_motor_group.set_brake_mode(MOTOR_BRAKE_HOLD);
     setMCLPaused(false);
-		soloAWP();
+		skills();
     // int idx = sc.selectedAuton;
     // if (idx < 0 || idx >= static_cast<int>(AUTONS.size())) idx = 0;
     // if (AUTONS[idx].run != nullptr) AUTONS[idx].run();

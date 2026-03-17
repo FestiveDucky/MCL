@@ -12,6 +12,7 @@ extern lemlib::MCLSettings settings;
 
 extern pros::Motor bottom_intake;
 extern pros::Motor top_intake;
+extern pros::Motor mid_intake;
 
 extern lemlib::Chassis chassis;
 extern pros::Imu imu;

@@ -30,8 +30,8 @@ void Intake::initialize() {
 }
 
 void Intake::store(int power) {
-    flappy.set_value(false);
-    flappier.set_value(true);
+    flappy.set_value(true);
+    // flappier.set_value(true);
     cooldown = 200;
     jam_timer_ms = 0;
     reverse_timer_ms = 0;
@@ -39,7 +39,9 @@ void Intake::store(int power) {
     Intake::power = power;
     state = IntakeState::STORING;
     bottom_intake.move(Intake::power);
-    top_intake.move(Intake::power);
+    mid_intake.move(Intake::power);
+    top_intake.move(0);
+
 }
 
 void Intake::score(int power, bool middle) {
@@ -47,7 +49,7 @@ void Intake::score(int power, bool middle) {
         flappy.set_value(true);
         flappier.set_value(true);
     } else {
-        flappier.set_value(false);
+        // flappier.set_value(false);
         flappy.set_value(false);
     }
     cooldown = 200;
@@ -57,6 +59,7 @@ void Intake::score(int power, bool middle) {
     Intake::power = power;
     state = IntakeState::SCORING;
     bottom_intake.move(Intake::power);
+    mid_intake.move(Intake::power);
     top_intake.move(Intake::power);
 }
 
@@ -67,8 +70,9 @@ void Intake::outtake(int power) {
     reversed = false;
     Intake::power = power;
     state = IntakeState::OUTTAKING;
-    bottom_intake.move(-Intake::power);
-    top_intake.move(-Intake::power);
+    bottom_intake.move(Intake::power *.3);
+    mid_intake.move(Intake::power*.5);
+    top_intake.move(0);
 }
 
 void Intake::stop() {
@@ -77,6 +81,7 @@ void Intake::stop() {
     reverse_timer_ms = 0;
     reversed = false;
     bottom_intake.move(0);
+    mid_intake.move(0);
     top_intake.move(0);
     // flappy.set_value(false);
     // flappier.set_value(true);

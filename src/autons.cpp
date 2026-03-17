@@ -131,9 +131,9 @@ void skills() {
     scraper.set_value(false);
     chassis.moveToPoint(-61.5, -36, 800,{.forwards = false, .maxSpeed = 50},false);
     chassis.turnToPoint(-61.5, 36, 800,{.forwards = false},false);
-    intake.stop();
-    flappy.set_value(false);
-    flappier.set_value(false);
+    // intake.stop();
+    // flappy.set_value(false);
+    // flappier.set_value(false);
     chassis.moveToPoint(-61.5, 36, 2000,{.forwards = false, .maxSpeed = 70},false);
     chassis.turnToPoint(-48, 36,800, {},false);
     chassis.moveToPoint(-48, 36, 800, {.maxSpeed = 70}, false);
@@ -179,9 +179,9 @@ void skills() {
     scraper.set_value(false);
     chassis.moveToPoint(61.5, 36, 800,{.forwards = false, .maxSpeed = 50},false);
     chassis.turnToPoint(61.5, -36, 800,{.forwards = false},false);
-    intake.stop();
-    flappy.set_value(false);
-    flappier.set_value(false);
+    // intake.stop();
+    // flappy.set_value(false);
+    // flappier.set_value(false);
     chassis.moveToPoint(61.5, -36, 2000,{.forwards = false, .maxSpeed = 70},false);
     chassis.turnToPoint(48, -36, 800, {},false);
     chassis.moveToPoint(48, -36, 800, {.maxSpeed = 70}, false);
@@ -234,14 +234,18 @@ void skills() {
     chassis.moveToPose(24, -62, -90, 3000, {.lead = .3}, false);
     pros::delay(500);
 
-    horLift.set_value(true);
-    verLift.set_value(true);
+    // horLift.set_value(true);
+    // verLift.set_value(true);
 
     move(120,0,false,100);
     scraper.set_value(true);
     move(120,6,false,225);
     scraper.set_value(false);
     move(127,6,false,300);
+
+
+   
+
 }
 
 void skills96(){
