@@ -31,7 +31,6 @@ void move(double power, double turn, bool swing=false, double time=10000) {
 
 void soloAWP() {
     chassis.setPose(17, -52, -90);
-    // descore.set_value(true);
 
     int scraperDist = 70;
     int scraperTimeout = 700;
@@ -39,39 +38,44 @@ void soloAWP() {
     int scraperDelay = 200;
     int scoreDelay = 1000;
 
+    wing.set_value(true);
     // First match loader
     intake.store(127);
-    chassis.tank(-127, -127);
-    pros::delay(410);
-    chassis.tank(0, 0);
+    // chassis.tank(-127, -127);
+    // pros::delay(410);
+    // chassis.tank(0, 0);
 
 
-
-    // chassis.moveToPoint(46.5, -40, 600, {.forwards = false, .minSpeed = 127});
+    chassis.moveToPoint(46.5, -40, 600, {.forwards = false, .minSpeed = 127});
     // pros::delay(100);
-    scraper.set_value(true);
     // chassis.turnToPoint(46.5, -scraperDist, 300, {});
     
     // chassis.turnToHeading(-200, 450);
-    chassis.moveToPoint(46.5, -scraperDist, scraperTimeout, {}, false);
+    // chassis.moveToPoint(46.5, -scraperDist, scraperTimeout, {}, false);
+    scraper.set_value(true);
+    chassis.turnToPoint(46.5, -scraperDist, 180, {},false);
     // // // move(52, double turn)
-    move(52, 0, false, scoreDelay);
+    move(52, 0, false, 1300);
 
     // // Score in long goal
     // // scraper.toggle();
-    chassis.tank(-127, -127);
-    pros::delay(400);
-    chassis.tank(0, 0);
-    chassis.moveToPoint(48, -23, 220, {.forwards=false, .maxSpeed=90, .minSpeed=70}, false);
+
+    chassis.moveToPoint(48, -27, 400, {.forwards=false, .minSpeed=127});
+    chassis.moveToPoint(48, -23, 400, {.forwards=false}, false);
+
     // pros::delay(400);
     intake.score(127);
-    move(-15, 0, false, scoreDelay);
+    move(-30, 0, false, scoreDelay);
     // pros::delay(scoreDelay);
     intake.stop();
 
     // // Intake center 3 balls
     scraper.set_value(false);
-    chassis.turnToPoint(24, 24, 600, {.direction=lemlib::AngularDirection::CW_CLOCKWISE});
+
+
+    chassis.swingToHeading(35,DriveSide::RIGHT, 700, {.direction=lemlib::AngularDirection::CW_CLOCKWISE}, false);
+    // chassis.turnToHeading(36, 1200, {.direction=lemlib::AngularDirection::CW_CLOCKWISE});
+    // chassis.turnToPoint(48, 0, 750, {.direction=lemlib::AngularDirection::CW_CLOCKWISE, .minSpeed = 75});
     // chassis.moveToPoint(-46, -46, 1000, {}, false);
     // chassis.turnToPoint(-18, -18, 800, {}, false);
     // intake.store(100);
