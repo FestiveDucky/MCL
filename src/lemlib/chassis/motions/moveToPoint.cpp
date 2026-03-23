@@ -113,13 +113,20 @@ void lemlib::Chassis::moveToPoint(float x, float y, int timeout, MoveToPointPara
             angularOut = 0;
         }
 
-        // ratio the speeds to respect the max speed
+        // combine lateral + angular; either scale uniformly (legacy) or clip angular first (faster straight-line feel)
         float leftPower = lateralOut + angularOut;
         float rightPower = lateralOut - angularOut;
-        const float ratio = std::max(std::fabs(leftPower), std::fabs(rightPower)) / params.maxSpeed;
-        if (ratio > 1) {
-            leftPower /= ratio;
-            rightPower /= ratio;
+        if (params.prioritizeLateral) {
+            clampAngularForIndependentMotors(lateralOut, angularOut, params.maxSpeed);
+            leftPower = lateralOut + angularOut;
+            rightPower = lateralOut - angularOut;
+            prevAngularOut = angularOut;
+        } else {
+            const float ratio = std::max(std::fabs(leftPower), std::fabs(rightPower)) / params.maxSpeed;
+            if (ratio > 1) {
+                leftPower /= ratio;
+                rightPower /= ratio;
+            }
         }
 
         // move the drivetrain

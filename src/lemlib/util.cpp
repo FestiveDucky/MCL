@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <vector>
 #include "lemlib/pose.hpp"
 #include "lemlib/util.hpp"
@@ -39,6 +40,15 @@ float lemlib::avg(std::vector<float> values) {
 
 float lemlib::ema(float current, float previous, float smooth) {
     return (current * smooth) + (previous * (1 - smooth));
+}
+
+void lemlib::clampAngularForIndependentMotors(float lateral, float& angular, float maxAbs) {
+    const float L = lateral;
+    const float M = maxAbs;
+    const float aLo = std::max(-M - L, L - M);
+    const float aHi = std::min(M - L, L + M);
+    if (aLo <= aHi) { angular = std::clamp(angular, aLo, aHi); }
+    else { angular = 0.F; }
 }
 
 float lemlib::getCurvature(Pose pose, Pose other) {

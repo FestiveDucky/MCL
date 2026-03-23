@@ -3,6 +3,7 @@
 #include "devices.h"
 #include "lemlib/chassis/odom.hpp"
 #include "intake.h"
+#include "pros/rtos.hpp"
 
 // Distance sensor position reset: call only when perpendicular to a wall.
 // resetPositionFront(); resetPositionBack(); resetPositionLeft(); resetPositionRight();
@@ -46,26 +47,27 @@ void soloAWP() {
     // chassis.tank(0, 0);
 
 
-    chassis.moveToPoint(46.5, -40, 600, {.forwards = false, .minSpeed = 127});
+    chassis.moveToPoint(46.5, -44, 620, {.forwards = false, .minSpeed = 150});
     // pros::delay(100);
     // chassis.turnToPoint(46.5, -scraperDist, 300, {});
     
     // chassis.turnToHeading(-200, 450);
     // chassis.moveToPoint(46.5, -scraperDist, scraperTimeout, {}, false);
     scraper.set_value(true);
-    chassis.turnToPoint(46.5, -scraperDist, 180, {},false);
+    chassis.turnToPoint(46.5, -scraperDist, 160, {},false);
     // // // move(52, double turn)
-    move(52, 0, false, 1300);
+    move(52, 0, false, 1000);
 
     // // Score in long goal
     // // scraper.toggle();
 
-    chassis.moveToPoint(48, -27, 400, {.forwards=false, .minSpeed=127});
-    chassis.moveToPoint(48, -23, 400, {.forwards=false}, false);
+    // chassis.moveToPoint(48, -27, 400, {.forwards=false, .minSpeed=127});
+    chassis.turnToPoint(48, -23, 400, {.forwards=false});
+    chassis.moveToPoint(48, -23, 700, {.forwards=false,.minSpeed=127,.earlyExitRange = 1}, false);
 
     // pros::delay(400);
     intake.score(127);
-    move(-30, 0, false, scoreDelay);
+    move(-25, 0, false, scoreDelay);
     // pros::delay(scoreDelay);
     intake.stop();
 
@@ -73,10 +75,30 @@ void soloAWP() {
     scraper.set_value(false);
 
 
-    chassis.swingToHeading(35,DriveSide::RIGHT, 700, {.direction=lemlib::AngularDirection::CW_CLOCKWISE}, false);
-    // chassis.turnToHeading(36, 1200, {.direction=lemlib::AngularDirection::CW_CLOCKWISE});
-    // chassis.turnToPoint(48, 0, 750, {.direction=lemlib::AngularDirection::CW_CLOCKWISE, .minSpeed = 75});
-    // chassis.moveToPoint(-46, -46, 1000, {}, false);
+    chassis.swingToHeading(-90,DriveSide::RIGHT, 500, {.direction=lemlib::AngularDirection::CW_CLOCKWISE,.minSpeed=80});
+    // chassis.turnToHeading(-70, 600, {.direction=lemlib::AngularDirection::CW_CLOCKWISE,.minSpeed=80}, false);
+    chassis.turnToHeading(0, 600, {.direction=lemlib::AngularDirection::CW_CLOCKWISE});
+
+    wing.set_value(false);
+    intake.store(127);
+        // chassis.moveToP(45, -12, 20, 1000, {.minSpeed=80});
+    chassis.moveToPoint(35, -8, 700, {.minSpeed=70});
+    chassis.waitUntilDone();
+    wing.set_value(true);
+
+    chassis.swingToHeading(45,DriveSide::RIGHT, 500, {.direction=lemlib::AngularDirection::CW_CLOCKWISE}, false);
+    scraper.set_value(true);
+
+
+    // chassis.moveToPoint(40, -7, 700);
+    // scraper.set_value(true);
+
+
+
+
+    // chassis.swingToHeading(35,DriveSide::RIGHT, 500, {.direction=lemlib::AngularDirection::CW_CLOCKWISE}, false);
+
+    // chassis.turnToPoint(48, -12, 1200, {.direction=lemlib::AngularDirection::CW_CLOCKWISE});
     // chassis.turnToPoint(-18, -18, 800, {}, false);
     // intake.store(100);
     // chassis.moveToPoint(-18, -18, 1500, {.headingCorrection=5}, false);
