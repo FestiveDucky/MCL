@@ -36,7 +36,7 @@ void soloAWP() {
     int scraperTimeout = 700;
     float matchLoaderSpeed = 60;
     int scraperDelay = 200;
-    int scoreDelay = 1000;
+    int scoreDelay = 850;
 
     wing.set_value(true);
     // First match loader
@@ -73,8 +73,11 @@ void soloAWP() {
     scraper.set_value(false);
 
 
-    chassis.swingToHeading(35,DriveSide::RIGHT, 700, {.direction=lemlib::AngularDirection::CW_CLOCKWISE}, false);
-    // chassis.turnToHeading(36, 1200, {.direction=lemlib::AngularDirection::CW_CLOCKWISE});
+    //chassis.swingToHeading(-90,DriveSide::RIGHT, 700, {.direction=lemlib::AngularDirection::CW_CLOCKWISE}, false);
+    chassis.turnToHeading(-80, 1200, {.direction=lemlib::AngularDirection::CW_CLOCKWISE});
+    intake.store(127);
+    chassis.moveToPoint(-20, -24, 2000, {.minSpeed = 90}, true);
+    
     // chassis.turnToPoint(48, 0, 750, {.direction=lemlib::AngularDirection::CW_CLOCKWISE, .minSpeed = 75});
     // chassis.moveToPoint(-46, -46, 1000, {}, false);
     // chassis.turnToPoint(-18, -18, 800, {}, false);
@@ -623,12 +626,6 @@ void skills106(){
     chassis.turnToPoint(8.5, 7.5, 700, {.forwards = false});
     chassis.moveToPoint(8.5, 7.5, 800, {.forwards = false},false);
 
-
-
-
-
-
-    
     // // // // // Score Middle Goal 
     
     intake.score(127, true);
