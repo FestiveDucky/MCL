@@ -116,9 +116,9 @@ void lemlib::Chassis::moveToPose(float x, float y, float theta, int timeout, Mov
         const float radius = 1 / fabs(getCurvature(pose, carrot));
         const float maxSlipSpeed(sqrt(params.horizontalDrift * radius * 9.8));
         lateralOut = std::clamp(lateralOut, -maxSlipSpeed, maxSlipSpeed);
-        // prioritize angular movement over lateral movement
+        // prioritize angular movement over lateral movement (skipped when prioritizing lateral at the motor mix step)
         const float overturn = fabs(angularOut) + fabs(lateralOut) - params.maxSpeed;
-        if (overturn > 0) lateralOut -= lateralOut > 0 ? overturn : -overturn;
+        if (!params.prioritizeLateral && overturn > 0) lateralOut -= lateralOut > 0 ? overturn : -overturn;
 
         // prevent moving in the wrong direction
         if (params.forwards && !close) lateralOut = std::fmax(lateralOut, 0);
@@ -135,13 +135,19 @@ void lemlib::Chassis::moveToPose(float x, float y, float theta, int timeout, Mov
 
         infoSink()->debug("lateralOut: {} angularOut: {}", lateralOut, angularOut);
 
-        // ratio the speeds to respect the max speed
         float leftPower = lateralOut + angularOut;
         float rightPower = lateralOut - angularOut;
-        const float ratio = std::max(std::fabs(leftPower), std::fabs(rightPower)) / params.maxSpeed;
-        if (ratio > 1) {
-            leftPower /= ratio;
-            rightPower /= ratio;
+        if (params.prioritizeLateral) {
+            clampAngularForIndependentMotors(lateralOut, angularOut, params.maxSpeed);
+            leftPower = lateralOut + angularOut;
+            rightPower = lateralOut - angularOut;
+            prevAngularOut = angularOut;
+        } else {
+            const float ratio = std::max(std::fabs(leftPower), std::fabs(rightPower)) / params.maxSpeed;
+            if (ratio > 1) {
+                leftPower /= ratio;
+                rightPower /= ratio;
+            }
         }
 
         // move the drivetrain

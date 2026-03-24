@@ -163,4 +163,16 @@ float ema(float current, float previous, float smooth);
  * @endcode
  */
 float getCurvature(Pose pose, Pose other);
+
+/**
+ * @brief Clamp angular output so each side stays within [-maxAbs, maxAbs] without reducing lateral.
+ *
+ * Default LemLib mixing scales lateral and angular together when the sum exceeds maxSpeed, which caps drive power
+ * whenever heading correction runs. Clamping angular first preserves full lateral command (closer to open-loop tank).
+ *
+ * @param lateral lateral motor command (unchanged)
+ * @param angular angular correction in/out; clamped to feasible range for the given lateral
+ * @param maxAbs per-motor limit (typically maxSpeed from motion params)
+ */
+void clampAngularForIndependentMotors(float lateral, float& angular, float maxAbs);
 } // namespace lemlib

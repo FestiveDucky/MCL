@@ -372,6 +372,9 @@ struct MoveToPoseParams {
         /** distance between the robot and target point where the movement will exit. Only has an effect if minSpeed is
          * non-zero.*/
         float earlyExitRange = 0;
+        /** if true, keep full lateral power and only clip angular correction to respect per-motor limits (faster than
+         * scaling both sides down). false matches legacy LemLib behavior. */
+        bool prioritizeLateral = false;
 };
 
 /**
@@ -395,6 +398,9 @@ struct MoveToPointParams {
         float earlyExitRange = 0;
         /** lateral error bound where angular correction is disabled. 0 keeps heading correction always on by default */
         int headingCorrection = 0;
+        /** if true, keep full lateral power and only clip angular correction to respect per-motor limits (faster than
+         * scaling both sides down). false matches legacy LemLib behavior. */
+        bool prioritizeLateral = false;
 };
 
 // default drive curve

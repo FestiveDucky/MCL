@@ -3,6 +3,7 @@
 #include "devices.h"
 #include "lemlib/chassis/odom.hpp"
 #include "intake.h"
+#include "pros/rtos.hpp"
 
 // Distance sensor position reset: call only when perpendicular to a wall.
 // resetPositionFront(); resetPositionBack(); resetPositionLeft(); resetPositionRight();
@@ -46,26 +47,27 @@ void soloAWP() {
     // chassis.tank(0, 0);
 
 
-    chassis.moveToPoint(46.5, -40, 600, {.forwards = false, .minSpeed = 127});
+    chassis.moveToPoint(46.5, -44, 620, {.forwards = false, .minSpeed = 150});
     // pros::delay(100);
     // chassis.turnToPoint(46.5, -scraperDist, 300, {});
     
     // chassis.turnToHeading(-200, 450);
     // chassis.moveToPoint(46.5, -scraperDist, scraperTimeout, {}, false);
     scraper.set_value(true);
-    chassis.turnToPoint(46.5, -scraperDist, 180, {},false);
+    chassis.turnToPoint(46.5, -scraperDist, 160, {},false);
     // // // move(52, double turn)
-    move(52, 0, false, 1300);
+    move(52, 0, false, 1000);
 
     // // Score in long goal
     // // scraper.toggle();
 
-    chassis.moveToPoint(48, -27, 400, {.forwards=false, .minSpeed=127});
-    chassis.moveToPoint(48, -23, 400, {.forwards=false}, false);
+    // chassis.moveToPoint(48, -27, 400, {.forwards=false, .minSpeed=127});
+    chassis.turnToPoint(48, -23, 400, {.forwards=false});
+    chassis.moveToPoint(48, -23, 700, {.forwards=false,.minSpeed=127,.earlyExitRange = 1}, false);
 
     // pros::delay(400);
     intake.score(127);
-    move(-30, 0, false, scoreDelay);
+    move(-25, 0, false, scoreDelay);
     // pros::delay(scoreDelay);
     intake.stop();
 
