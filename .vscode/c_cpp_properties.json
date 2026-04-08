@@ -4,20 +4,21 @@
       "name": "PROS Project",
       "includePath": [
         "${workspaceFolder}/**",
-        "c:\\Users\\alexr\\Documents\\GitHub\\testtesttest\\include"
+        "c:\\Users\\alexr\\Documents\\GitHub\\testtesttest\\include",
+        "/home/festive/GitHub/MCL/include"
       ],
       "defines": [
         "_DEBUG",
         "UNICODE",
         "_UNICODE"
       ],
-      "compilerPath": "C:\\Users\\alexr\\AppData\\Roaming\\Code\\User\\globalStorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\arm-none-eabi-g++",
+      "compilerPath": "/home/festive/.config/Code - OSS/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/arm-none-eabi-g++",
       "cStandard": "gnu11",
       "cppStandard": "gnu++20",
       "intelliSenseMode": "gcc-arm",
       "browse": {
         "path": [
-          "c:\\Users\\alexr\\Documents\\GitHub\\testtesttest"
+          "/home/festive/GitHub/MCL"
         ],
         "limitSymbolsToIncludedHeaders": true,
         "databaseFilename": ""

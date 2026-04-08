@@ -18,6 +18,7 @@ void move(double power, double turn, bool swing=false, double time=10000) {
     pros::delay(time);
     left_motor_group.brake();
     right_motor_group.brake();
+    
     // left_center_motor.move(left);
     // left_back_motor.move(left);
     // right_front_motor.move(left);
