@@ -69,9 +69,9 @@ lemlib::MCLSettings makeMCLSettings() {
     lemlib::MCLSettings cfg(500); // Number of particles tracked by MCL.
 
     cfg.distanceSensors = {
-        {2, {-4.75f, 7.0f, 0.0f}},            // Front sensor (old behavior): port 7.
-        {10, {-4.75f, 1.3f, -1.57079632679f}}, // Left sensor (old behavior): port 5.
-        {17, {5.0f, 2.75f, 1.57079632679f}},   // Right sensor (old behavior): port 6.
+        {5, {4f, 5.125f, 0.0f}},            // Front sensor (old behavior): port 7.
+        {6, {-4.5f, 1.42f, -1.57079632679f}}, // Left sensor (old behavior): port 5.
+        {14, {4.25f, -3.75f, 1.57079632679f}},   // Right sensor (old behavior): port 6.
     };
 
     cfg.sigma0XY = 0.06f;         // Baseline XY process noise each cycle (in).
@@ -104,7 +104,7 @@ lemlib::MCLSettings makeMCLSettings() {
     cfg.penalizeOobParticles = true; // Downweights particles that leave bounds.
     cfg.oobWeightMult = 1e-3;       // Weight multiplier applied to OOB particles.
     cfg.useFieldMargin = true;      // Shrinks particle-valid region inward from walls.
-    cfg.fieldMarginIn = 5.5f;       // Margin size from field walls for particle bounds (in).
+    cfg.fieldMarginIn = 6f;       // Margin size from field walls for particle bounds (in).
     cfg.useSensorConfidence = true; // Uses sensor confidence to blend likelihood strength.
     cfg.sensorConfMax = 63.0f;      // Confidence value mapped to full trust.
     cfg.useNoHitModel = true;       // Treats >zMax as explicit "no wall hit" evidence.
@@ -124,31 +124,34 @@ lemlib::MCLSettings makeMCLSettings() {
 
 lemlib::MCLSettings settings = makeMCLSettings();
 
-pros::MotorGroup left_motor_group({-1, 12, -14}, pros::MotorGears::blue);
-pros::MotorGroup right_motor_group({13, -16, 18}, pros::MotorGears::blue);
+pros::MotorGroup left_motor_group({1, -2, -15}, pros::MotorGears::blue);
+pros::MotorGroup right_motor_group({17, -19, 20}, pros::MotorGears::blue);
 
-pros::Motor bottom_intake(-7, pros::MotorGears::blue);
-pros::Motor top_intake(6, pros::MotorGears::blue);
+pros::Motor bottom_intake(16, pros::MotorGears::blue);
+pros::Motor top_intake(-18, pros::MotorGears::blue);
 
 // drivetrain settings
 lemlib::Drivetrain drivetrain(&left_motor_group, // left motor group
                               &right_motor_group, // right motor group
-                              10.95, // track width
+                              11.375, // track width
                               lemlib::Omniwheel::NEW_325,
                               480, // drivetrain rpm
                               1 // horizontal drift
 );
 
 // imu
-pros::Imu imu(5);
-pros::Rotation vertical_rotation(-15);
+pros::Imu imu(9);
+pros::Rotation vertical_rotation();
+pros::Rotation horizontal_rotation(-8);
 // vertical tracking wheel
-lemlib::TrackingWheel vertical_tracking_wheel(&vertical_rotation, lemlib::Omniwheel::NEW_275, 0.6);
+lemlib::TrackingWheel vertical_tracking_wheel(&vertical_rotation, lemlib::Omniwheel::NEW_2, -0.5);
+lemlib::TrackingWheel horizontal_tracking_wheel(&horizontal_rotation, lemlib::Omniwheel::NEW_2, -3.25);
+
 
 // odometry settings
 lemlib::OdomSensors sensors(&vertical_tracking_wheel, // vertical tracking wheel 1 &vertical_tracking_wheel
                             nullptr, // vertical tracking wheel 2
-                            nullptr, // horizontal tracking wheel 1
+                            &horizontal_tracking_wheel, // horizontal tracking wheel 1
                             nullptr, // horizontal tracking wheel 2
                             &imu // inertial sensor
 );
@@ -185,7 +188,7 @@ lemlib::ExpoDriveCurve throttle_curve(15, // joystick deadband out of 127
 // input curve for steer input during driver control
 lemlib::ExpoDriveCurve steer_curve(15, // joystick deadband out of 127
                                   15, // minimum output where drivetrain will move out of 127
-                                  1.005 // expo curve gain
+                                  1.032 // expo curve gain
 ); // 1.03
 
 // create the chassis
@@ -200,12 +203,13 @@ lemlib::Chassis chassis(drivetrain, // drivetrain settings
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
-pros::adi::AnalogIn potentiometer ('E'); // Auton selector
+pros::adi::AnalogIn potentiometer ('F'); // Auton selector
 
-pros::adi::Pneumatics scraper_piston = pros::adi::Pneumatics('B', true);
-pros::adi::Pneumatics descore = pros::adi::Pneumatics('G', false);
-pros::adi::Pneumatics middlescore_piston = pros::adi::Pneumatics('A', true);
-pros::adi::Pneumatics top_score = pros::adi::Pneumatics('C', true);
+pros::adi::Pneumatics scraper_piston = pros::adi::Pneumatics('A', false);
+pros::adi::Pneumatics descore = pros::adi::Pneumatics('B', false);
+pros::adi::Pneumatics middlescore_piston = pros::adi::Pneumatics('C', true);
+pros::adi::Pneumatics top_score = pros::adi::Pneumatics('H', true);
+pros::adi::Pneumatics intake_roller = pros::adi::Pneumatics('E', true);
 
 namespace {
 constexpr float DISTANCE_RESET_MAX_IN = 200.0f;

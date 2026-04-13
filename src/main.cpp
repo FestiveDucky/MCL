@@ -176,31 +176,35 @@ void opcontrol() {
 		if (controller.get_digital_new_release(DIGITAL_L1) || controller.get_digital_new_release(DIGITAL_L2) || controller.get_digital_new_release(DIGITAL_Y) || controller.get_digital_new_release(DIGITAL_R2)) {
 			bottom_intake_voltage = 0;
 			top_intake_voltage = 0;
-			top_score.set_value(true);
+			top_score.set_value(false);
 			middlescore_piston.set_value(true);
+			intake_roller.set(true);
 		}
 		
-		// release descore
-		if (controller.get_digital_new_release(DIGITAL_R1)) {
-			descore.set_value(true);
-		}
+		// // release descore (for hold)
+		// if (controller.get_digital_new_release(DIGITAL_R1)) {
+		// 	descore.set_value(true);
+		// }
 
-		// Intake (Both)
+		// Score top: Intake (Both)
 		if (controller.get_digital_new_press(DIGITAL_L2)) {
-			top_score.set_value(false);
+			top_score.set_value(true);
 			bottom_intake_voltage = 127;
 			top_intake_voltage = 110;
 		}
 
-		// Intake (Bottom)
+		// Store: Intake (Bottom)
 		if (controller.get_digital_new_press(DIGITAL_L1)) {
+			top_score.set_value(false);
 			bottom_intake_voltage = 127;
+			top_intake_voltage = 40;
 		}
 
 		// Outtake
 		if (controller.get_digital_new_press(DIGITAL_Y)) {
 			bottom_intake_voltage = -127;
 			top_intake_voltage = -127;
+			intake_roller.set(false);
 		}
 
 		// Scraper (toggle)
@@ -209,16 +213,17 @@ void opcontrol() {
 			scraper_piston.toggle();
 		}
 
-		// Descore (toggle)
+		// Descore
 		if (controller.get_digital_new_press(DIGITAL_R1)) {
-			descore.set_value(false);
+			// descore.set_value(false);
+			descore.toggle();
 		}
 
 		// Middle Score
 		if (controller.get_digital_new_press(DIGITAL_R2)) {
 			middlescore_piston.set_value(false);
-			bottom_intake_voltage = 80;
-			top_intake_voltage = 60;
+			bottom_intake_voltage = 127;
+			top_intake_voltage = 100;
 		}
 
 
@@ -237,7 +242,7 @@ void opcontrol() {
 		// sc.showInfoLabel(currents.c_str());
 
 		// chassis.arcade(volt, turn, false, 0.75);
-		chassis.arcade(volt, turn, false, 0.75);
+		chassis.arcade(volt, std::min(turn, 110), false, 0.75);
 		// left_motor_group.move(volt + turn);
 		// right_motor_group.move(volt - turn);
 
