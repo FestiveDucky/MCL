@@ -69,7 +69,7 @@ lemlib::MCLSettings makeMCLSettings() {
     lemlib::MCLSettings cfg(500); // Number of particles tracked by MCL.
 
     cfg.distanceSensors = {
-        {5, {4f, 5.125f, 0.0f}},            // Front sensor (old behavior): port 7.
+        {5, {4.f, 5.125f, 0.0f}},            // Front sensor (old behavior): port 7.
         {6, {-4.5f, 1.42f, -1.57079632679f}}, // Left sensor (old behavior): port 5.
         {14, {4.25f, -3.75f, 1.57079632679f}},   // Right sensor (old behavior): port 6.
     };
@@ -104,7 +104,7 @@ lemlib::MCLSettings makeMCLSettings() {
     cfg.penalizeOobParticles = true; // Downweights particles that leave bounds.
     cfg.oobWeightMult = 1e-3;       // Weight multiplier applied to OOB particles.
     cfg.useFieldMargin = true;      // Shrinks particle-valid region inward from walls.
-    cfg.fieldMarginIn = 6f;       // Margin size from field walls for particle bounds (in).
+    cfg.fieldMarginIn = 6.f;       // Margin size from field walls for particle bounds (in).
     cfg.useSensorConfidence = true; // Uses sensor confidence to blend likelihood strength.
     cfg.sensorConfMax = 63.0f;      // Confidence value mapped to full trust.
     cfg.useNoHitModel = true;       // Treats >zMax as explicit "no wall hit" evidence.
@@ -141,17 +141,15 @@ lemlib::Drivetrain drivetrain(&left_motor_group, // left motor group
 
 // imu
 pros::Imu imu(9);
-pros::Rotation vertical_rotation();
-pros::Rotation horizontal_rotation(-8);
+pros::Rotation vertical_rotation(7);
 // vertical tracking wheel
 lemlib::TrackingWheel vertical_tracking_wheel(&vertical_rotation, lemlib::Omniwheel::NEW_2, -0.5);
-lemlib::TrackingWheel horizontal_tracking_wheel(&horizontal_rotation, lemlib::Omniwheel::NEW_2, -3.25);
 
 
 // odometry settings
 lemlib::OdomSensors sensors(&vertical_tracking_wheel, // vertical tracking wheel 1 &vertical_tracking_wheel
                             nullptr, // vertical tracking wheel 2
-                            &horizontal_tracking_wheel, // horizontal tracking wheel 1
+                            nullptr, // horizontal tracking wheel 1
                             nullptr, // horizontal tracking wheel 2
                             &imu // inertial sensor
 );
@@ -165,7 +163,7 @@ lemlib::ControllerSettings lateral_controller(3.8, // proportional gain (kP)  //
                                               150, // small error range timeout, in milliseconds
                                               1, // large error range, in inches
                                               200, // large error range timeout, in milliseconds
-                                              15 // maximum acceleration (slew)
+                                              0 // maximum acceleration (slew)
 );
 
 // angular PID controller
@@ -177,7 +175,7 @@ lemlib::ControllerSettings angular_controller(1.82, // proportional gain (kP) 1.
                                               100, // small error range timeout, in milliseconds
                                               2, // large error range, in degrees
                                               200, // large error range timeout, in milliseconds
-                                              15 // maximum acceleration (slew)
+                                              0 // maximum acceleration (slew)
 );
 
 lemlib::ExpoDriveCurve throttle_curve(15, // joystick deadband out of 127
@@ -208,7 +206,7 @@ pros::adi::AnalogIn potentiometer ('F'); // Auton selector
 pros::adi::Pneumatics scraper_piston = pros::adi::Pneumatics('A', false);
 pros::adi::Pneumatics descore = pros::adi::Pneumatics('B', false);
 pros::adi::Pneumatics middlescore_piston = pros::adi::Pneumatics('C', true);
-pros::adi::Pneumatics top_score = pros::adi::Pneumatics('H', true);
+pros::adi::Pneumatics top_score = pros::adi::Pneumatics('H', false);
 pros::adi::Pneumatics intake_roller = pros::adi::Pneumatics('E', true);
 
 namespace {

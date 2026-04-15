@@ -70,6 +70,9 @@ void initialize() {
 	sc.initialize();
 	intake.initialize();
 
+	left_motor_group.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	right_motor_group.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
     static pros::Task screen_task([&]() {
         while (true) {
             if (mclPaused.load()) {
@@ -161,10 +164,11 @@ void opcontrol() {
 	// test();
 	// skills();
 	// chassis.setPose(-48, -48, 0);
+	left_motor_group.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+	right_motor_group.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	
 
 	//right();
-	descore.set_value(true);
 	intake.stop();
 	while (true) {
 		// Potentiometer test 
@@ -178,7 +182,7 @@ void opcontrol() {
 			top_intake_voltage = 0;
 			top_score.set_value(false);
 			middlescore_piston.set_value(true);
-			intake_roller.set(true);
+			intake_roller.set_value(true);
 		}
 		
 		// // release descore (for hold)
@@ -204,7 +208,7 @@ void opcontrol() {
 		if (controller.get_digital_new_press(DIGITAL_Y)) {
 			bottom_intake_voltage = -127;
 			top_intake_voltage = -127;
-			intake_roller.set(false);
+			intake_roller.set_value(false);
 		}
 
 		// Scraper (toggle)
@@ -242,7 +246,7 @@ void opcontrol() {
 		// sc.showInfoLabel(currents.c_str());
 
 		// chassis.arcade(volt, turn, false, 0.75);
-		chassis.arcade(volt, std::min(turn, 110), false, 0.75);
+		chassis.arcade(volt, std::min(turn, 100), false, 0.75);
 		// left_motor_group.move(volt + turn);
 		// right_motor_group.move(volt - turn);
 

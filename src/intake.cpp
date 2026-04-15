@@ -49,7 +49,7 @@ void Intake::score(int power, bool middle) {
     if (middle) {
         middlescore_piston.set_value(false);
     } else {
-        top_score.set_value(false);
+        top_score.set_value(true);
     }
     cooldown = 200;
     jam_timer_ms = 0;
@@ -80,7 +80,7 @@ void Intake::stop() {
     bottom_intake.move(0);
     top_intake.move(0);
     middlescore_piston.set_value(true);
-    top_score.set_value(true);
+    top_score.set_value(false);
 }
 
 void Intake::update() {

@@ -28,6 +28,7 @@ extern pros::adi::Pneumatics scraper_piston;
 extern pros::adi::Pneumatics descore;
 extern pros::adi::Pneumatics middlescore_piston;
 extern pros::adi::Pneumatics top_score;
+extern pros::adi::Pneumatics intake_roller;
 
 /**
  * Reset odometry pose from all configured MCL distance sensors.
