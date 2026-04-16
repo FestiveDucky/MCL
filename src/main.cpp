@@ -1,14 +1,11 @@
 #include "main.h"
 #include "devices.h"
 #include "lemlib/chassis/odom.hpp"
-#include "liblvgl/lv_conf_internal.h"
-#include "liblvgl/misc/lv_area.h"
 #include "screen.h"
 #include "autons.h"
 #include "intake.h"
 #include <array>
 #include <atomic>
-#include <cstdio>
 #include <string>
 #include <vector>
 
@@ -42,6 +39,7 @@ void setMCLPaused(bool pause) {
     if (pause == mclPaused.load()) return;
     lemlib::toggleMCL();
     mclPaused.store(pause);
+    sc.setMCLPaused(pause);
 }
 } // namespace
 
@@ -72,35 +70,6 @@ void initialize() {
 
 	left_motor_group.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 	right_motor_group.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
-    static pros::Task screen_task([&]() {
-        while (true) {
-            if (mclPaused.load()) {
-                sc.showInfoLabel("MCL paused (enabled in autonomous)");
-                pros::delay(100);
-                continue;
-            }
-
-			lemlib::Pose poseMCL = chassis.getPose();
-			lemlib::Pose poseOLD = lemlib::getOldPose();
-			std::uint32_t calculationTime = lemlib::getCalculationTime();
-			std::int32_t confidenceFront = lemlib::getConfidence();
-            char info[192];
-            std::snprintf(
-                info,
-                sizeof(info),
-                "MCL X: %.2f Y: %.2f\nTh: %.2f OldX: %.2f OldY: %.2f\nCalc Time: %u  FrontConf: %d",
-                poseMCL.x,
-                poseMCL.y,
-                poseMCL.theta,
-                poseOLD.x,
-                poseOLD.y,
-                static_cast<unsigned>(calculationTime),
-                static_cast<int>(confidenceFront));
-            sc.showInfoLabel(info);
-            pros::delay(100); 
-        }
-    });
 }
 
 /**
@@ -137,7 +106,7 @@ void competition_initialize() {
 void autonomous() {
     sc.state = RobotState::AUTONOMOUS;
     setMCLPaused(false);
-    int idx = sc.selectedAuton;
+    int idx = sc.getSelectedAuton();
     if (idx < 0 || idx >= static_cast<int>(AUTONS.size())) idx = 0;
     if (AUTONS[idx].run != nullptr) AUTONS[idx].run();
 }

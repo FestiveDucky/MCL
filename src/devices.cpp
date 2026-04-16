@@ -66,7 +66,7 @@
 
 namespace {
 lemlib::MCLSettings makeMCLSettings() {
-    lemlib::MCLSettings cfg(500); // Number of particles tracked by MCL.
+    lemlib::MCLSettings cfg(400); // Number of particles tracked by MCL.
 
     cfg.distanceSensors = {
         {5, {4.f, 5.125f, 0.0f}},            // Front sensor (old behavior): port 7.
@@ -74,18 +74,18 @@ lemlib::MCLSettings makeMCLSettings() {
         {14, {4.25f, -3.75f, 1.57079632679f}},   // Right sensor (old behavior): port 6.
     };
 
-    cfg.sigma0XY = 0.06f;         // Baseline XY process noise each cycle (in).
-    cfg.kDistXY = 0.58f;          // Extra XY noise per inch translated.
-    cfg.kTurnXY = 0.24f;          // Extra XY noise per radian turned.
+    cfg.sigma0XY = 0.08f;         // Baseline XY process noise each cycle (in).
+    cfg.kDistXY = 0.68f;          // Extra XY noise per inch translated.
+    cfg.kTurnXY = 0.28f;          // Extra XY noise per radian turned.
     cfg.maxStartPosErrorIn = 5.0f; // Initial particle spread radius (in).
-    cfg.neffResampleThreshold = 0.80f; // Resample when Neff drops below this fraction of particle count.
+    cfg.neffResampleThreshold = 0.60f; // Resample when Neff drops below this fraction of particle count.
 
     cfg.clampDeltaSForNoise = true; // Caps translation before noise scaling.
-    cfg.maxDeltaSForNoise = 3.0f;   // Max translation used in noise model (in).
+    cfg.maxDeltaSForNoise = 5.0f;   // Max translation used in noise model (in).
     cfg.clampSigmaXY = true;        // Caps computed sigmaXY to prevent blowups.
-    cfg.maxSigmaXY = 1.75f;         // Upper bound for sigmaXY (in).
+    cfg.maxSigmaXY = 2.50f;         // Upper bound for sigmaXY (in).
 
-    cfg.estMsBandwidth = 8.5f;      // Mean-shift kernel radius (in).
+    cfg.estMsBandwidth = 12.0f;     // Mean-shift kernel radius (in).
     cfg.estMsIters = 6;             // Max mean-shift refinement iterations.
     cfg.estMsEpsStop = 0.1f;        // Mean-shift convergence threshold (in).
     cfg.estUseHuberRefinement = true; // Enables robust Huber refinement pass.
@@ -93,28 +93,28 @@ lemlib::MCLSettings makeMCLSettings() {
     cfg.estHuberIters = 3;          // Max Huber refinement iterations.
     cfg.estHuberGateMult = 2.0f;    // Huber neighborhood gate as bandwidth multiplier.
     cfg.estHuberDeltaMult = 0.5f;   // Huber delta as bandwidth multiplier.
-    cfg.estAlphaMin = 0.10f;        // Min smoothing factor for final pose EMA.
-    cfg.estAlphaMax = 0.80f;        // Max smoothing factor for final pose EMA.
-    cfg.estSigmaLo = 2.0f;          // Spread where EMA starts using higher smoothing.
-    cfg.estSigmaHi = 11.0f;         // Spread where EMA reaches max smoothing.
-    cfg.estJumpThresh = 22.0f;      // Innovation threshold for jump suppression (in).
-    cfg.estAlphaJump = 0.84f;       // EMA alpha used when a jump is detected.
+    cfg.estAlphaMin = 0.05f;        // Min smoothing factor for final pose EMA.
+    cfg.estAlphaMax = 0.60f;        // Max smoothing factor for final pose EMA.
+    cfg.estSigmaLo = 2.5f;          // Spread where EMA starts using higher smoothing.
+    cfg.estSigmaHi = 10.0f;         // Spread where EMA reaches max smoothing.
+    cfg.estJumpThresh = 28.0f;      // Innovation threshold for jump suppression (in).
+    cfg.estAlphaJump = 0.65f;       // EMA alpha used when a jump is detected.
 
     cfg.clampOobParticles = true;   // Clamps particles to field bounds if out of bounds.
     cfg.penalizeOobParticles = true; // Downweights particles that leave bounds.
     cfg.oobWeightMult = 1e-3;       // Weight multiplier applied to OOB particles.
     cfg.useFieldMargin = true;      // Shrinks particle-valid region inward from walls.
-    cfg.fieldMarginIn = 6.f;       // Margin size from field walls for particle bounds (in).
+    cfg.fieldMarginIn = 3.f;       // Margin size from field walls for particle bounds (in).
     cfg.useSensorConfidence = true; // Uses sensor confidence to blend likelihood strength.
     cfg.sensorConfMax = 63.0f;      // Confidence value mapped to full trust.
     cfg.useNoHitModel = true;       // Treats >zMax as explicit "no wall hit" evidence.
-    cfg.noHitPenalty = 0.035f;      // Penalty if particle expected a wall during no-hit.
+    cfg.noHitPenalty = 0.06f;       // Penalty if particle expected a wall during no-hit.
 
     cfg.fieldHalf = 70.75f;         // Half field size from center to wall (in).
     cfg.zMin = 0.1f;                // Minimum accepted distance measurement (in).
     cfg.zMax = 85.0f;               // Maximum accepted distance measurement (in).
-    cfg.sigmaD = 3.0f;              // Sensor model triangle half-width scale (in).
-    cfg.pFloor = 5e-5;              // Minimum per-sensor likelihood floor.
+    cfg.sigmaD = 5.5f;              // Sensor model triangle half-width scale (in).
+    cfg.pFloor = 2e-4;              // Minimum per-sensor likelihood floor.
     cfg.wHit = 0.90f;               // Reserved hit-model blend weight (for future model variants).
     cfg.wRand = 1.0f - cfg.wHit;    // Reserved random-model blend weight.
 

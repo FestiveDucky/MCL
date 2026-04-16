@@ -416,36 +416,55 @@ static std::pair<float, float> lemlib::weightedMeanXY(const std::vector<Particle
     const double h = mclSettings.estMsBandwidth;
     const double h2 = h * h;
     const double epsStop2 = mclSettings.estMsEpsStop * mclSettings.estMsEpsStop;
-    for (int k = 0; k < mclSettings.estMsIters; k++) {
-        double sumW = 0.0;
-        double sumX = 0.0;
-        double sumY = 0.0;
+    auto runMeanShift = [&](double startX, double startY, double& outX, double& outY) {
+        outX = startX;
+        outY = startY;
+        for (int k = 0; k < mclSettings.estMsIters; k++) {
+            double sumW = 0.0;
+            double sumX = 0.0;
+            double sumY = 0.0;
 
-        for (const auto& p : particles) {
-            const double dx = p.pose_.x - muX;
-            const double dy = p.pose_.y - muY;
-            const double r2 = dx * dx + dy * dy;
+            for (const auto& p : particles) {
+                const double dx = p.pose_.x - outX;
+                const double dy = p.pose_.y - outY;
+                const double r2 = dx * dx + dy * dy;
 
-            const double t = 1.0 - (r2 / h2);
-            if (t <= 0.0) continue;
+                const double t = 1.0 - (r2 / h2);
+                if (t <= 0.0) continue;
 
-            const double wk = p.weight_ * t;
-            sumW += wk;
-            sumX += wk * p.pose_.x;
-            sumY += wk * p.pose_.y;
+                const double wk = p.weight_ * t;
+                sumW += wk;
+                sumX += wk * p.pose_.x;
+                sumY += wk * p.pose_.y;
+            }
+
+            if (sumW <= 1e-12) return false;
+
+            const double nextX = sumX / sumW;
+            const double nextY = sumY / sumW;
+            const double ddx = nextX - outX;
+            const double ddy = nextY - outY;
+            outX = nextX;
+            outY = nextY;
+            if ((ddx * ddx + ddy * ddy) <= epsStop2) break;
         }
+        return true;
+    };
 
-        // Empty neighborhood: do not jump.
-        // printf("Sum of Weights: %f\n", sumW);
-        if (sumW <= 1e-12) return {static_cast<float>(seedX), static_cast<float>(seedY)};
+    if (!runMeanShift(seedX, seedY, muX, muY)) {
+        // If the previous estimate is outside the posterior support, re-seed from
+        // the most likely particle instead of freezing at the stale pose.
+        const auto bestIt = std::max_element(
+            particles.begin(),
+            particles.end(),
+            [](const Particle& a, const Particle& b) { return a.weight_ < b.weight_; });
+        if (bestIt == particles.end()) return {static_cast<float>(seedX), static_cast<float>(seedY)};
 
-        const double nextX = sumX / sumW;
-        const double nextY = sumY / sumW;
-        const double ddx = nextX - muX;
-        const double ddy = nextY - muY;
-        muX = nextX;
-        muY = nextY;
-        if ((ddx * ddx + ddy * ddy) <= epsStop2) break;
+        muX = bestIt->pose_.x;
+        muY = bestIt->pose_.y;
+        if (!runMeanShift(muX, muY, muX, muY)) {
+            return {static_cast<float>(muX), static_cast<float>(muY)};
+        }
     }
 
     // 2) Optional Huber local refinement to reduce tail/outlier pull.

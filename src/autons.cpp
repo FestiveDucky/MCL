@@ -30,36 +30,50 @@ void soloAWP() {
     chassis.setPose(13, -47, 90);
 
     // First match loader
-    chassis.moveToPoint(46.5, -48, 500, {.minSpeed=127, .earlyExitRange=5}, false);
+    chassis.moveToPoint(46.5, -48, 1000, {.minSpeed=100, .earlyExitRange=20}, false);
     scraper_piston.toggle();
-    chassis.turnToPoint(46.5, -68, 600, {}, true);
+    chassis.turnToHeading(-180, 700, {}, true);
     intake.store(127, true);
-    chassis.moveToPoint(46.5, -69, 1000, {}, true);
-    // pros::delay(scraperDelay);
+    chassis.moveToPoint(46.5, -80, 550, {}, false);
+    move(40, 0, false, 500);
+    chassis.turnToHeading(-180, 600, {}, false);
+
+    // move(20, 0, false, 500);
 
     // Score in long goal
-    chassis.moveToPoint(48, -24, 800, {.forwards=false}, true);
+    chassis.moveToPoint(47, -30, 900, {.forwards=false, .minSpeed=30}, true);
     pros::delay(700);
     scraper_piston.toggle();
     intake.score(127);
-    pros::delay(800);
+    chassis.turnToHeading(180, 600, {}, false);
+    move(-30, 0, false, 600);
     intake.stop();
 
-    // // Intake center 3 balls
-    // chassis.moveToPoint(48, -48, 1000, {}, false);
-    // chassis.turnToPoint(18, -18, 800, {}, false);
-    // intake.store(127);
-    // chassis.moveToPoint(18, -24, 800, {}, true);
+    // Intake center 3 balls
+    chassis.turnToPoint(20, -22, 600, {}, false);
+    intake.store(127);
+    chassis.moveToPoint(20, -22, 800, {.minSpeed=120, .earlyExitRange=10}, true);
     // pros::delay(700);
     // scraper_piston.toggle();
     
-    // // Move to second set of 3 balls
-    // chassis.turnToPoint(-24, -24, 400, {}, false);
+    // Move to second set of 3 balls
+    chassis.turnToPoint(-24, -24, 350, {}, true);
     // scraper_piston.toggle();
-    // chassis.moveToPoint(-24, -24, 1100, {}, true);
+    chassis.moveToPoint(-24, -24, 1100, {.minSpeed=120, .earlyExitRange=14}, true);
     // pros::delay(900);
     // scraper_piston.toggle();
     // intake.stop();
+
+    chassis.turnToPoint(-48, -48, 600, {}, true);
+    chassis.moveToPoint(-48, -48, 1000, {.minSpeed=120, .earlyExitRange=16}, true);
+
+    chassis.turnToHeading(180, 600, {}, true);
+    chassis.moveToPoint(-48, -30, 500, {.forwards=false, .minSpeed=30}, true);
+    pros::delay(400);
+    intake.score(127);
+    move(-30, 0, false, 600);
+    intake.stop();
+
 
     // ----------------------
 

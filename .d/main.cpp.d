@@ -679,9 +679,8 @@ bin/main.cpp.o: src/main.cpp include/main.h include/api.h \
  include/lemlib/logger/telemetrySink.hpp include/pros/apix.h \
  include/api.h include/pros/device.h include/pros/serial.h \
  include/pros/serial.hpp include/devices.h include/main.h \
- include/lemlib/chassis/odom.hpp include/particle.h \
- include/liblvgl/lv_conf_internal.h include/liblvgl/misc/lv_area.h \
- include/screen.h include/autons.h include/intake.h
+ include/lemlib/chassis/odom.hpp include/particle.h include/screen.h \
+ include/autons.h include/intake.h
 include/main.h:
 include/api.h:
 include/pros/adi.h:
@@ -1453,8 +1452,6 @@ include/devices.h:
 include/main.h:
 include/lemlib/chassis/odom.hpp:
 include/particle.h:
-include/liblvgl/lv_conf_internal.h:
-include/liblvgl/misc/lv_area.h:
 include/screen.h:
 include/autons.h:
 include/intake.h:
