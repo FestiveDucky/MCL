@@ -313,46 +313,44 @@ void skills() {
 
 void right() {
     chassis.setPose(16, -47, 0);
-    descore.set_value(true);
 
-    int scraperDist = 69.5;
-    int scraperTimeout = 700;
-    float matchLoaderSpeed = 55;
-    int scraperDelay = 600;
-    int scoreDelay = 1500;
-    int iterTime = 100;
 
     // Get first set of 3 balls
-    chassis.turnToPoint(26, -18, 800, {}, false);
-    intake.store(127);
-    chassis.moveToPoint(26, -18, 800, {}, true);
-    pros::delay(550);
+    // chassis.turnToPoint(26, -18, 475, {}, true);
+    intake.store(127, true);
+    chassis.moveToPoint(26, -18, 800, {.minSpeed=127, .earlyExitRange=15}, true);
+    pros::delay(400);
     scraper_piston.toggle();
 
     // Go to matchloader
-    chassis.turnToPoint(46.5, -48, 1000, {}, false);
-    chassis.moveToPoint(46.5, -48, 1000, {}, false);
-    chassis.turnToPoint(46.5, -scraperDist, 800, {}, false);
-    intake.store(127);
-    chassis.moveToPoint(46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
-    // Jiggle
-    for (int i = 0; i < scraperDelay/iterTime; i++) {
-        int sign = i % 2 ? -1 : 1; 
-        move(sign * 30, 0, false, iterTime + sign * 30);
-    }
+    chassis.turnToPoint(47, -48, 500, {}, true);
+    chassis.moveToPoint(47, -48, 1000, {.minSpeed=127, .earlyExitRange=14}, false);
+    chassis.turnToHeading(180, 500, {}, false);
+    intake.store(127, true);
+    chassis.moveToPoint(47, -60, 475, {.minSpeed=60}, false);
+    
+    move(40, 0, false, 550);
+    
 
     // Score in long goal
-    chassis.moveToPoint(48, -24, 1200, {.forwards=false, .maxSpeed=70}, false);
-    intake.score(127);
+    chassis.moveToPoint(47.5, -30, 900, {.forwards=false, .minSpeed=127, .earlyExitRange=20}, true);
+    pros::delay(400);
     scraper_piston.toggle();
-    pros::delay(scoreDelay);
+    intake.score(127);
+    chassis.moveToPoint(47.5, -25, 400, {.forwards=false}, true);
+    chassis.waitUntilDone();
+    move(-30, 0, false, 900);
     intake.stop();
 
+    chassis.turnToHeading(-135, 475, {}, false);
+    chassis.tank(100, 100);
+    pros::delay(250);
+    chassis.tank(0, 0);
+
     // Push with deosicourwing
-    chassis.turnToHeading(0, 1500, {.direction=AngularDirection::CCW_COUNTERCLOCKWISE, .maxSpeed=60}, false);
-    chassis.moveToPoint(60, -30, 600, {.forwards=false}, false);
-    descore.set_value(false);
-    chassis.moveToPoint(60, -8, 1000, {}, false);
+    descore.set_value(true);
+    chassis.moveToPoint(35.5, -25, 600, {.forwards=false, .minSpeed=50, .earlyExitRange=5}, true);
+    chassis.moveToPoint(37, -7, 800, {.forwards=false}, true);
 }
 
 void left() {

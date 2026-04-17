@@ -215,7 +215,9 @@ void opcontrol() {
 		// sc.showInfoLabel(currents.c_str());
 
 		// chassis.arcade(volt, turn, false, 0.75);
-		chassis.arcade(volt, std::min(turn, 100), false, 0.75);
+		int sign = turn < 0 ? -1 : 1;
+		// sign * std::min(std::abs(turn), 100)
+		chassis.arcade(volt, turn, false, 0.75);
 		// left_motor_group.move(volt + turn);
 		// right_motor_group.move(volt - turn);
 
