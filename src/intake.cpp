@@ -4,6 +4,7 @@
 #include <cmath>
 
 namespace {
+constexpr bool kAntiJamEnabled = false;
 constexpr int kUpdatePeriodMs = 10;
 constexpr int kDirectionSwapCooldownMs = 120;
 constexpr int kJamCurrentThresholdMa = 1200;
@@ -108,6 +109,13 @@ void Intake::update() {
     if (cooldown != 0) {
         cooldown -= kUpdatePeriodMs;
         if (cooldown < 0) cooldown = 0;
+        return;
+    }
+
+    if (!kAntiJamEnabled) {
+        jam_timer_ms = 0;
+        reverse_timer_ms = 0;
+        reversed = false;
         return;
     }
 

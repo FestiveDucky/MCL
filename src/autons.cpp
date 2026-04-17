@@ -32,17 +32,17 @@ void soloAWP() {
     // TODO Catch middle balls with scraper, double check all path (especially ending variance due to other bots)
 
     // First match loader
-    chassis.moveToPoint(46.5, -48, 1000, {.minSpeed=100, .earlyExitRange=20}, false);
+    chassis.moveToPoint(46.5, -48, 1000, {.minSpeed=100, .earlyExitRange=22}, false);
     scraper_piston.toggle();
     chassis.turnToHeading(-180, 700, {}, true);
     intake.store(127, true);
     chassis.moveToPoint(46.5, -70, 550, {.maxSpeed=60}, false);
-    move(30, 0, false, 500);
+    move(30, 0, false, 550);
 
     // move(20, 0, false, 500);
 
     // Score in long goal
-    chassis.moveToPoint(47, -30, 900, {.forwards=false, .minSpeed=30}, true);
+    chassis.moveToPoint(47, -31, 900, {.forwards=false, .minSpeed=30}, true);
     pros::delay(700);
     scraper_piston.toggle();
     intake.score(127);
@@ -52,7 +52,7 @@ void soloAWP() {
 
     // Intake center 3 balls
     chassis.turnToPoint(20, -22, 600, {}, false);
-    intake.store(127);
+    intake.store(127, true);
     chassis.moveToPoint(20, -22, 800, {.minSpeed=120, .earlyExitRange=14}, true);
     // pros::delay(700);
     // scraper_piston.toggle();
@@ -65,11 +65,13 @@ void soloAWP() {
     scraper_piston.toggle();
     // intake.stop();
 
-    chassis.turnToPoint(-47.2, -48, 600, {}, true);
-    chassis.moveToPoint(-47.2, -48, 1000, {.minSpeed=120, .earlyExitRange=16}, true);
+    chassis.turnToPoint(-48, -50, 600, {}, true);
+    chassis.moveToPoint(-48, -50, 1000, {.minSpeed=120, .earlyExitRange=16}, false);
+    resetPositionFromTwoDistanceSensors(0, 2);
+    chassis.turnToHeading(180, 600, {}, false);
 
-    chassis.turnToHeading(180, 600, {}, true);
-    chassis.moveToPoint(-46, -30, 500, {.forwards=false, .minSpeed=30}, true);
+    chassis.moveToPoint(-48, -25, 500, {.forwards=false, .minSpeed=30}, true);
+    pros::delay(150);
     intake.score(127);
     pros::delay(300);
     move(-30, 0, false, 1000);
@@ -77,15 +79,18 @@ void soloAWP() {
 
     // Second Match Loader
     intake.store(127, true);
-    chassis.moveToPoint(-46.5, -70, 800, {}, false);
-    move(40, 0, false, 500);
+    chassis.moveToPoint(-46.5, -70, 800, {.minSpeed=60, .earlyExitRange=15}, false);
+    move(40, 0, false, 600);
 
     // Middle
     chassis.turnToPoint(-8, -8, 600, {.forwards=false}, false);
-    chassis.moveToPoint(-8, -8, 1500, {.forwards=false, .minSpeed=120, .earlyExitRange=18}, true);
+    chassis.moveToPoint(-8, -8, 1500, {.forwards=false, .minSpeed=120, .earlyExitRange=40}, true);
+    pros::delay(300);
+    lemlib::toggleMCL();
+    chassis.moveToPoint(-8, -8, 800, {.forwards=false}, true);
     intake.stop();
-    // pros::delay(300)
-    // lemlib::toggleMCL();
+    
+    // 
     chassis.waitUntilDone();
     intake.score(127, true);
     chassis.turnToHeading(-135, 300, {}, false);
@@ -412,9 +417,8 @@ void left() {
 
 // ASSET(path1_txt);
 void test() {
-    chassis.setPose(48, -48, 0);
-    chassis.turnToHeading(-90, 1000, {}, false);
-    chassis.moveToPoint(0, -48, 1500, {}, false);
+    chassis.setPose(0, 0, 180);
+    resetPositionFromTwoDistanceSensors(0, 2);
 
 }
 

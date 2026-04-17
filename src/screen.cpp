@@ -80,7 +80,7 @@ void Screen::initialize() {
     task = std::make_unique<pros::Task>([this]() {
         while (true) {
             update();
-            pros::delay(50);
+            pros::delay(150);
         }
     });
 }
