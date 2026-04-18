@@ -404,11 +404,11 @@ void left() {
     chassis.setPose(-13, -47, -90);
 
     // First match loader
-    chassis.moveToPoint(-47, -48, 1000, {.minSpeed=127, .earlyExitRange=18}, false);
+    chassis.moveToPoint(-45.5, -48, 1000, {.minSpeed=127, .earlyExitRange=18}, false);
     scraper_piston.toggle();
     chassis.turnToHeading(-180, 700, {}, true);
     intake.store(127, true);
-    chassis.moveToPoint(-47, -70, 550, {.maxSpeed=60}, false); // KINDA slow -> refer to right auto
+    chassis.moveToPoint(-45.5, -70, 550, {.maxSpeed=60}, false); // KINDA slow -> refer to right auto
     move(40, 0, false, 560);
 
     // Score in long goal
@@ -431,6 +431,8 @@ void left() {
     chassis.turnToHeading(-10, 350, {}, false);
     chassis.moveToPoint(-39.5, -25, 600, {.minSpeed=50, .earlyExitRange=5}, true);
     move(30, 0, false, 700);
+    chassis.turnToHeading(10, 500, {}, false);
+    move(60, 0, false, 1000); //crosses the line A LOT, I made this while the custodians were shouting at me to get out so I didnt have time to tune it
     //chassis.moveToPoint(-37, -7, 800, {.forwards=false}, true);
 
     // lemlib::toggleMCL();

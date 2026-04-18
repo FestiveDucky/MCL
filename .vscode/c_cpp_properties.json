@@ -5,20 +5,21 @@
       "includePath": [
         "${workspaceFolder}/**",
         "c:\\Users\\alexr\\Documents\\GitHub\\testtesttest\\include",
-        "/home/festive/GitHub/MCL/include"
+        "/home/festive/GitHub/MCL/include",
+        "c:\\Users\\senha\\OneDrive\\Documents\\GitHub\\MCL\\include"
       ],
       "defines": [
         "_DEBUG",
         "UNICODE",
         "_UNICODE"
       ],
-      "compilerPath": "/home/festive/.config/Code - OSS/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/arm-none-eabi-g++",
+      "compilerPath": "c:\\Users\\senha\\AppData\\Roaming\\Code\\User\\globalStorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\arm-none-eabi-g++",
       "cStandard": "gnu11",
       "cppStandard": "gnu++20",
       "intelliSenseMode": "gcc-arm",
       "browse": {
         "path": [
-          "/home/festive/GitHub/MCL"
+          "c:\\Users\\senha\\OneDrive\\Documents\\GitHub\\MCL"
         ],
         "limitSymbolsToIncludedHeaders": true,
         "databaseFilename": ""
