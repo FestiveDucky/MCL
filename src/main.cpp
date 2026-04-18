@@ -18,8 +18,8 @@ struct AutonOption {
 // Change this table to change auton count and mapping for the potentiometer selector.
 const std::array<AutonOption, 7> AUTONS = {{
     {"Left", left},
-    {"Right", right},
-    {"Skills", skills},
+    {"Right (30 second 7 Ball)", right},
+    {"Right (45 second 4 + 3 + 2 + 1)", rightthreeplusfour},
     {"Five Inch", fiveInch},
 	{"Test", test},
 	{"Solo AWP", soloAWP},

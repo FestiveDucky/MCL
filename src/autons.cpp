@@ -26,10 +26,59 @@ void move(double power, double turn, bool swing=false, double time=10000) {
     // right_back_motor.move(left);
 }
 
-void soloAWP() {
+void rightthreeplusfour() {
     chassis.setPose(13, -47, 90);
 
-    // TODO Catch middle balls with scraper, double check all path (especially ending variance due to other bots)
+    // First match loader
+    chassis.moveToPoint(47, -48, 1000, {.minSpeed=127, .earlyExitRange=18}, false);
+    scraper_piston.toggle();
+    chassis.turnToHeading(-180, 700, {}, true);
+    intake.store(127, true);
+    chassis.moveToPoint(47, -70, 550, {.maxSpeed=60}, false); // KINDA slow -> refer to right auto
+    move(40, 0, false, 560);
+
+    // Score in long goal
+    chassis.moveToPoint(47.5, -30, 900, {.forwards=false, .minSpeed=127, .earlyExitRange=20}, true);
+    pros::delay(400);
+    scraper_piston.toggle();
+    intake.score(127);
+    chassis.moveToPoint(47.5, -25, 400, {.forwards=false}, true);
+    chassis.waitUntilDone();
+    move(-30, 0, false, 700);
+    intake.stop();
+
+    chassis.turnToHeading(-135, 475, {}, false);
+    chassis.tank(100, 100);
+    pros::delay(250);
+    chassis.tank(0, 0);
+
+    // Push with deosicourwing
+    descore.set_value(true);
+    chassis.moveToPoint(35.5, -25, 600, {.forwards=false, .minSpeed=50, .earlyExitRange=5}, true);
+    chassis.moveToPoint(37, -7, 800, {.forwards=false}, true);
+
+    lemlib::toggleMCL();
+    pros::delay(7000);
+    lemlib::toggleMCL();
+    descore.set_value(false);
+    intake.store(127);
+
+
+    chassis.moveToPoint(20, -24, 1000, {.minSpeed=127, .earlyExitRange=12}, true);
+    pros::delay(600);
+    scraper_piston.toggle();
+    chassis.turnToHeading(-35, 700, {}, true);
+    chassis.moveToPoint(12, -6, 1000, {.minSpeed=40, .earlyExitRange=5}, true);
+    scraper_piston.toggle();
+    pros::delay(200);
+    intake.stop();
+    intake.outtake(90);
+
+
+}
+
+void soloAWP() {
+    chassis.setPose(13, -47, 90);
 
     // First match loader
     chassis.moveToPoint(46.5, -48, 1000, {.minSpeed=100, .earlyExitRange=22}, false);
@@ -38,8 +87,6 @@ void soloAWP() {
     intake.store(127, true);
     chassis.moveToPoint(46.5, -70, 550, {.maxSpeed=60}, false);
     move(30, 0, false, 550);
-
-    // move(20, 0, false, 500);
 
     // Score in long goal
     chassis.moveToPoint(47, -31, 900, {.forwards=false, .minSpeed=30}, true);
@@ -355,62 +402,52 @@ void right() {
 
 void left() {
     chassis.setPose(-13, -47, -90);
-    descore.set_value(true);
-
-    int scraperDist = 70;
-    int scraperTimeout = 700;
-    float matchLoaderSpeed = 40;
-    int scraperDelay = 600;
-    int scoreDelay = 1100;
-    int iterTime = 100;
 
     // First match loader
-    chassis.moveToPoint(-46.5, -48, 1000, {}, false);
+    chassis.moveToPoint(-47, -48, 1000, {.minSpeed=127, .earlyExitRange=18}, false);
     scraper_piston.toggle();
-    chassis.turnToPoint(-46.5, -scraperDist, 800, {}, false);
-    intake.store(127);
-    chassis.moveToPoint(-46.5, -scraperDist, scraperTimeout, {.maxSpeed=matchLoaderSpeed},false);
-    // Jiggle
-    for (int i = 0; i < scraperDelay/iterTime; i++) {
-        int sign = i % 2 ? -1 : 1; 
-        move(sign * 30, 0, false, iterTime + sign * 30);
-    }
+    chassis.turnToHeading(-180, 700, {}, true);
+    intake.store(127, true);
+    chassis.moveToPoint(-47, -70, 550, {.maxSpeed=60}, false); // KINDA slow -> refer to right auto
+    move(40, 0, false, 560);
 
     // Score in long goal
-    scraper_piston.toggle();
-    chassis.moveToPoint(-48, -10, 1200, {.forwards=false, .maxSpeed=75}, true);
-    pros::delay(650);
-    intake.score(115);
-    move(-10, 0, false, scoreDelay);
-    intake.stop();
-
-    // Intake center 3 balls
-    chassis.turnToPoint(-20, -24, 800, {.direction=lemlib::AngularDirection::CCW_COUNTERCLOCKWISE}, true);
-    intake.store(127);
-    chassis.moveToPoint(-20, -24, 1500, {.maxSpeed=70}, true);
+    chassis.moveToPoint(-47.5, -30, 900, {.forwards=false, .minSpeed=127, .earlyExitRange=20}, true);
     pros::delay(400);
     scraper_piston.toggle();
-    chassis.turnToPoint(-4, -2, 800, {.forwards = false}, true);
+    intake.score(127);
+    chassis.moveToPoint(-47.5, -25, 400, {.forwards=false}, true);
+    chassis.waitUntilDone();
+    move(-30, 0, false, 700);
+    intake.stop();
 
-    pros::delay(100);
-    lemlib::toggleMCL();
-    intake.stop();
-    top_intake.move(-100);
-    bottom_intake.move(-20);
-    chassis.moveToPoint(-4, -2, 1000, {.forwards = false}, false);
-    intake.score(95, true);
-    move(-20,0,false, 1500);
-    intake.stop();
-    scraper_piston.toggle();
+    chassis.turnToHeading(-135, 475, {}, false);
+    chassis.tank(100, 100);
+    pros::delay(250);
+    chassis.tank(0, 0);
 
     // Push with deosicourwing
-    chassis.moveToPoint(-38, -26, 1200, {}, false);
-    // lemlib::toggleMCL();
+    descore.set_value(true);
+    chassis.moveToPoint(35.5, -25, 600, {.forwards=false, .minSpeed=50, .earlyExitRange=5}, true);
+    chassis.moveToPoint(37, -7, 800, {.forwards=false}, true);
+
+    lemlib::toggleMCL();
+    pros::delay(7000);
+    lemlib::toggleMCL();
     descore.set_value(false);
-    chassis.turnToHeading(-5, 1000, {.direction=AngularDirection::CW_CLOCKWISE}, true);
-    chassis.moveToPoint(-40, -6, 1000, {}, true);
-    chassis.turnToHeading(60, 1000, {}, false);
-    
+    intake.store(127);
+
+
+    chassis.moveToPoint(20, -24, 1000, {.minSpeed=127, .earlyExitRange=12}, true);
+    pros::delay(600);
+    scraper_piston.toggle();
+    chassis.turnToHeading(-35, 700, {}, true);
+    chassis.moveToPoint(12, -6, 1000, {.minSpeed=40, .earlyExitRange=5}, true);
+    scraper_piston.toggle();
+    pros::delay(200);
+    intake.stop();
+    intake.outtake(90);
+
 }
 
 // ASSET(path1_txt);

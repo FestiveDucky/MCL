@@ -1,11 +1,11 @@
 #include "main.h"
 
 void right();
+void rightthreeplusfour();
 void left();
 void soloAWP();
 void skills2();
 void test();
-// void right();
 void skills();
 // void sevenRight();
 // void odom();
