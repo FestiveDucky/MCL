@@ -412,41 +412,43 @@ void left() {
     move(40, 0, false, 560);
 
     // Score in long goal
-    chassis.moveToPoint(-47.5, -30, 900, {.forwards=false, .minSpeed=127, .earlyExitRange=20}, true);
+    chassis.moveToPoint(-49, -30, 900, {.forwards=false, .minSpeed=127, .earlyExitRange=20}, true);
     pros::delay(400);
     scraper_piston.toggle();
     intake.score(127);
-    chassis.moveToPoint(-47.5, -25, 400, {.forwards=false}, true);
+    chassis.moveToPoint(-49, -25, 400, {.forwards=false}, true);
     chassis.waitUntilDone();
     move(-30, 0, false, 700);
     intake.stop();
 
-    chassis.turnToHeading(-135, 475, {}, false);
+    chassis.turnToHeading(-225, 475, {}, false);
     chassis.tank(100, 100);
     pros::delay(250);
     chassis.tank(0, 0);
 
     // Push with deosicourwing
     descore.set_value(true);
-    chassis.moveToPoint(35.5, -25, 600, {.forwards=false, .minSpeed=50, .earlyExitRange=5}, true);
-    chassis.moveToPoint(37, -7, 800, {.forwards=false}, true);
+    chassis.turnToHeading(-10, 350, {}, false);
+    chassis.moveToPoint(-39.5, -25, 600, {.minSpeed=50, .earlyExitRange=5}, true);
+    move(30, 0, false, 700);
+    //chassis.moveToPoint(-37, -7, 800, {.forwards=false}, true);
 
-    lemlib::toggleMCL();
-    pros::delay(7000);
-    lemlib::toggleMCL();
-    descore.set_value(false);
-    intake.store(127);
+    // lemlib::toggleMCL();
+    // pros::delay(7000);
+    // lemlib::toggleMCL();
+    // descore.set_value(false);
+    // intake.store(127);
 
 
-    chassis.moveToPoint(20, -24, 1000, {.minSpeed=127, .earlyExitRange=12}, true);
-    pros::delay(600);
-    scraper_piston.toggle();
-    chassis.turnToHeading(-35, 700, {}, true);
-    chassis.moveToPoint(12, -6, 1000, {.minSpeed=40, .earlyExitRange=5}, true);
-    scraper_piston.toggle();
-    pros::delay(200);
-    intake.stop();
-    intake.outtake(90);
+    // chassis.moveToPoint(-20, -24, 1000, {.minSpeed=127, .earlyExitRange=12}, true);
+    // pros::delay(600);
+    // scraper_piston.toggle();
+    // chassis.turnToHeading(-125, 700, {}, true);
+    // chassis.moveToPoint(-12, -6, 1000, {.minSpeed=40, .earlyExitRange=5}, true);
+    // scraper_piston.toggle();
+    // pros::delay(200);
+    // intake.stop();
+    // intake.score(90,true);
 
 }
 
