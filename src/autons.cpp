@@ -35,17 +35,19 @@ void rightthreeplusfour() {
     chassis.turnToHeading(-180, 700, {}, true);
     intake.store(127, true);
     chassis.moveToPoint(47, -70, 550, {.maxSpeed=60}, false); // KINDA slow -> refer to right auto
-    move(40, 0, false, 560);
+    move(40, 0, false, 500);
 
     // Score in long goal
-    chassis.moveToPoint(47.5, -30, 900, {.forwards=false, .minSpeed=127, .earlyExitRange=20}, true);
-    pros::delay(400);
+    chassis.moveToPoint(47.5, -30, 900, {.forwards=false, .minSpeed=127, .earlyExitRange=20}, false);
+    // pros::delay(525);
     scraper_piston.toggle();
     intake.score(127);
-    chassis.moveToPoint(47.5, -25, 400, {.forwards=false}, true);
-    chassis.waitUntilDone();
-    move(-30, 0, false, 700);
+    chassis.moveToPoint(47.5, -25, 400, {.forwards=false}, false);
+    // chassis.waitUntilDone();
+    move(-30, 0, false, 900);
     intake.stop();
+    pros::delay(50);
+    
 
     chassis.turnToHeading(-135, 475, {}, false);
     chassis.tank(100, 100);
@@ -58,21 +60,21 @@ void rightthreeplusfour() {
     chassis.moveToPoint(37, -7, 800, {.forwards=false}, true);
 
     lemlib::toggleMCL();
-    pros::delay(7000);
+    pros::delay(6500);
     lemlib::toggleMCL();
     descore.set_value(false);
     intake.store(127);
 
 
-    chassis.moveToPoint(20, -24, 1000, {.minSpeed=127, .earlyExitRange=12}, true);
+    chassis.moveToPoint(20, -23, 800, {}, true);
     pros::delay(600);
     scraper_piston.toggle();
     chassis.turnToHeading(-35, 700, {}, true);
-    chassis.moveToPoint(12, -6, 1000, {.minSpeed=40, .earlyExitRange=5}, true);
+    chassis.moveToPoint(9, -6, 1000, {.minSpeed=40, .earlyExitRange=5}, true);
     scraper_piston.toggle();
     pros::delay(200);
     intake.stop();
-    intake.outtake(90);
+    intake.outtake(55);
 
 
 }
@@ -81,26 +83,26 @@ void soloAWP() {
     chassis.setPose(13, -47, 90);
 
     // First match loader
-    chassis.moveToPoint(46.5, -48, 1000, {.minSpeed=100, .earlyExitRange=22}, false);
+    chassis.moveToPoint(46.5, -48, 1000, {.minSpeed=127, .earlyExitRange=18}, false);
     scraper_piston.toggle();
     chassis.turnToHeading(-180, 700, {}, true);
     intake.store(127, true);
-    chassis.moveToPoint(46.5, -70, 550, {.maxSpeed=60}, false);
-    move(30, 0, false, 550);
+    chassis.moveToPoint(46.5, -73, 550, {.maxSpeed=60}, false);
+    move(30, 0, false, 575);
 
     // Score in long goal
     chassis.moveToPoint(47, -31, 900, {.forwards=false, .minSpeed=30}, true);
     pros::delay(700);
     scraper_piston.toggle();
-    intake.score(127);
+    intake.score(100);
     chassis.turnToHeading(180, 600, {}, false);
     move(-30, 0, false, 600);
-    intake.stop();
 
     // Intake center 3 balls
-    chassis.turnToPoint(20, -22, 600, {}, false);
+    chassis.turnToPoint(20, -24, 600, {}, false);
+    intake.stop();
     intake.store(127, true);
-    chassis.moveToPoint(20, -22, 800, {.minSpeed=120, .earlyExitRange=14}, true);
+    chassis.moveToPoint(20, -24, 800, {.minSpeed=120, .earlyExitRange=14}, true);
     // pros::delay(700);
     // scraper_piston.toggle();
     
@@ -112,21 +114,22 @@ void soloAWP() {
     scraper_piston.toggle();
     // intake.stop();
 
-    chassis.turnToPoint(-48, -50, 600, {}, true);
-    chassis.moveToPoint(-48, -50, 1000, {.minSpeed=120, .earlyExitRange=16}, false);
-    resetPositionFromTwoDistanceSensors(0, 2);
+    chassis.turnToPoint(-50, -50, 600, {}, true);
+    chassis.moveToPoint(-50, -50, 1000, {.minSpeed=120, .earlyExitRange=16}, false);
     chassis.turnToHeading(180, 600, {}, false);
+    resetPositionFromTwoDistanceSensors(0, 2);
+    
 
-    chassis.moveToPoint(-48, -25, 500, {.forwards=false, .minSpeed=30}, true);
+    chassis.moveToPoint(-49, -25, 500, {.forwards=false, .minSpeed=30}, true);
     pros::delay(150);
-    intake.score(127);
+    intake.score(100);
     pros::delay(300);
     move(-30, 0, false, 1000);
     intake.stop();
 
     // Second Match Loader
     intake.store(127, true);
-    chassis.moveToPoint(-46.5, -70, 800, {.minSpeed=60, .earlyExitRange=15}, false);
+    chassis.moveToPoint(-48, -70, 800, {.minSpeed=60, .earlyExitRange=15}, false);
     move(40, 0, false, 600);
 
     // Middle
@@ -139,7 +142,7 @@ void soloAWP() {
     
     // 
     chassis.waitUntilDone();
-    intake.score(127, true);
+    intake.score(70, true);
     chassis.turnToHeading(-135, 300, {}, false);
     move(-40, 0, false, 600);
     
@@ -358,7 +361,7 @@ void skills() {
     // ---------------- END --------------------
 }
 
-void right() {
+void right() { // 7 ball
     chassis.setPose(16, -47, 0);
 
 
@@ -371,32 +374,34 @@ void right() {
 
     // Go to matchloader
     chassis.turnToPoint(47, -48, 500, {}, true);
-    chassis.moveToPoint(47, -48, 1000, {.minSpeed=127, .earlyExitRange=14}, false);
+    chassis.moveToPoint(47, -48, 1000, {.minSpeed=127, .earlyExitRange=16}, false);
     chassis.turnToHeading(180, 500, {}, false);
+    resetPositionFromTwoDistanceSensors(0, 1);
     intake.store(127, true);
-    chassis.moveToPoint(47, -60, 475, {.minSpeed=60}, false);
+    chassis.moveToPoint(47, -60, 475, {.minSpeed=80}, false);
     
-    move(40, 0, false, 550);
+    move(60, 0, false, 650);
     
 
     // Score in long goal
-    chassis.moveToPoint(47.5, -30, 900, {.forwards=false, .minSpeed=127, .earlyExitRange=20}, true);
-    pros::delay(400);
+    chassis.moveToPoint(46.5, -30, 900, {.forwards=false, .minSpeed=127, .earlyExitRange=20}, true);
+    pros::delay(475);
     scraper_piston.toggle();
     intake.score(127);
-    chassis.moveToPoint(47.5, -25, 400, {.forwards=false}, true);
+    chassis.moveToPoint(46.5, -25, 400, {.forwards=false}, true);
     chassis.waitUntilDone();
-    move(-30, 0, false, 900);
-    intake.stop();
+    move(-30, 0, false, 1000);
+    
 
     chassis.turnToHeading(-135, 475, {}, false);
+    intake.stop();
     chassis.tank(100, 100);
     pros::delay(250);
     chassis.tank(0, 0);
 
     // Push with deosicourwing
     descore.set_value(true);
-    chassis.moveToPoint(35.5, -25, 600, {.forwards=false, .minSpeed=50, .earlyExitRange=5}, true);
+    chassis.moveToPoint(34.5, -25, 600, {.forwards=false, .minSpeed=50, .earlyExitRange=5}, true);
     chassis.moveToPoint(37, -7, 800, {.forwards=false}, true);
 }
 
@@ -404,51 +409,79 @@ void left() {
     chassis.setPose(-13, -47, -90);
 
     // First match loader
-    chassis.moveToPoint(-47, -48, 1000, {.minSpeed=127, .earlyExitRange=18}, false);
+    chassis.moveToPoint(-47, -48, 1000, {.minSpeed=127, .earlyExitRange=15}, false);
     scraper_piston.toggle();
     chassis.turnToHeading(-180, 700, {}, true);
     intake.store(127, true);
     chassis.moveToPoint(-47, -70, 550, {.maxSpeed=60}, false); // KINDA slow -> refer to right auto
-    move(40, 0, false, 560);
+    move(40, 0, false, 400);
 
     // Score in long goal
     chassis.moveToPoint(-49, -30, 900, {.forwards=false, .minSpeed=127, .earlyExitRange=20}, true);
-    pros::delay(400);
+    pros::delay(530);
     scraper_piston.toggle();
     intake.score(127);
     chassis.moveToPoint(-49, -25, 400, {.forwards=false}, true);
     chassis.waitUntilDone();
     move(-30, 0, false, 700);
-    intake.stop();
 
-    chassis.turnToHeading(-225, 475, {}, false);
+    chassis.turnToHeading(135, 475, {}, false);
+    intake.stop();
     chassis.tank(100, 100);
     pros::delay(250);
     chassis.tank(0, 0);
 
     // Push with deosicourwing
     descore.set_value(true);
-    chassis.turnToHeading(-10, 350, {}, false);
-    chassis.moveToPoint(-39.5, -25, 600, {.minSpeed=50, .earlyExitRange=5}, true);
-    move(30, 0, false, 700);
-    //chassis.moveToPoint(-37, -7, 800, {.forwards=false}, true);
-
-    // lemlib::toggleMCL();
-    // pros::delay(7000);
-    // lemlib::toggleMCL();
-    // descore.set_value(false);
-    // intake.store(127);
+    chassis.turnToHeading(0, 600, {}, true);
+    chassis.moveToPoint(-34, -25, 600, {.minSpeed=60, .earlyExitRange=5}, true);
+    chassis.moveToPoint(-35, -7, 800, {}, true);
+    chassis.turnToHeading(90, 600, {}, false);
 
 
-    // chassis.moveToPoint(-20, -24, 1000, {.minSpeed=127, .earlyExitRange=12}, true);
-    // pros::delay(600);
+
+
+
+
+
+
+
+
+
+
+
+
+    // chassis.setPose(-13, -47, -90);
+
+    // // First match loader
+    // chassis.moveToPoint(-47, -48, 1000, {.minSpeed=127, .earlyExitRange=18}, false);
     // scraper_piston.toggle();
-    // chassis.turnToHeading(-125, 700, {}, true);
-    // chassis.moveToPoint(-12, -6, 1000, {.minSpeed=40, .earlyExitRange=5}, true);
+    // chassis.turnToHeading(-180, 700, {}, true);
+    // intake.store(127, true);
+    // chassis.moveToPoint(-47, -70, 550, {.maxSpeed=60}, false); // KINDA slow -> refer to right auto
+    // move(40, 0, false, 560);
+
+    // // Score in long goal
+    // chassis.moveToPoint(-49, -30, 900, {.forwards=false, .minSpeed=127, .earlyExitRange=20}, true);
+    // pros::delay(400);
     // scraper_piston.toggle();
-    // pros::delay(200);
+    // intake.score(127);
+    // chassis.moveToPoint(-49, -25, 400, {.forwards=false}, true);
+    // chassis.waitUntilDone();
+    // move(-30, 0, false, 700);
     // intake.stop();
-    // intake.score(90,true);
+
+    // chassis.turnToHeading(-225, 475, {}, false);
+    // chassis.tank(100, 100);
+    // pros::delay(250);
+    // chassis.tank(0, 0);
+
+    // // Push with deosicourwing
+    // descore.set_value(true);
+    // chassis.turnToHeading(-10, 350, {}, false);
+    // chassis.moveToPoint(-39.5, -25, 600, {.minSpeed=50, .earlyExitRange=5}, true);
+    // move(30, 0, false, 700);
+
 
 }
 

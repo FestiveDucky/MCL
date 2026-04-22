@@ -81,6 +81,13 @@ float confidenceToUnit(int confidence) {
     const float denom = std::max(1e-6f, mclSettings.sensorConfMax);
     return clampf(static_cast<float>(confidence) / denom, 0.0f, 1.0f);
 }
+
+bool isIgnoredHitPoint(float x, float y) {
+    for (const auto& region : mclSettings.ignoredHitRegions) {
+        if (inRange(x, region.xMin, region.xMax) && inRange(y, region.yMin, region.yMax)) return true;
+    }
+    return false;
+}
 } // namespace
 
 std::vector<Particle> particles; // The possible robot poses
@@ -306,6 +313,8 @@ void lemlib::update() {
 
         const float sh = std::sin(heading);
         const float ch = std::cos(heading);
+        const float nominalRobotX = odomPose.x + dxField;
+        const float nominalRobotY = odomPose.y + dyField;
 
         const std::size_t sensorCount = std::min(distanceSensors.size(), mclSettings.distanceSensors.size());
         for (std::size_t i = 0; i < sensorCount; i++) {
@@ -329,6 +338,13 @@ void lemlib::update() {
             const float rayAngle = heading + sensorConfig.mount.headingOffset;
             const float rayDirX = std::sin(rayAngle);
             const float rayDirY = std::cos(rayAngle);
+            if (hasHit) {
+                const float sensorX = nominalRobotX + mountOffsetX;
+                const float sensorY = nominalRobotY + mountOffsetY;
+                const float hitX = sensorX + measuredDistanceIn * rayDirX;
+                const float hitY = sensorY + measuredDistanceIn * rayDirY;
+                if (isIgnoredHitPoint(hitX, hitY)) continue;
+            }
 
             sensorObservations.push_back({measuredDistanceIn, confidenceToUnit(confidence), hasHit, hasNoHit,
                                           mountOffsetX, mountOffsetY, rayDirX, rayDirY});

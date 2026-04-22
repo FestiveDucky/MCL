@@ -26,6 +26,13 @@ class MCLSettings {
                 DistanceSensorMount mount;
         };
 
+        struct IgnoredHitRegion {
+                float xMin;
+                float xMax;
+                float yMin;
+                float yMax;
+        };
+
         explicit MCLSettings(int particleCount = 0);
 
         int particleCount = 0;
@@ -35,6 +42,7 @@ class MCLSettings {
             {5, {-4.75f, 1.3f, -1.57079632679f}},
             {6, {5.0f, 2.75f, 1.57079632679f}},
         };
+        std::vector<IgnoredHitRegion> ignoredHitRegions{};
 
         float sigma0XY = 0.05f;
         float kDistXY = 0.50f;

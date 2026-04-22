@@ -63,6 +63,7 @@ void Intake::score(int power, bool middle) {
 }
 
 void Intake::outtake(int power) {
+    middlescore_piston.set_value(false);
     cooldown = 200;
     jam_timer_ms = 0;
     reverse_timer_ms = 0;
