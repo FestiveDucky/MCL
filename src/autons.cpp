@@ -3,6 +3,10 @@
 #include "lemlib/chassis/odom.hpp"
 #include "intake.h"
 
+void nothing(){
+    chassis.setPose(0, 0, 0);
+}
+
 void move(double power, double turn, bool swing=false, double time=10000) {
     chassis.cancelAllMotions();
 
@@ -41,41 +45,41 @@ void rightthreeplusfour() {
     chassis.moveToPoint(47.5, -30, 900, {.forwards=false, .minSpeed=127, .earlyExitRange=20}, false);
     // pros::delay(525);
     scraper_piston.toggle();
-    intake.score(127);
     chassis.moveToPoint(47.5, -25, 400, {.forwards=false}, false);
+    intake.score(100);
     // chassis.waitUntilDone();
-    move(-30, 0, false, 900);
-    intake.stop();
-    pros::delay(50);
+    move(-30, 0, false, 950);
     
 
     chassis.turnToHeading(-135, 475, {}, false);
+    intake.stop();
     chassis.tank(100, 100);
     pros::delay(250);
     chassis.tank(0, 0);
 
     // Push with deosicourwing
     descore.set_value(true);
-    chassis.moveToPoint(35.5, -25, 600, {.forwards=false, .minSpeed=50, .earlyExitRange=5}, true);
+    chassis.moveToPoint(36, -25, 600, {.forwards=false, .minSpeed=50, .earlyExitRange=5}, true);
     chassis.moveToPoint(37, -7, 800, {.forwards=false}, true);
 
     lemlib::toggleMCL();
-    pros::delay(6500);
+    pros::delay(5750);
     lemlib::toggleMCL();
     descore.set_value(false);
     intake.store(127);
 
 
-    chassis.moveToPoint(20, -23, 800, {}, true);
+    chassis.moveToPoint(19.5, -23, 800, {}, true);
     pros::delay(600);
     scraper_piston.toggle();
     chassis.turnToHeading(-35, 700, {}, true);
-    chassis.moveToPoint(9, -6, 1000, {.minSpeed=40, .earlyExitRange=5}, true);
+    chassis.moveToPoint(9, -8, 1000, {.minSpeed=40, .earlyExitRange=5}, true);
     scraper_piston.toggle();
     pros::delay(200);
     intake.stop();
     intake.outtake(55);
-
+    pros::delay(500);
+    move(-30, 0, false, 400);
 
 }
 
@@ -88,7 +92,7 @@ void soloAWP() {
     chassis.turnToHeading(-180, 700, {}, true);
     intake.store(127, true);
     chassis.moveToPoint(46.5, -73, 550, {.maxSpeed=60}, false);
-    move(30, 0, false, 575);
+    move(30, 0, false, 550);
 
     // Score in long goal
     chassis.moveToPoint(47, -31, 900, {.forwards=false, .minSpeed=30}, true);
@@ -96,10 +100,11 @@ void soloAWP() {
     scraper_piston.toggle();
     intake.score(100);
     chassis.turnToHeading(180, 600, {}, false);
-    move(-30, 0, false, 600);
+    move(-30, 0, false, 650);
 
     // Intake center 3 balls
-    chassis.turnToPoint(20, -24, 600, {}, false);
+    chassis.turnToHeading(-80, 600, {}, false);
+    // chassis.turnToPoint(20, -24, 600, {}, false);
     intake.stop();
     intake.store(127, true);
     chassis.moveToPoint(20, -24, 800, {.minSpeed=120, .earlyExitRange=14}, true);
@@ -107,20 +112,21 @@ void soloAWP() {
     // scraper_piston.toggle();
     
     // Move to second set of 3 balls
-    chassis.turnToPoint(-24, -24, 350, {}, true);
+    chassis.turnToPoint(-24, -23, 350, {}, true);
     // scraper_piston.toggle();
-    chassis.moveToPoint(-24, -24, 1100, {.minSpeed=120, .earlyExitRange=14}, true);
+    chassis.moveToPoint(-24, -23, 1100, {.minSpeed=120, .earlyExitRange=14}, true);
     pros::delay(800);
     scraper_piston.toggle();
     // intake.stop();
 
-    chassis.turnToPoint(-50, -50, 600, {}, true);
-    chassis.moveToPoint(-50, -50, 1000, {.minSpeed=120, .earlyExitRange=16}, false);
+    chassis.turnToPoint(-48, -50, 600, {}, true);
+    chassis.moveToPoint(-48, -50, 1000, {.minSpeed=127, .earlyExitRange=24}, false);
+    chassis.moveToPoint(-48, -50, 500, {}, false);
     chassis.turnToHeading(180, 600, {}, false);
     resetPositionFromTwoDistanceSensors(0, 2);
     
 
-    chassis.moveToPoint(-49, -25, 500, {.forwards=false, .minSpeed=30}, true);
+    chassis.moveToPoint(-49, -25, 500, {.forwards=false, .minSpeed=60}, true);
     pros::delay(150);
     intake.score(100);
     pros::delay(300);
@@ -129,27 +135,24 @@ void soloAWP() {
 
     // Second Match Loader
     intake.store(127, true);
-    chassis.moveToPoint(-48, -70, 800, {.minSpeed=60, .earlyExitRange=15}, false);
-    move(40, 0, false, 600);
+    chassis.moveToPoint(-48, -70, 800, {.minSpeed=60, .earlyExitRange=18}, false);
+    move(35, 0, false, 750);
 
     // Middle
-    chassis.turnToPoint(-8, -8, 600, {.forwards=false}, false);
-    chassis.moveToPoint(-8, -8, 1500, {.forwards=false, .minSpeed=120, .earlyExitRange=40}, true);
+    move(-127, 0, false, 200);
+    chassis.turnToPoint(-7, -9, 600, {.forwards=false}, false);
+    chassis.moveToPoint(-7, -9, 1500, {.forwards=false, .minSpeed=120, .earlyExitRange=40}, true);
     pros::delay(300);
     lemlib::toggleMCL();
-    chassis.moveToPoint(-8, -8, 800, {.forwards=false}, true);
+    chassis.moveToPoint(-7, -9, 800, {.forwards=false}, true);
     intake.stop();
     
     // 
     chassis.waitUntilDone();
-    intake.score(70, true);
+    intake.score(60, true);
     chassis.turnToHeading(-135, 300, {}, false);
     move(-40, 0, false, 600);
     
-    
-    
-
-
 
 }
 
@@ -374,23 +377,22 @@ void right() { // 7 ball
 
     // Go to matchloader
     chassis.turnToPoint(47, -48, 500, {}, true);
-    chassis.moveToPoint(47, -48, 1000, {.minSpeed=127, .earlyExitRange=16}, false);
+    chassis.moveToPoint(47, -48, 1000, {.minSpeed=127, .earlyExitRange=24}, true);
+    chassis.moveToPoint(47, -48, 500, {}, false);
     chassis.turnToHeading(180, 500, {}, false);
     resetPositionFromTwoDistanceSensors(0, 1);
     intake.store(127, true);
-    chassis.moveToPoint(47, -60, 475, {.minSpeed=80}, false);
+    chassis.moveToPoint(46.5, -60, 475, {.minSpeed=80}, false);
     
     move(60, 0, false, 650);
     
 
     // Score in long goal
-    chassis.moveToPoint(46.5, -30, 900, {.forwards=false, .minSpeed=127, .earlyExitRange=20}, true);
-    pros::delay(475);
-    scraper_piston.toggle();
+    chassis.moveToPoint(46.5, -30, 900, {.forwards=false, .minSpeed=127, .earlyExitRange=20}, false);
+    chassis.moveToPoint(46.5, -25, 400, {.forwards=false}, false);
     intake.score(127);
-    chassis.moveToPoint(46.5, -25, 400, {.forwards=false}, true);
-    chassis.waitUntilDone();
-    move(-30, 0, false, 1000);
+    move(-30, 0, false, 1100);
+    scraper_piston.toggle();
     
 
     chassis.turnToHeading(-135, 475, {}, false);
@@ -401,8 +403,8 @@ void right() { // 7 ball
 
     // Push with deosicourwing
     descore.set_value(true);
-    chassis.moveToPoint(34.5, -25, 600, {.forwards=false, .minSpeed=50, .earlyExitRange=5}, true);
-    chassis.moveToPoint(37, -7, 800, {.forwards=false}, true);
+    chassis.moveToPoint(35.7, -25, 600, {.forwards=false, .minSpeed=50, .earlyExitRange=5}, true);
+    chassis.moveToPoint(36.7, -7, 800, {.forwards=false}, true);
 }
 
 void left() {

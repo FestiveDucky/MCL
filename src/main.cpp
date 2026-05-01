@@ -16,14 +16,15 @@ struct AutonOption {
 };
 
 // Change this table to change auton count and mapping for the potentiometer selector.
-const std::array<AutonOption, 7> AUTONS = {{
+const std::array<AutonOption, 8> AUTONS = {{
     {"Left", left},
     {"Right (30 second 7 Ball)", right},
     {"Right (45 second 4 + 3 + 2 + 1)", rightthreeplusfour},
     {"Five Inch", fiveInch},
 	{"Test", test},
-	{"Solo AWP", soloAWP},
-	{"Skills 2", skills2}
+	{"Slop", soloAWP},
+	{"Skills 2", skills2},
+	{"DO ABSOLUTELY NOTHING AND I MEAN NOTHING", nothing}
 }};
 
 std::vector<std::string> autonNamesFromTable() {
@@ -126,6 +127,7 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+	// right();
 	// sc.state = RobotState::DRIVER;
 	// sc.hideSelector();
 

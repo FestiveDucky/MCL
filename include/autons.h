@@ -1,5 +1,6 @@
 #include "main.h"
 
+void nothing();
 void right();
 void rightthreeplusfour();
 void left();

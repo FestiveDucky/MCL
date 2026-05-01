@@ -154,7 +154,7 @@ lemlib::TrackingWheel vertical_tracking_wheel(&vertical_rotation, lemlib::Omniwh
 
 
 // odometry settings
-lemlib::OdomSensors sensors(&vertical_tracking_wheel, // vertical tracking wheel 1 &vertical_tracking_wheel
+lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel 1 &vertical_tracking_wheel
                             nullptr, // vertical tracking wheel 2
                             nullptr, // horizontal tracking wheel 1
                             nullptr, // horizontal tracking wheel 2
@@ -211,7 +211,7 @@ pros::Controller controller(pros::E_CONTROLLER_MASTER);
 pros::adi::AnalogIn potentiometer ('F'); // Auton selector
 
 pros::adi::Pneumatics scraper_piston = pros::adi::Pneumatics('A', false);
-pros::adi::Pneumatics descore = pros::adi::Pneumatics('B', false);
+pros::adi::Pneumatics descore = pros::adi::Pneumatics('B', true);
 pros::adi::Pneumatics middlescore_piston = pros::adi::Pneumatics('C', true);
 pros::adi::Pneumatics top_score = pros::adi::Pneumatics('H', false);
 pros::adi::Pneumatics intake_roller = pros::adi::Pneumatics('E', true);
