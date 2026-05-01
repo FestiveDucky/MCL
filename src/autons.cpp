@@ -489,8 +489,17 @@ void left() {
 
 // ASSET(path1_txt);
 void test() {
-    chassis.setPose(0, 0, 180);
-    resetPositionFromTwoDistanceSensors(0, 2);
+    chassis.setPose(0, -48, 0);
+    chassis.turnToPoint(48, -48, 800, {}, false);
+    chassis.moveToPoint(48, -48, 1200, {}, false);
+    chassis.turnToPoint(24, -24, 800, {}, false);
+    chassis.moveToPoint(24, -24, 1200, {}, false);
+    chassis.turnToPoint(24, 0, 800, {}, false);
+    chassis.moveToPoint(24, 0, 1200, {}, false);
+    chassis.turnToPoint(0, 0, 800, {}, false);
+    chassis.moveToPoint(0, 0, 1200, {}, false);
+    chassis.turnToPoint(48, 48, 800, {}, false);
+    chassis.moveToPoint(48, 48, 1500, {}, false);
 
 }
 
