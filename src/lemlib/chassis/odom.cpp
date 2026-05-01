@@ -48,6 +48,7 @@ pros::Mutex particlesMutex;
 struct NormalizedFieldElement {
     float xMin;
     float xMax;
+    float yMin;
     float yMax;
     float reliability;
 };
