@@ -73,6 +73,7 @@ std::uint32_t getConfidence();
 void toggleMCL();
 std::size_t getDistanceSensorCount();
 float getDistanceInchesByIndex(std::size_t index);
+std::vector<Particle> getParticlesSnapshot();
 
 static double effectiveSampleSize(const std::vector<Particle>& particles);
 static std::vector<Particle> systematicResample(const std::vector<Particle>& particles);

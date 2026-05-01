@@ -13,7 +13,6 @@
 #include "pros/rtos.hpp"
 #include "lemlib/util.hpp"
 #include "lemlib/chassis/odom.hpp"
-#include <mutex>
 #include <shared_mutex>
 #include "lemlib/chassis/chassis.hpp"
 #include "lemlib/chassis/trackingWheel.hpp"
@@ -41,6 +40,21 @@ constexpr float MM_TO_IN = 1.0f / 25.4f;
 
 std::vector<std::unique_ptr<pros::Distance>> distanceSensors;
 std::vector<Particle::SensorObservation> sensorObservations;
+pros::Mutex particlesMutex;
+
+class MutexGuard {
+    public:
+        explicit MutexGuard(pros::Mutex& mutex) : mutex(mutex), locked(mutex.take(TIMEOUT_MAX)) {}
+        ~MutexGuard() {
+            if (locked) mutex.give();
+        }
+
+        bool ownsLock() const { return locked; }
+
+    private:
+        pros::Mutex& mutex;
+        bool locked = false;
+};
 
 std::unique_ptr<pros::Distance> makeDistanceSensor(int port) {
     if (port <= 0) return nullptr;
@@ -119,6 +133,12 @@ std::size_t lemlib::getDistanceSensorCount() {
 float lemlib::getDistanceInchesByIndex(std::size_t index) {
     if (index >= distanceSensors.size()) return std::numeric_limits<float>::quiet_NaN();
     return readDistanceInches(distanceSensors[index]);
+}
+
+std::vector<Particle> lemlib::getParticlesSnapshot() {
+    MutexGuard lock(particlesMutex);
+    if (!lock.ownsLock()) return {};
+    return particles;
 }
 
 void lemlib::setMCLSettings(const lemlib::MCLSettings& settings) {
@@ -293,100 +313,105 @@ void lemlib::update() {
         if (mclSettings.clampSigmaXY) sigmaXY = std::min(sigmaXY, mclSettings.maxSigmaXY);
     }
     
-    // 1) Motion update: move every particle
-    for (auto& p : particles) {
-        p.adjustPose(dxField, dyField, sigmaXY);
-        // printf("(%f, %f, %f)", odomPose.x + dxField - p.pose_.x, odomPose.y + dyField - p.pose_.y, p.weight_);
-    }
-    
     // TODO -> if robot rotates in place this never executes add a delta heading value
     // Possibly sensor update once every 0.5s even if we standing still to prevent particles from spreading out too much
     // const bool shouldDoSensor = (deltaS > 0.01f) || (pros::millis() - prev_time > 200);
     const bool shouldDoSensor = !paused;
     float estX = odomPose.x;
     float estY = odomPose.y;
-    if (shouldDoSensor) {
-        prev_time = pros::millis();
-        // 2) Sensor update: build observations once per odom iteration.
-        sensorObservations.clear();
-        frontConf = 0;
+    {
+        MutexGuard particleLock(particlesMutex);
+        if (!particleLock.ownsLock()) return;
 
-        const float sh = std::sin(heading);
-        const float ch = std::cos(heading);
-        const float nominalRobotX = odomPose.x + dxField;
-        const float nominalRobotY = odomPose.y + dyField;
-
-        const std::size_t sensorCount = std::min(distanceSensors.size(), mclSettings.distanceSensors.size());
-        for (std::size_t i = 0; i < sensorCount; i++) {
-            const auto& sensor = distanceSensors[i];
-            if (sensor == nullptr) continue;
-
-            const auto& sensorConfig = mclSettings.distanceSensors[i];
-            const float measuredDistanceIn = readDistanceInches(sensor);
-            const int confidence = readDistanceConfidence(sensor);
-
-            if (i == 0) frontConf = static_cast<std::uint32_t>(confidence);
-
-            const bool hasHit = inRange(measuredDistanceIn, mclSettings.zMin, mclSettings.zMax);
-            const bool hasNoHit = mclSettings.useNoHitModel && std::isfinite(measuredDistanceIn) &&
-                                  measuredDistanceIn > mclSettings.zMax;
-            if (!hasHit && !hasNoHit) continue;
-
-            // Transform mount offsets and ray direction once per update. These values are reused for every particle.
-            const float mountOffsetX = ch * sensorConfig.mount.xOffset + sh * sensorConfig.mount.yOffset;
-            const float mountOffsetY = -sh * sensorConfig.mount.xOffset + ch * sensorConfig.mount.yOffset;
-            const float rayAngle = heading + sensorConfig.mount.headingOffset;
-            const float rayDirX = std::sin(rayAngle);
-            const float rayDirY = std::cos(rayAngle);
-            if (hasHit) {
-                const float sensorX = nominalRobotX + mountOffsetX;
-                const float sensorY = nominalRobotY + mountOffsetY;
-                const float hitX = sensorX + measuredDistanceIn * rayDirX;
-                const float hitY = sensorY + measuredDistanceIn * rayDirY;
-                if (isIgnoredHitPoint(hitX, hitY)) continue;
-            }
-
-            sensorObservations.push_back({measuredDistanceIn, confidenceToUnit(confidence), hasHit, hasNoHit,
-                                          mountOffsetX, mountOffsetY, rayDirX, rayDirY});
+        // 1) Motion update: move every particle
+        for (auto& p : particles) {
+            p.adjustPose(dxField, dyField, sigmaXY);
+            // printf("(%f, %f, %f)", odomPose.x + dxField - p.pose_.x, odomPose.y + dyField - p.pose_.y, p.weight_);
         }
 
-        if (!sensorObservations.empty()) {
-            for (auto& p : particles) {
-                p.sensorUpdate(sensorObservations);
+        if (shouldDoSensor) {
+            prev_time = pros::millis();
+            // 2) Sensor update: build observations once per odom iteration.
+            sensorObservations.clear();
+            frontConf = 0;
+
+            const float sh = std::sin(heading);
+            const float ch = std::cos(heading);
+            const float nominalRobotX = odomPose.x + dxField;
+            const float nominalRobotY = odomPose.y + dyField;
+
+            const std::size_t sensorCount = std::min(distanceSensors.size(), mclSettings.distanceSensors.size());
+            for (std::size_t i = 0; i < sensorCount; i++) {
+                const auto& sensor = distanceSensors[i];
+                if (sensor == nullptr) continue;
+
+                const auto& sensorConfig = mclSettings.distanceSensors[i];
+                const float measuredDistanceIn = readDistanceInches(sensor);
+                const int confidence = readDistanceConfidence(sensor);
+
+                if (i == 0) frontConf = static_cast<std::uint32_t>(confidence);
+
+                const bool hasHit = inRange(measuredDistanceIn, mclSettings.zMin, mclSettings.zMax);
+                const bool hasNoHit = mclSettings.useNoHitModel && std::isfinite(measuredDistanceIn) &&
+                                      measuredDistanceIn > mclSettings.zMax;
+                if (!hasHit && !hasNoHit) continue;
+
+                // Transform mount offsets and ray direction once per update. These values are reused for every particle.
+                const float mountOffsetX = ch * sensorConfig.mount.xOffset + sh * sensorConfig.mount.yOffset;
+                const float mountOffsetY = -sh * sensorConfig.mount.xOffset + ch * sensorConfig.mount.yOffset;
+                const float rayAngle = heading + sensorConfig.mount.headingOffset;
+                const float rayDirX = std::sin(rayAngle);
+                const float rayDirY = std::cos(rayAngle);
+                if (hasHit) {
+                    const float sensorX = nominalRobotX + mountOffsetX;
+                    const float sensorY = nominalRobotY + mountOffsetY;
+                    const float hitX = sensorX + measuredDistanceIn * rayDirX;
+                    const float hitY = sensorY + measuredDistanceIn * rayDirY;
+                    if (isIgnoredHitPoint(hitX, hitY)) continue;
+                }
+
+                sensorObservations.push_back({measuredDistanceIn, confidenceToUnit(confidence), hasHit, hasNoHit,
+                                              mountOffsetX, mountOffsetY, rayDirX, rayDirY});
             }
 
-            // 3) Normalize weights
-            normalizeWeights(particles);
+            if (!sensorObservations.empty()) {
+                for (auto& p : particles) {
+                    p.sensorUpdate(sensorObservations);
+                }
 
-            // Estimate pose from the posterior BEFORE resampling resets weights.
-            auto [preResampleX, preResampleY] = weightedMeanXY(particles);
-            estX = preResampleX;
-            estY = preResampleY;
+                // 3) Normalize weights
+                normalizeWeights(particles);
 
-            // 4) Neff check -> resample if needed
-            const double Neff = effectiveSampleSize(particles);
-            const double N = static_cast<double>(particles.size());
-            const double neffThreshold = static_cast<double>(mclSettings.neffResampleThreshold) * N;
+                // Estimate pose from the posterior BEFORE resampling resets weights.
+                auto [preResampleX, preResampleY] = weightedMeanXY(particles);
+                estX = preResampleX;
+                estY = preResampleY;
 
-            // Typical threshold: 0.5N (tune via mclSettings.neffResampleThreshold)
-            // printf("N-Effective: %f, Threshold, %f\n", Neff, neffThreshold);
-            if (Neff < neffThreshold) {
-                particles = systematicResample(particles);
+                // 4) Neff check -> resample if needed
+                const double Neff = effectiveSampleSize(particles);
+                const double N = static_cast<double>(particles.size());
+                const double neffThreshold = static_cast<double>(mclSettings.neffResampleThreshold) * N;
 
-                // Optional: "roughening" / jitter here to prevent duplicates
-                // for (auto& p : particles) p.addSmallJitter(...);
+                // Typical threshold: 0.5N (tune via mclSettings.neffResampleThreshold)
+                // printf("N-Effective: %f, Threshold, %f\n", Neff, neffThreshold);
+                if (Neff < neffThreshold) {
+                    particles = systematicResample(particles);
+
+                    // Optional: "roughening" / jitter here to prevent duplicates
+                    // for (auto& p : particles) p.addSmallJitter(...);
+                }
+            } else {
+                auto [noSensorX, noSensorY] = weightedMeanXY(particles);
+                estX = noSensorX;
+                estY = noSensorY;
             }
         } else {
+            // If you did not do sensor update, keep weights as-is (often uniform).
+            // You could optionally skip resampling entirely here (recommended).
             auto [noSensorX, noSensorY] = weightedMeanXY(particles);
             estX = noSensorX;
             estY = noSensorY;
         }
-    } else {
-        // If you did not do sensor update, keep weights as-is (often uniform).
-        // You could optionally skip resampling entirely here (recommended).
-        auto [noSensorX, noSensorY] = weightedMeanXY(particles);
-        estX = noSensorX;
-        estY = noSensorY;
     }
     
     // 5) Apply filtered estimate
@@ -638,6 +663,8 @@ void lemlib::init() {
 }
 
 void lemlib::initParticles() {
+    MutexGuard lock(particlesMutex);
+    if (!lock.ownsLock()) return;
     particles.clear();
     const int particleCount = std::max(0, mclSettings.particleCount);
     if (particleCount == 0) return;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "main.h"
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <vector>
@@ -15,28 +16,41 @@ enum RobotState {
 
 class Screen {
     private:
+        struct PathSample {
+            float x = 0.0f;
+            float y = 0.0f;
+        };
+
         std::unique_ptr<pros::Task> task;
-        lv_obj_t* autonLabel = nullptr;
+        std::unique_ptr<pros::Task> pathTask;
+        lv_obj_t* field = nullptr;
+        lv_obj_t* pathLine = nullptr;
+        lv_obj_t* robotDot = nullptr;
+        lv_obj_t* selectorLabel = nullptr;
         lv_obj_t* infoLabel = nullptr;
-        lv_obj_t* footerLabel = nullptr;
+        lv_obj_t* legendLabel = nullptr;
+        std::vector<lv_obj_t*> particleDots;
+        std::vector<PathSample> pathSamples;
+        std::vector<lv_point_precise_t> pathLinePoints;
         pros::Mutex stateMutex;
-        char autonText[64] = {0};
-        char infoText[192] = {0};
-        char footerText[64] = {0};
-        char infoOverrideText[192] = {0};
+        char selectorText[160] = {0};
+        char infoText[256] = {0};
+        char infoOverrideText[256] = {0};
         Screen() = default;
         Screen(const Screen&) = delete;
         Screen& operator=(const Screen&) = delete;
         std::vector<std::string> autonNames;
         int selectedAuton = 0;
-        int lastPotValue = -1;
-        int lastDisplayedAuton = -1;
         bool selectorHidden = false;
         bool lastSelectorHidden = false;
         bool mclPaused = true;
         bool infoOverrideEnabled = false;
 
-        void createLabels();
+        void createUI();
+        void samplePath();
+        void refreshPath();
+        void refreshField();
+        void syncParticleDots(std::size_t count);
         void update();
         void refreshSelector();
         void refreshInfo();
