@@ -91,6 +91,7 @@ void lemlib::Chassis::calibrate(bool calibrateImu) {
     if (sensors.horizontal2 != nullptr) sensors.horizontal2->reset();
     setSensors(sensors, drivetrain);
     setMCLSettings(mclSettings);
+    initParticles();
     init();
     // rumble to controller to indicate success
     pros::c::controller_rumble(pros::E_CONTROLLER_MASTER, ".");
@@ -102,7 +103,10 @@ void lemlib::Chassis::setPose(float x, float y, float theta, bool radians) {
     initParticles();
 }
 
-void lemlib::Chassis::setPose(Pose pose, bool radians) { lemlib::setPose(pose, radians); }
+void lemlib::Chassis::setPose(Pose pose, bool radians) {
+    lemlib::setPose(pose, radians);
+    initParticles();
+}
 
 lemlib::Pose lemlib::Chassis::getPose(bool radians, bool standardPos) {
     Pose pose = lemlib::getPose(true);
@@ -158,7 +162,7 @@ bool lemlib::Chassis::isInMotion() const { return this->motionRunning; }
 
 void lemlib::Chassis::resetLocalPosition() {
     float theta = this->getPose().theta;
-    lemlib::setPose(lemlib::Pose(0, 0, theta), false);
+    this->setPose(0, 0, theta, false);
 }
 
 void lemlib::Chassis::setBrakeMode(pros::motor_brake_mode_e mode) {

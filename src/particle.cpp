@@ -30,6 +30,15 @@ static inline double likelihoodTriangle(float e, const lemlib::MCLSettings& cfg)
     const double t = 1.0 - (std::fabs(e) / b);
     return std::max(cfg.pFloor, std::max(0.0, t));
 }
+
+static inline double applyFieldElementReliability(double baseProb,
+                                                  const lemlib::DistanceRaycastHit& predicted,
+                                                  const lemlib::MCLSettings& cfg) {
+    // Preserve the legacy wall-only measurement model exactly when no field
+    // elements are configured, or when this ray actually predicted a wall hit.
+    if (cfg.fieldElements.empty() || predicted.hitWall) return baseProb;
+    return predicted.reliability * baseProb + (1.0f - predicted.reliability);
+}
 } // namespace
 
 Particle::Particle(lemlib::Pose p, double w) : pose_(p.x, p.y, p.theta), weight_(w) {}
@@ -87,11 +96,11 @@ void Particle::sensorUpdate(const std::vector<SensorObservation>& observations) 
         double prob = 1.0;
         if (observation.hasHit) {
             const float e = observation.distanceIn - predicted.distanceIn;
-            prob = predicted.reliability * likelihoodTriangle(e, cfg) + (1.0f - predicted.reliability);
+            prob = applyFieldElementReliability(likelihoodTriangle(e, cfg), predicted, cfg);
         } else if (observation.hasNoHit) {
             // "No hit": penalize particles that expected an in-range hit.
             if (predicted.distanceIn <= zMax) {
-                prob = predicted.reliability * cfg.noHitPenalty + (1.0f - predicted.reliability);
+                prob = applyFieldElementReliability(cfg.noHitPenalty, predicted, cfg);
             }
         }
 
