@@ -492,14 +492,14 @@ void test() {
     chassis.setPose(0, -48, 0);
     chassis.turnToPoint(48, -48, 800, {}, false);
     chassis.moveToPoint(48, -48, 1200, {}, false);
-    chassis.turnToPoint(24, -24, 800, {}, false);
-    chassis.moveToPoint(24, -24, 1200, {}, false);
-    chassis.turnToPoint(24, 0, 800, {}, false);
-    chassis.moveToPoint(24, 0, 1200, {}, false);
-    chassis.turnToPoint(0, 0, 800, {}, false);
-    chassis.moveToPoint(0, 0, 1200, {}, false);
-    chassis.turnToPoint(48, 48, 800, {}, false);
-    chassis.moveToPoint(48, 48, 2000, {}, false);
+    // chassis.turnToPoint(24, -24, 800, {}, false);
+    // chassis.moveToPoint(24, -24, 1200, {}, false);
+    // chassis.turnToPoint(24, 0, 800, {}, false);
+    // chassis.moveToPoint(24, 0, 1200, {}, false);
+    chassis.turnToPoint(-8, -8, 800, {}, false);
+    chassis.moveToPoint(-8, -8, 2000, {}, false);
+    // chassis.turnToPoint(48, 48, 800, {}, false);
+    // chassis.moveToPoint(48, 48, 2000, {}, false);
 
 }
 

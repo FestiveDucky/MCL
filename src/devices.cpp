@@ -3,7 +3,6 @@
 #include "lemlib/chassis/chassis.hpp"
 #include "lemlib/chassis/odom.hpp"
 #include <cmath>
-#include <limits>
 
 // namespace {
 // lemlib::MCLSettings makeMCLSettings() {
@@ -74,11 +73,12 @@ lemlib::MCLSettings makeMCLSettings() {
         {14, {4.25f, -3.75f, 1.57079632679f}},   // Right sensor (old behavior): port 6.
         // {port, x offset, y offset, angle (rad)}
     };
-    cfg.ignoredHitRegions = {
-        {-30, -6, -24, 12},
+    cfg.fieldElements = {
+        // {-30, -6, -24, 12, 0.2f},
+        // {-20, 20, -20, 20, 0.6},
 
 
-        // {xMin, xMax, yMin, yMax},
+        // {xMin, xMax, yMin, yMax, reliability},
     };
 
     cfg.sigma0XY = 0.06f;         // Baseline XY process noise each cycle (in).
@@ -218,14 +218,7 @@ pros::adi::Pneumatics intake_roller = pros::adi::Pneumatics('E', true);
 
 namespace {
 constexpr float DISTANCE_RESET_MAX_IN = 200.0f;
-constexpr float DISTANCE_RESET_RAY_EPS = 1e-5f;
 constexpr float DEG_TO_RAD = 0.01745329251994329577f;
-
-struct WallHit {
-    bool valid = false;
-    bool solvesX = false; // true => x wall (x = +/-fieldHalf), false => y wall.
-    float wallCoord = 0.0f;
-};
 
 struct AxisEstimate {
     bool hasX = false;
@@ -233,58 +226,6 @@ struct AxisEstimate {
     float x = 0.0f;
     float y = 0.0f;
 };
-
-bool inRange(float value, float min, float max) {
-    return value >= min && value <= max;
-}
-
-// Select the wall this ray most likely hits first, using current pose as the wall-selection seed.
-WallHit raycastWall(float x0, float y0, float dx, float dy, float wallMin, float wallMax) {
-    float bestT = std::numeric_limits<float>::infinity();
-    WallHit hit{};
-
-    if (std::fabs(dx) > DISTANCE_RESET_RAY_EPS) {
-        float t = (wallMin - x0) / dx;
-        if (t >= 0.0f) {
-            const float y = y0 + t * dy;
-            if (inRange(y, wallMin, wallMax) && t < bestT) {
-                bestT = t;
-                hit = {true, true, wallMin};
-            }
-        }
-
-        t = (wallMax - x0) / dx;
-        if (t >= 0.0f) {
-            const float y = y0 + t * dy;
-            if (inRange(y, wallMin, wallMax) && t < bestT) {
-                bestT = t;
-                hit = {true, true, wallMax};
-            }
-        }
-    }
-
-    if (std::fabs(dy) > DISTANCE_RESET_RAY_EPS) {
-        float t = (wallMin - y0) / dy;
-        if (t >= 0.0f) {
-            const float x = x0 + t * dx;
-            if (inRange(x, wallMin, wallMax) && t < bestT) {
-                bestT = t;
-                hit = {true, false, wallMin};
-            }
-        }
-
-        t = (wallMax - y0) / dy;
-        if (t >= 0.0f) {
-            const float x = x0 + t * dx;
-            if (inRange(x, wallMin, wallMax) && t < bestT) {
-                bestT = t;
-                hit = {true, false, wallMax};
-            }
-        }
-    }
-
-    return hit;
-}
 
 AxisEstimate estimateAxisFromSensor(std::size_t sensorIndex, const lemlib::Pose& currentPoseDeg) {
     AxisEstimate estimate{};
@@ -310,11 +251,11 @@ AxisEstimate estimateAxisFromSensor(std::size_t sensorIndex, const lemlib::Pose&
     const float rayDirX = std::sin(rayAngle);
     const float rayDirY = std::cos(rayAngle);
 
-    const WallHit hit = raycastWall(sensorX, sensorY, rayDirX, rayDirY, -cfg.fieldHalf, cfg.fieldHalf);
-    if (!hit.valid) return estimate;
+    const lemlib::DistanceRaycastHit hit = lemlib::raycastDistanceField(sensorX, sensorY, rayDirX, rayDirY);
+    if (!hit.valid || !hit.hitWall) return estimate;
 
     // If we hit a vertical wall, solve x. If horizontal wall, solve y.
-    if (hit.solvesX) {
+    if (hit.wallVertical) {
         estimate.hasX = true;
         estimate.x = hit.wallCoord - (mountOffsetX + readingIn * rayDirX);
     } else {

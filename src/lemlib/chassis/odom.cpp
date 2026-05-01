@@ -4,6 +4,7 @@
 // http://thepilons.ca/wp-content/uploads/2018/10/Tracking.pdf
 
 #include <math.h>
+#include <array>
 #include <random>
 #include <cmath>
 #include <algorithm>
@@ -37,10 +38,29 @@ bool paused = false;
 
 namespace {
 constexpr float MM_TO_IN = 1.0f / 25.4f;
+constexpr int FIELD_GRID_SIZE = 28;
+constexpr float RAYCAST_EPS = 1e-6f;
 
 std::vector<std::unique_ptr<pros::Distance>> distanceSensors;
 std::vector<Particle::SensorObservation> sensorObservations;
 pros::Mutex particlesMutex;
+
+struct NormalizedFieldElement {
+    float xMin;
+    float xMax;
+    float yMax;
+    float reliability;
+};
+
+struct FieldGridCell {
+    std::vector<std::size_t> elementIndices;
+};
+
+std::vector<NormalizedFieldElement> normalizedFieldElements;
+std::array<FieldGridCell, FIELD_GRID_SIZE * FIELD_GRID_SIZE> fieldGrid;
+float fieldGridCellSize = 0.0f;
+thread_local std::vector<std::uint32_t> fieldElementVisitMarks;
+thread_local std::uint32_t fieldElementVisitToken = 0;
 
 class MutexGuard {
     public:
@@ -72,6 +92,10 @@ void configureDistanceSensors() {
     sensorObservations.reserve(mclSettings.distanceSensors.size());
 }
 
+int flatCellIndex(int cellX, int cellY) {
+    return cellY * FIELD_GRID_SIZE + cellX;
+}
+
 float readDistanceInches(const std::unique_ptr<pros::Distance>& sensor) {
     if (sensor == nullptr) return std::numeric_limits<float>::quiet_NaN();
     return sensor->get() * MM_TO_IN;
@@ -90,17 +114,152 @@ float clampf(float value, float min, float max) {
     return std::max(min, std::min(value, max));
 }
 
+int axisCellIndex(float coord, float fieldHalf) {
+    if (fieldGridCellSize <= 0.0f) return 0;
+    const int raw = static_cast<int>(std::floor((coord + fieldHalf) / fieldGridCellSize));
+    return std::max(0, std::min(FIELD_GRID_SIZE - 1, raw));
+}
+
+void clearFieldGeometry() {
+    normalizedFieldElements.clear();
+    for (auto& cell : fieldGrid) cell.elementIndices.clear();
+    fieldGridCellSize = 0.0f;
+}
+
+void configureFieldGeometry() {
+    clearFieldGeometry();
+
+    const float fieldHalf = mclSettings.fieldHalf;
+    if (fieldHalf <= 0.0f) return;
+
+    fieldGridCellSize = (fieldHalf * 2.0f) / static_cast<float>(FIELD_GRID_SIZE);
+    if (fieldGridCellSize <= 0.0f) return;
+
+    const float wallMin = -fieldHalf;
+    const float wallMax = fieldHalf;
+
+    normalizedFieldElements.reserve(mclSettings.fieldElements.size());
+    for (const auto& element : mclSettings.fieldElements) {
+        NormalizedFieldElement normalized{
+            std::min(element.xMin, element.xMax),
+            std::max(element.xMin, element.xMax),
+            std::min(element.yMin, element.yMax),
+            std::max(element.yMin, element.yMax),
+            clampf(element.reliability, 0.0f, 1.0f),
+        };
+
+        const std::size_t elementIndex = normalizedFieldElements.size();
+        normalizedFieldElements.push_back(normalized);
+
+        if (normalized.xMax < wallMin || normalized.xMin > wallMax || normalized.yMax < wallMin ||
+            normalized.yMin > wallMax) {
+            continue;
+        }
+
+        const int minCellX = axisCellIndex(clampf(normalized.xMin, wallMin, wallMax), fieldHalf);
+        const int maxCellX = axisCellIndex(clampf(normalized.xMax, wallMin, wallMax), fieldHalf);
+        const int minCellY = axisCellIndex(clampf(normalized.yMin, wallMin, wallMax), fieldHalf);
+        const int maxCellY = axisCellIndex(clampf(normalized.yMax, wallMin, wallMax), fieldHalf);
+
+        for (int cellY = minCellY; cellY <= maxCellY; cellY++) {
+            for (int cellX = minCellX; cellX <= maxCellX; cellX++) {
+                fieldGrid[flatCellIndex(cellX, cellY)].elementIndices.push_back(elementIndex);
+            }
+        }
+    }
+}
+
+lemlib::DistanceRaycastHit raycastWall(float x0, float y0, float dx, float dy, float wallMin, float wallMax) {
+    lemlib::DistanceRaycastHit hit{};
+    float bestT = std::numeric_limits<float>::infinity();
+
+    if (std::fabs(dx) > RAYCAST_EPS) {
+        float t = (wallMin - x0) / dx;
+        if (t >= 0.0f) {
+            const float y = y0 + t * dy;
+            if (inRange(y, wallMin, wallMax) && t < bestT) {
+                bestT = t;
+                hit = {true, true, true, wallMin, t, 1.0f};
+            }
+        }
+
+        t = (wallMax - x0) / dx;
+        if (t >= 0.0f) {
+            const float y = y0 + t * dy;
+            if (inRange(y, wallMin, wallMax) && t < bestT) {
+                bestT = t;
+                hit = {true, true, true, wallMax, t, 1.0f};
+            }
+        }
+    }
+
+    if (std::fabs(dy) > RAYCAST_EPS) {
+        float t = (wallMin - y0) / dy;
+        if (t >= 0.0f) {
+            const float x = x0 + t * dx;
+            if (inRange(x, wallMin, wallMax) && t < bestT) {
+                bestT = t;
+                hit = {true, true, false, wallMin, t, 1.0f};
+            }
+        }
+
+        t = (wallMax - y0) / dy;
+        if (t >= 0.0f) {
+            const float x = x0 + t * dx;
+            if (inRange(x, wallMin, wallMax) && t < bestT) {
+                bestT = t;
+                hit = {true, true, false, wallMax, t, 1.0f};
+            }
+        }
+    }
+
+    return hit;
+}
+
+float raycastFieldElement(const NormalizedFieldElement& element, float x0, float y0, float dx, float dy) {
+    float tMin = 0.0f;
+    float tMax = std::numeric_limits<float>::infinity();
+
+    if (std::fabs(dx) <= RAYCAST_EPS) {
+        if (!inRange(x0, element.xMin, element.xMax)) return std::numeric_limits<float>::infinity();
+    } else {
+        const float tx1 = (element.xMin - x0) / dx;
+        const float tx2 = (element.xMax - x0) / dx;
+        tMin = std::max(tMin, std::min(tx1, tx2));
+        tMax = std::min(tMax, std::max(tx1, tx2));
+    }
+
+    if (std::fabs(dy) <= RAYCAST_EPS) {
+        if (!inRange(y0, element.yMin, element.yMax)) return std::numeric_limits<float>::infinity();
+    } else {
+        const float ty1 = (element.yMin - y0) / dy;
+        const float ty2 = (element.yMax - y0) / dy;
+        tMin = std::max(tMin, std::min(ty1, ty2));
+        tMax = std::min(tMax, std::max(ty1, ty2));
+    }
+
+    if (tMin > tMax || tMax < 0.0f) return std::numeric_limits<float>::infinity();
+    return std::max(tMin, 0.0f);
+}
+
+std::uint32_t nextFieldElementVisitToken() {
+    if (fieldElementVisitMarks.size() < normalizedFieldElements.size()) {
+        fieldElementVisitMarks.resize(normalizedFieldElements.size(), 0);
+    }
+
+    fieldElementVisitToken++;
+    if (fieldElementVisitToken == 0) {
+        std::fill(fieldElementVisitMarks.begin(), fieldElementVisitMarks.end(), 0);
+        fieldElementVisitToken = 1;
+    }
+
+    return fieldElementVisitToken;
+}
+
 float confidenceToUnit(int confidence) {
     if (!mclSettings.useSensorConfidence) return 1.0f;
     const float denom = std::max(1e-6f, mclSettings.sensorConfMax);
     return clampf(static_cast<float>(confidence) / denom, 0.0f, 1.0f);
-}
-
-bool isIgnoredHitPoint(float x, float y) {
-    for (const auto& region : mclSettings.ignoredHitRegions) {
-        if (inRange(x, region.xMin, region.xMax) && inRange(y, region.yMin, region.yMax)) return true;
-    }
-    return false;
 }
 } // namespace
 
@@ -144,10 +303,84 @@ std::vector<Particle> lemlib::getParticlesSnapshot() {
 void lemlib::setMCLSettings(const lemlib::MCLSettings& settings) {
     mclSettings = settings;
     configureDistanceSensors();
+    configureFieldGeometry();
 }
 
 const lemlib::MCLSettings& lemlib::getMCLSettings() {
     return mclSettings;
+}
+
+lemlib::DistanceRaycastHit lemlib::raycastDistanceField(float x0, float y0, float dx, float dy) {
+    const float fieldHalf = mclSettings.fieldHalf;
+    const lemlib::DistanceRaycastHit wallHit = raycastWall(x0, y0, dx, dy, -fieldHalf, fieldHalf);
+    if (!wallHit.valid) return {};
+
+    lemlib::DistanceRaycastHit bestHit = wallHit;
+    if (normalizedFieldElements.empty() || fieldGridCellSize <= 0.0f) return bestHit;
+
+    const int stepX = (dx > RAYCAST_EPS) ? 1 : ((dx < -RAYCAST_EPS) ? -1 : 0);
+    const int stepY = (dy > RAYCAST_EPS) ? 1 : ((dy < -RAYCAST_EPS) ? -1 : 0);
+    if (stepX == 0 && stepY == 0) return {};
+
+    const float clampedX = clampf(x0, -fieldHalf, fieldHalf);
+    const float clampedY = clampf(y0, -fieldHalf, fieldHalf);
+    int cellX = axisCellIndex(clampedX, fieldHalf);
+    int cellY = axisCellIndex(clampedY, fieldHalf);
+
+    float tMaxX = std::numeric_limits<float>::infinity();
+    float tMaxY = std::numeric_limits<float>::infinity();
+    float tDeltaX = std::numeric_limits<float>::infinity();
+    float tDeltaY = std::numeric_limits<float>::infinity();
+
+    if (stepX != 0) {
+        const float nextBoundaryX =
+            -fieldHalf + static_cast<float>((stepX > 0) ? (cellX + 1) : cellX) * fieldGridCellSize;
+        tMaxX = std::max((nextBoundaryX - x0) / dx, 0.0f);
+        tDeltaX = fieldGridCellSize / std::fabs(dx);
+    }
+
+    if (stepY != 0) {
+        const float nextBoundaryY =
+            -fieldHalf + static_cast<float>((stepY > 0) ? (cellY + 1) : cellY) * fieldGridCellSize;
+        tMaxY = std::max((nextBoundaryY - y0) / dy, 0.0f);
+        tDeltaY = fieldGridCellSize / std::fabs(dy);
+    }
+
+    const std::uint32_t visitToken = nextFieldElementVisitToken();
+    float cellEntryT = 0.0f;
+
+    while (cellX >= 0 && cellX < FIELD_GRID_SIZE && cellY >= 0 && cellY < FIELD_GRID_SIZE &&
+           cellEntryT <= bestHit.distanceIn) {
+        for (const std::size_t elementIndex : fieldGrid[flatCellIndex(cellX, cellY)].elementIndices) {
+            if (fieldElementVisitMarks[elementIndex] == visitToken) continue;
+            fieldElementVisitMarks[elementIndex] = visitToken;
+
+            const auto& element = normalizedFieldElements[elementIndex];
+            const float t = raycastFieldElement(element, x0, y0, dx, dy);
+            if (!std::isfinite(t) || t >= bestHit.distanceIn) continue;
+
+            bestHit = {true, false, false, 0.0f, t, element.reliability};
+        }
+
+        const float nextCellT = std::min(tMaxX, tMaxY);
+        if (!std::isfinite(nextCellT) || bestHit.distanceIn <= nextCellT) break;
+
+        cellEntryT = nextCellT;
+        if (tMaxX < tMaxY) {
+            cellX += stepX;
+            tMaxX += tDeltaX;
+        } else if (tMaxY < tMaxX) {
+            cellY += stepY;
+            tMaxY += tDeltaY;
+        } else {
+            cellX += stepX;
+            cellY += stepY;
+            tMaxX += tDeltaX;
+            tMaxY += tDeltaY;
+        }
+    }
+
+    return bestHit;
 }
 
 void lemlib::setSensors(lemlib::OdomSensors sensors, lemlib::Drivetrain drivetrain) {
@@ -337,8 +570,6 @@ void lemlib::update() {
 
             const float sh = std::sin(heading);
             const float ch = std::cos(heading);
-            const float nominalRobotX = odomPose.x + dxField;
-            const float nominalRobotY = odomPose.y + dyField;
 
             const std::size_t sensorCount = std::min(distanceSensors.size(), mclSettings.distanceSensors.size());
             for (std::size_t i = 0; i < sensorCount; i++) {
@@ -362,13 +593,6 @@ void lemlib::update() {
                 const float rayAngle = heading + sensorConfig.mount.headingOffset;
                 const float rayDirX = std::sin(rayAngle);
                 const float rayDirY = std::cos(rayAngle);
-                if (hasHit) {
-                    const float sensorX = nominalRobotX + mountOffsetX;
-                    const float sensorY = nominalRobotY + mountOffsetY;
-                    const float hitX = sensorX + measuredDistanceIn * rayDirX;
-                    const float hitY = sensorY + measuredDistanceIn * rayDirY;
-                    if (isIgnoredHitPoint(hitX, hitY)) continue;
-                }
 
                 sensorObservations.push_back({measuredDistanceIn, confidenceToUnit(confidence), hasHit, hasNoHit,
                                               mountOffsetX, mountOffsetY, rayDirX, rayDirY});

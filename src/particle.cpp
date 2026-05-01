@@ -21,48 +21,6 @@ static inline float clampf(float v, float lo, float hi) {
     return std::max(lo, std::min(v, hi));
 }
 
-static inline bool inRange(float v, float lo, float hi) {
-    return (v >= lo && v <= hi);
-}
-
-// Raycast from (x0,y0) in direction (dx,dy) to rectangle boundary.
-// Returns smallest valid t >= 0 (distance).
-static float raycastToFieldWalls(float x0, float y0, float dx, float dy, float wallMin, float wallMax) {
-    float bestT = INFINITY;
-
-    // ---- Vertical walls x = wallMin and x = wallMax ----
-    if (std::fabs(dx) > 1e-6f) {
-        float t = (wallMin - x0) / dx;
-        if (t >= 0.0f) {
-            const float y = y0 + t * dy;
-            if (inRange(y, wallMin, wallMax)) bestT = std::min(bestT, t);
-        }
-
-        t = (wallMax - x0) / dx;
-        if (t >= 0.0f) {
-            const float y = y0 + t * dy;
-            if (inRange(y, wallMin, wallMax)) bestT = std::min(bestT, t);
-        }
-    }
-
-    // ---- Horizontal walls y = wallMin and y = wallMax ----
-    if (std::fabs(dy) > 1e-6f) {
-        float t = (wallMin - y0) / dy;
-        if (t >= 0.0f) {
-            const float x = x0 + t * dx;
-            if (inRange(x, wallMin, wallMax)) bestT = std::min(bestT, t);
-        }
-
-        t = (wallMax - y0) / dy;
-        if (t >= 0.0f) {
-            const float x = x0 + t * dx;
-            if (inRange(x, wallMin, wallMax)) bestT = std::min(bestT, t);
-        }
-    }
-
-    return bestT;
-}
-
 static inline double likelihoodTriangle(float e, const lemlib::MCLSettings& cfg) {
     const float b = SQRT3 * cfg.sigmaD;
 
@@ -111,8 +69,6 @@ void Particle::sensorUpdate(const std::vector<SensorObservation>& observations) 
     if (observations.empty()) return;
 
     const auto& cfg = lemlib::getMCLSettings();
-    const float wallMin = -cfg.fieldHalf;
-    const float wallMax = cfg.fieldHalf;
     const float zMax = cfg.zMax;
     const double pFloor = cfg.pFloor;
 
@@ -124,16 +80,19 @@ void Particle::sensorUpdate(const std::vector<SensorObservation>& observations) 
         const float sx = x + observation.originOffsetX;
         const float sy = y + observation.originOffsetY;
 
-        const float zHat = raycastToFieldWalls(sx, sy, observation.rayDirX, observation.rayDirY, wallMin, wallMax);
-        if (!std::isfinite(zHat)) continue;
+        const lemlib::DistanceRaycastHit predicted =
+            lemlib::raycastDistanceField(sx, sy, observation.rayDirX, observation.rayDirY);
+        if (!predicted.valid || !std::isfinite(predicted.distanceIn)) continue;
 
         double prob = 1.0;
         if (observation.hasHit) {
-            const float e = observation.distanceIn - zHat;
-            prob = likelihoodTriangle(e, cfg);
+            const float e = observation.distanceIn - predicted.distanceIn;
+            prob = predicted.reliability * likelihoodTriangle(e, cfg) + (1.0f - predicted.reliability);
         } else if (observation.hasNoHit) {
-            // "No hit": penalize particles that expected a wall in range.
-            prob = (zHat <= zMax) ? cfg.noHitPenalty : 1.0;
+            // "No hit": penalize particles that expected an in-range hit.
+            if (predicted.distanceIn <= zMax) {
+                prob = predicted.reliability * cfg.noHitPenalty + (1.0f - predicted.reliability);
+            }
         }
 
         // Confidence blending is pre-scaled per sensor in odom for reuse across all particles.

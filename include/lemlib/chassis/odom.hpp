@@ -8,9 +8,19 @@
 #include <mutex>
 
 namespace lemlib {
-    
+
+struct DistanceRaycastHit {
+    bool valid = false;
+    bool hitWall = false;
+    bool wallVertical = false;
+    float wallCoord = 0.0f;
+    float distanceIn = 0.0f;
+    float reliability = 1.0f;
+};
+
 void setMCLSettings(const lemlib::MCLSettings& settings);
 const lemlib::MCLSettings& getMCLSettings();
+DistanceRaycastHit raycastDistanceField(float x0, float y0, float dx, float dy);
 /**
  * @brief Set the sensors to be used for odometry
  *

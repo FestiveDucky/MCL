@@ -200,11 +200,11 @@ void Screen::createUI() {
     }
 
     const auto& cfg = lemlib::getMCLSettings();
-    for (const auto& region : cfg.ignoredHitRegions) {
-        const int left = std::min(fieldPixelEdgeX(region.xMin), fieldPixelEdgeX(region.xMax));
-        const int right = std::max(fieldPixelEdgeX(region.xMin), fieldPixelEdgeX(region.xMax));
-        const int top = std::min(fieldPixelEdgeY(region.yMin), fieldPixelEdgeY(region.yMax));
-        const int bottom = std::max(fieldPixelEdgeY(region.yMin), fieldPixelEdgeY(region.yMax));
+    for (const auto& element : cfg.fieldElements) {
+        const int left = std::min(fieldPixelEdgeX(element.xMin), fieldPixelEdgeX(element.xMax));
+        const int right = std::max(fieldPixelEdgeX(element.xMin), fieldPixelEdgeX(element.xMax));
+        const int top = std::min(fieldPixelEdgeY(element.yMin), fieldPixelEdgeY(element.yMax));
+        const int bottom = std::max(fieldPixelEdgeY(element.yMin), fieldPixelEdgeY(element.yMax));
         const int width = std::max(1, right - left);
         const int height = std::max(1, bottom - top);
 
@@ -242,7 +242,7 @@ void Screen::createUI() {
 
     legendLabel = makeLabel(screen, panelWidth, lv_color_hex(0x94a3b8), &lv_font_montserrat_14);
     lv_obj_align(legendLabel, LV_ALIGN_BOTTOM_RIGHT, -FIELD_PADDING_PX, -FIELD_PADDING_PX);
-    lv_label_set_text_static(legendLabel, "Green: robot\nWhite: particles\nBlue: path\nRed: ignored hits");
+    lv_label_set_text_static(legendLabel, "Green: robot\nWhite: particles\nBlue: path\nRed: field elements");
 }
 
 void Screen::update() {
