@@ -12,13 +12,13 @@
         "UNICODE",
         "_UNICODE"
       ],
-      "compilerPath": "/home/festive/.config/Code - OSS/User/globalStorage/sigbots.pros/install/pros-toolchain-linux/bin/arm-none-eabi-g++",
+      "compilerPath": "C:\\Users\\alexr\\AppData\\Roaming\\Code\\User\\globalStorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\arm-none-eabi-g++",
       "cStandard": "gnu11",
       "cppStandard": "gnu++20",
       "intelliSenseMode": "gcc-arm",
       "browse": {
         "path": [
-          "/home/festive/GitHub/MCL"
+          "c:\\Users\\alexr\\Documents\\GitHub\\testtesttest"
         ],
         "limitSymbolsToIncludedHeaders": true,
         "databaseFilename": ""

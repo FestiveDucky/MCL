@@ -75,7 +75,7 @@ lemlib::MCLSettings makeMCLSettings() {
         // {port, x offset, y offset, angle (rad)}
     };
     cfg.ignoredHitRegions = {
-        // {-10, 10, -10, 10}, // middle goal
+        {-30, -6, -24, 12},
 
 
         // {xMin, xMax, yMin, yMax},
@@ -115,7 +115,7 @@ lemlib::MCLSettings makeMCLSettings() {
     cfg.useSensorConfidence = true; // Uses sensor confidence to blend likelihood strength.
     cfg.sensorConfMax = 63.0f;      // Confidence value mapped to full trust.
     cfg.useNoHitModel = true;       // Treats >zMax as explicit "no wall hit" evidence.
-    cfg.noHitPenalty = 0.035f;      // Penalty if particle expected a wall during no-hit.
+    cfg.noHitPenalty = 0.8f;      // Penalty if particle expected a wall during no-hit.
 
     cfg.fieldHalf = 70.75f;         // Half field size from center to wall (in).
     cfg.zMin = 0.1f;                // Minimum accepted distance measurement (in).

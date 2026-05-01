@@ -22,6 +22,7 @@ constexpr int PATH_LINE_WIDTH_PX = 2;
 constexpr int PATH_SAMPLE_INTERVAL_MS = 100;
 constexpr std::size_t PATH_MAX_POINTS = 1024;
 constexpr float PATH_MIN_DISTANCE_IN = 2.0f;
+constexpr float PATH_START_RESEED_DISTANCE_IN = 24.0f;
 constexpr float FALLBACK_FIELD_HALF_IN = 70.75f;
 
 template <std::size_t N>
@@ -341,7 +342,15 @@ void Screen::samplePath() {
     const PathSample& last = pathSamples.back();
     const float dx = static_cast<float>(pose.x) - last.x;
     const float dy = static_cast<float>(pose.y) - last.y;
-    if (std::hypot(dx, dy) < PATH_MIN_DISTANCE_IN) {
+    const float distance = std::hypot(dx, dy);
+    if (distance < PATH_MIN_DISTANCE_IN) {
+        stateMutex.give();
+        return;
+    }
+
+    // Treat a large first-point jump as the auton start pose being seeded after screen init.
+    if (pathSamples.size() == 1 && distance >= PATH_START_RESEED_DISTANCE_IN) {
+        pathSamples.back() = {static_cast<float>(pose.x), static_cast<float>(pose.y)};
         stateMutex.give();
         return;
     }

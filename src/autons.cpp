@@ -499,7 +499,7 @@ void test() {
     chassis.turnToPoint(0, 0, 800, {}, false);
     chassis.moveToPoint(0, 0, 1200, {}, false);
     chassis.turnToPoint(48, 48, 800, {}, false);
-    chassis.moveToPoint(48, 48, 1500, {}, false);
+    chassis.moveToPoint(48, 48, 2000, {}, false);
 
 }
 
