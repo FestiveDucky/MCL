@@ -74,8 +74,8 @@ lemlib::MCLSettings makeMCLSettings() {
         // {port, x offset, y offset, angle (rad)}
     };
     cfg.fieldElements = {
-        // {-30, -6, -24, 12, 0.2f},
-        // {-20, 20, -20, 20, 0.6},
+        {-8, 8, -32, -16, 0.4f},
+        {-15, 15, -15, 15, 0.05},
 
 
         // {xMin, xMax, yMin, yMax, reliability},
